@@ -1,26 +1,82 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   WEB-XR.STUDIO design tokens — light theme, ink-on-white to match the logo.
+   The brand mark is a stroked black "XR" on white; the palette stays minimal
+   and editorial with a single blue accent for calls to action.
+--------------------------------------------------------------------------- */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --surface: #f7f8fa;
+  --surface-2: #eef1f5;
+  --ink: #0d1017;
+  --ink-soft: #3a4152;
+  --muted: #5a6479;
+  --line: #e3e7ee;
+  --accent: #0a84ff;
+  --accent-ink: #0060df;
+  --radius: 16px;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --font-sans: var(--font-noto-sans-jp), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Helvetica, Arial, sans-serif;
+  --radius-brand: var(--radius);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.7;
+}
+
+/* The public site is intentionally light-only; do not invert in dark mode. */
+::selection {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Utility: the site content waits behind the intro overlay, then fades up. */
+.reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+[data-xr-intro="playing"] .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    transition: none;
+  }
+  [data-xr-intro="playing"] .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
