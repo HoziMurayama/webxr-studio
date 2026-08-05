@@ -24,6 +24,8 @@
      text must be solid `text-white`, never `text-white/85`. */
   --chrome: #0066ff;
   --chrome-line: #3d8bff;
+  /* Light sky blue — the hero wash's top stop. */
+  --sky: #d6ecfb;
   --radius: 16px;
 }
 
@@ -41,6 +43,7 @@
   --color-accent-hover: var(--accent-hover);
   --color-chrome: var(--chrome);
   --color-chrome-line: var(--chrome-line);
+  --color-sky: var(--sky);
   --font-sans: "游ゴシック体", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic Pro",
     "ヒラギノ角ゴ Pro W3", "ヒラギノ角ゴ Pro", "メイリオ", "Meiryo", Osaka,
     "ＭＳ Ｐゴシック", "Helvetica", "Verdana", sans-serif;
@@ -71,63 +74,23 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   Hero background. The illustration is decorative, so it is painted as a CSS
-   background instead of an <img>. Two layers in one declaration (first paints
-   on top): a left-to-right wash that keeps the copy legible, then the artwork
-   anchored right so its subject is never cropped by the copy's column.
+   Hero background — a light sky-blue wash, standing in until artwork is chosen.
+   A soft vertical gradient rather than a flat fill, so the hero settles into the
+   white page below it instead of ending on a hard band.
+
+   The illustration that used to live here is gone; add one back by restoring a
+   `background-image` on this rule (and an aspect ratio on the section, which now
+   uses a plain min-height).
 --------------------------------------------------------------------------- */
-/* `relative` + `isolate` already come from the section's utility classes; the
-   pseudo-elements below rely on that stacking context to sit behind the copy. */
-
-/* The artwork lives on a pseudo-element so it can carry its own opacity —
-   setting `opacity` on the section itself would fade the copy with it.
-   The PNG's white background has been stripped to real alpha, so the artwork
-   renders at full strength; `--hero-bg-opacity` still tunes it if needed. */
-.hero-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background-image: url("/hero-bg.png");
-  /* Full section width, height following the artwork's own ratio, so the entire
-     illustration is on screen the moment the page loads — nothing cropped on
-     any edge. The section carries the matching `aspect-[1376/768]`, so these
-     line up exactly; `top` keeps the artwork flush with the section's upper
-     edge (immediately below the fixed header) on the narrow screens where
-     `min-h` makes the section taller than the scaled artwork. */
-  background-size: 100% auto;
-  background-position: center top;
-  background-repeat: no-repeat;
-  opacity: var(--hero-bg-opacity, 1);
-}
-
-/* A light scrim behind the heading only. The artwork now spans the full width,
-   so this stays narrow and fades out well before the illustration's subjects. */
-.hero-bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
+.hero-bg {
+  /* Starts on `--sky`, the same tone the fixed header uses at rest, so the two
+     meet with no visible seam and fade to the page white together. */
   background-image: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--background) 85%, transparent) 0%,
-    color-mix(in srgb, var(--background) 40%, transparent) 18%,
-    transparent 32%
+    to bottom,
+    var(--sky) 0%,
+    color-mix(in srgb, var(--sky) 45%, var(--background)) 55%,
+    var(--background) 100%
   );
-}
-
-/* Narrow viewports have no empty column for the copy to sit in, so the wash
-   covers the full width and the artwork falls back to a faint texture. */
-@media (max-width: 640px) {
-  .hero-bg {
-    background-image:
-      linear-gradient(
-        to right,
-        var(--background) 0%,
-        color-mix(in srgb, var(--background) 88%, transparent) 100%
-      ),
-      url("/hero-bg.png");
-  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -163,7 +126,9 @@ body {
   }
 }
 
-/* Utility: the site content waits behind the intro overlay, then fades up. */
+/* Utility: content fades up into place. The intro overlay that used to gate
+   this is gone, so `.reveal` is now simply a transition hook — sections are
+   visible from first paint. */
 .reveal {
   opacity: 1;
   transform: none;
@@ -171,19 +136,11 @@ body {
     opacity 0.7s ease,
     transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
-[data-xr-intro="playing"] .reveal {
-  opacity: 0;
-  transform: translateY(18px);
-}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .reveal {
     transition: none;
-  }
-  [data-xr-intro="playing"] .reveal {
-    opacity: 1;
-    transform: none;
   }
 }

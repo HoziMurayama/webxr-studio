@@ -26,9 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // The intro engine (loaded client-side by <IntroOverlay> on the public
-    // site) mutates <html> via data-xr-intro; suppress the resulting attribute
-    // mismatch warning since that change is expected and intentional.
+    // `suppressHydrationWarning` guards against browser extensions that mutate
+    // <html> before React hydrates — a common source of spurious warnings.
     <html lang="ja" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">{children}</body>
     </html>

@@ -48,12 +48,11 @@ export function Header() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-40 border-b transition-colors duration-300",
-        // A frosted wash even at rest: the hero illustration runs dark on its
-        // right side, where the nav sits, and plain transparency leaves those
-        // items unreadable.
+        // Solid white in both states; only the border and blur change once the
+        // header is scrolled over page content rather than the hero.
         scrolled
           ? "border-line bg-card/90 backdrop-blur-md"
-          : "border-transparent bg-card/70 backdrop-blur-sm",
+          : "border-transparent bg-card",
       )}
     >
       <div

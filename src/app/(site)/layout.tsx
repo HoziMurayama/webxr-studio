@@ -1,7 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ChatWidget } from "@/components/ai/ChatWidget";
-import { IntroOverlay } from "@/components/brand/IntroOverlay";
 import { LiveContent } from "@/components/LiveContent";
 import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/content";
@@ -41,9 +40,6 @@ export default async function SiteLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Intro overlay — loaded and mounted client-side to avoid SSR/hydration
-          mismatches with the custom element. */}
-      <IntroOverlay />
       {/* Refreshes this route when an admin save is broadcast. Renders nothing. */}
       <LiveContent />
       <Header />
