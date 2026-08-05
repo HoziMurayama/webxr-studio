@@ -77,7 +77,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-surface">
       {/* Mobile top bar */}
-      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-white px-4 py-3 lg:hidden">
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-card px-4 py-3 lg:hidden">
         <Logo href="/admin" showName={false} />
         <button
           onClick={() => setOpen((v) => !v)}
@@ -92,7 +92,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="mx-auto flex max-w-7xl">
         {/* Desktop sidebar */}
-        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-line bg-white lg:block">
+        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-line bg-card lg:block">
           {sidebar}
         </aside>
 
@@ -103,7 +103,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="fixed inset-0 z-30 bg-black/30 lg:hidden"
               onClick={() => setOpen(false)}
             />
-            <aside className="fixed inset-y-0 left-0 z-40 w-64 border-r border-line bg-white lg:hidden">
+            <aside className="fixed inset-y-0 left-0 z-40 w-64 border-r border-line bg-card lg:hidden">
               {sidebar}
             </aside>
           </>

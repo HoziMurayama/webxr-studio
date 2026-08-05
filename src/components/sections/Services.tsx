@@ -9,6 +9,7 @@ export function Services({ services }: { services: Service[] }) {
   return (
     <Section
       id="services"
+      align="center"
       tone="muted"
       eyebrow="Services"
       title="サービス内容"

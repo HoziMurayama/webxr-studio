@@ -39,11 +39,14 @@ export function Contact({ contactEmail }: { contactEmail?: string }) {
   return (
     <Section
       id="contact"
+      align="center"
       eyebrow="Contact"
       title="お問い合わせ"
       description="ご相談・お見積もりは無料です。お気軽にご連絡ください。"
     >
-      <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
+      {/* Two columns: intro copy on the left, form on the right. Stacks to a
+          single column below `lg`, where the copy still reads before the form. */}
+      <div className="grid gap-10 text-left lg:grid-cols-[1fr_1.2fr] lg:items-start">
         <div className="space-y-6">
           <p className="text-base leading-relaxed text-ink-soft">
             プロジェクトのご相談、技術的なお悩み、既存システムの改善など、
@@ -54,7 +57,7 @@ export function Contact({ contactEmail }: { contactEmail?: string }) {
               <p className="text-sm text-muted">メール</p>
               <a
                 href={`mailto:${contactEmail}`}
-                className="text-base font-semibold text-ink hover:text-accent"
+                className="text-base font-semibold text-ink hover:text-accent-ink"
               >
                 {contactEmail}
               </a>
@@ -95,7 +98,12 @@ export function Contact({ contactEmail }: { contactEmail?: string }) {
             </p>
           )}
 
-          <Button type="submit" size="lg" disabled={status === "sending"} className="w-full sm:w-auto">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={status === "sending"}
+            className="w-full sm:w-auto sm:min-w-48"
+          >
             {status === "sending" ? "送信中..." : "送信する"}
           </Button>
         </form>

@@ -1,13 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
-
-const notoSansJp = Noto_Sans_JP({
-  variable: "--font-noto-sans-jp",
-  subsets: ["latin"],
-  weight: ["400", "500", "700", "900"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://web-xr.studio"),
@@ -37,11 +29,7 @@ export default function RootLayout({
     // The intro engine (loaded client-side by <IntroOverlay> on the public
     // site) mutates <html> via data-xr-intro; suppress the resulting attribute
     // mismatch warning since that change is expected and intentional.
-    <html
-      lang="ja"
-      className={`${notoSansJp.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="ja" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">{children}</body>
     </html>
   );

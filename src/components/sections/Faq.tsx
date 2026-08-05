@@ -7,12 +7,13 @@ export function Faq({ faqs }: { faqs: FaqItem[] }) {
   return (
     <Section
       id="faq"
+      align="center"
       tone="muted"
       eyebrow="FAQ"
       title="よくある質問"
       description="お問い合わせの前に、よくいただくご質問をまとめました。"
     >
-      <div className="mx-auto max-w-3xl divide-y divide-line rounded-2xl border border-line bg-white">
+      <div className="mx-auto max-w-3xl divide-y divide-line rounded-2xl border border-line bg-card">
         {faqs.map((f) => (
           <details key={f.id} className="group px-6 py-5 [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-semibold text-ink">

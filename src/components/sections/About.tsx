@@ -5,13 +5,13 @@ export function About({ company }: { company: Company | null }) {
   if (!company) return null;
 
   return (
-    <Section id="about" eyebrow="About Us" title="会社概要">
+    <Section id="about" align="center" eyebrow="About Us" title="私たちについて">
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-6 text-base leading-relaxed text-ink-soft">
           {company.about && <p>{company.about}</p>}
           {company.history && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent">
+              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent-ink">
                 沿革
               </h3>
               <p>{company.history}</p>
@@ -19,7 +19,7 @@ export function About({ company }: { company: Company | null }) {
           )}
           {company.mission && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent">
+              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent-ink">
                 ミッション
               </h3>
               <p>{company.mission}</p>

@@ -6,21 +6,17 @@ export function Hero({ company }: { company: Company | null }) {
   const stats = company?.stats ?? [];
 
   return (
-    <section className="reveal relative overflow-hidden px-5 pb-16 pt-16 sm:pb-24 sm:pt-24">
-      {/* Soft brand backdrop */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(10,132,255,0.08),transparent_70%)]"
-      />
+    // The illustration is a CSS background rather than an <img>: it is purely
+    // decorative, and `background-position: right center` keeps its subject
+    // (which sits on the right half) intact while the copy uses the open space
+    // on the left. `hero-bg` also paints the readability wash — see globals.css.
+    // `pt-24` clears the fixed header, which the hero now sits beneath.
+    <section className="hero-bg reveal relative isolate flex min-h-[36rem] items-center overflow-hidden px-5 pb-16 pt-40 sm:min-h-[40rem] sm:pb-24 sm:pt-44">
       <div className="mx-auto w-full max-w-6xl">
-        <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-medium text-ink-soft">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-          Web制作 / システム開発 / アプリ開発 / AIソリューション
-        </p>
-        <h1 className="max-w-4xl text-4xl font-black leading-[1.1] tracking-tight text-ink sm:text-6xl">
+        <h1 className="max-w-2xl text-4xl font-black leading-[1.1] tracking-tight text-ink sm:text-5xl lg:max-w-xl xl:max-w-2xl xl:text-6xl">
           {tagline}
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-soft lg:max-w-md xl:max-w-lg">
           私たちWEB-XR.STUDIOは、単なる制作会社ではなくお客様のITパートナーです。
           企画から開発、そして公開後の運用・改善まで一気通貫で伴走します。
         </p>
@@ -34,10 +30,12 @@ export function Hero({ company }: { company: Company | null }) {
         </div>
 
         {stats.length > 0 && (
-          <dl className="mt-16 grid grid-cols-2 gap-6 border-t border-line pt-10 sm:grid-cols-4">
+          // Sits over the busiest part of the artwork, so it carries its own
+          // translucent surface instead of relying on the section-wide wash.
+          <dl className="mt-16 grid max-w-3xl grid-cols-2 gap-6 rounded-2xl border border-line/70 bg-card/75 p-6 backdrop-blur-md sm:grid-cols-4 lg:max-w-2xl xl:max-w-3xl">
             {stats.map((s) => (
               <div key={s.label}>
-                <dt className="text-sm text-muted">{s.label}</dt>
+                <dt className="text-sm text-ink-soft">{s.label}</dt>
                 <dd className="mt-1 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
                   {s.value}
                 </dd>

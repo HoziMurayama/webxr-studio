@@ -28,7 +28,7 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-line bg-white px-4 py-12 text-center text-sm text-muted">
+      <div className="rounded-xl border border-dashed border-line bg-card px-4 py-12 text-center text-sm text-muted">
         まだお問い合わせはありません。
       </div>
     );
@@ -40,7 +40,7 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
         <li
           key={r.id}
           className={cn(
-            "rounded-xl border bg-white p-5",
+            "rounded-xl border bg-card p-5",
             r.handled ? "border-line opacity-70" : "border-accent/40",
           )}
         >

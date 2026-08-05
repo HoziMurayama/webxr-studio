@@ -10,16 +10,22 @@ export function Logo({
   className,
   href = "/",
   showName = true,
+  markClassName = "h-8 w-8",
+  nameClassName = "text-sm",
 }: {
   className?: string;
   href?: string | null;
   showName?: boolean;
+  /** Size utilities for the mark; callers animate this to resize the logo. */
+  markClassName?: string;
+  /** Size utilities for the wordmark, kept in step with `markClassName`. */
+  nameClassName?: string;
 }) {
   const mark = (
     <span className="inline-flex items-center gap-2.5">
       <svg
         viewBox="0 0 200 200"
-        className="h-8 w-8 shrink-0 text-ink"
+        className={cn("shrink-0 transition-[width,height] duration-300 ease-out", markClassName)}
         role="img"
         aria-label={showName ? undefined : "WEB-XR.STUDIO"}
         aria-hidden={showName ? true : undefined}
@@ -50,14 +56,23 @@ export function Logo({
         </text>
       </svg>
       {showName && (
-        <span className="text-sm font-semibold tracking-tight text-ink">
+        <span
+          className={cn(
+            "font-semibold tracking-tight transition-[font-size] duration-300 ease-out",
+            nameClassName,
+          )}
+        >
           WEB-XR.STUDIO
         </span>
       )}
     </span>
   );
 
-  const content = <span className={cn("inline-flex items-center", className)}>{mark}</span>;
+  // Both the mark and the wordmark inherit `currentColor`, so a caller on a
+  // dark background can recolor the whole logo with a single text utility.
+  const content = (
+    <span className={cn("inline-flex items-center text-ink", className)}>{mark}</span>
+  );
 
   if (href === null) return content;
   return (

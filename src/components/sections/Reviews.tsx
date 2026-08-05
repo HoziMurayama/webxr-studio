@@ -27,6 +27,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   return (
     <Section
       id="reviews"
+      align="center"
       tone="muted"
       eyebrow="Client Reviews"
       title="クライアントの声"

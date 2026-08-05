@@ -38,7 +38,7 @@ function LoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface px-5">
-      <div className="w-full max-w-sm rounded-2xl border border-line bg-white p-8 shadow-sm">
+      <div className="w-full max-w-sm rounded-2xl border border-line bg-card p-8 shadow-sm">
         <div className="mb-6 flex justify-center">
           <Logo href={null} />
         </div>

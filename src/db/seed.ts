@@ -187,7 +187,7 @@ async function seed() {
     id: 1,
     contactEmail: "contact@web-xr.studio",
     phone: "",
-    address: "神奈川県",
+    address: "",
     socials: [{ label: "Lancers", url: "https://www.lancers.jp/profile/WEB-XR_studio" }],
     seoTitle: "WEB-XR.STUDIO｜Web・アプリ・AI開発スタジオ",
     seoDescription:

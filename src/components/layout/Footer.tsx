@@ -2,13 +2,15 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import type { SiteSettings } from "@/db/schema";
 
+// Mirrors the header nav. The sitemap keeps a link to お客様の声, which the
+// header nav no longer lists, so the section stays reachable from the page.
 const NAV = [
-  { href: "#about", label: "会社概要" },
+  { href: "#about", label: "私たちについて" },
   { href: "#services", label: "サービス" },
-  { href: "#portfolio", label: "制作実績" },
+  { href: "#portfolio", label: "お客様事例" },
   { href: "#reviews", label: "お客様の声" },
   { href: "#team", label: "チーム" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#faq", label: "よくある質問" },
   { href: "#contact", label: "お問い合わせ" },
 ];
 
@@ -17,32 +19,40 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
   const socials = settings?.socials ?? [];
 
   return (
-    <footer className="border-t border-line bg-surface">
+    <footer className="border-t border-chrome-line bg-chrome">
       <div className="mx-auto w-full max-w-6xl px-5 py-16">
         <div className="flex flex-col gap-10 md:flex-row md:justify-between">
           <div className="max-w-sm">
-            <Logo href={null} />
-            <p className="mt-4 text-sm leading-relaxed text-muted">
+            <Logo href={null} className="text-white" />
+            <p className="mt-4 text-sm leading-relaxed text-white">
               Web制作・システム開発・アプリ開発・AIソリューションを一気通貫で。
               作って終わりではなく、育て続けるITパートナーです。
             </p>
             {settings?.contactEmail && (
               <a
                 href={`mailto:${settings.contactEmail}`}
-                className="mt-4 inline-block text-sm font-medium text-ink hover:text-accent"
+                className="mt-4 inline-block text-sm font-semibold text-white underline-offset-4 hover:underline"
               >
                 {settings.contactEmail}
+              </a>
+            )}
+            {settings?.phone && (
+              <a
+                href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}
+                className="mt-1 block text-sm font-semibold text-white underline-offset-4 hover:underline"
+              >
+                {settings.phone}
               </a>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-10 text-sm">
             <div>
-              <p className="mb-3 font-semibold text-ink">サイトマップ</p>
+              <p className="mb-3 font-semibold text-white">サイトマップ</p>
               <ul className="space-y-2">
                 {NAV.map((item) => (
                   <li key={item.href}>
-                    <a href={item.href} className="text-muted hover:text-ink">
+                    <a href={item.href} className="text-white hover:underline underline-offset-4">
                       {item.label}
                     </a>
                   </li>
@@ -50,7 +60,7 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
               </ul>
             </div>
             <div>
-              <p className="mb-3 font-semibold text-ink">リンク</p>
+              <p className="mb-3 font-semibold text-white">リンク</p>
               <ul className="space-y-2">
                 {socials.map((s) => (
                   <li key={s.url}>
@@ -58,14 +68,14 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
                       href={s.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted hover:text-ink"
+                      className="text-white hover:underline underline-offset-4"
                     >
                       {s.label}
                     </a>
                   </li>
                 ))}
                 <li>
-                  <Link href="/admin" className="text-muted hover:text-ink">
+                  <Link href="/admin" className="text-white hover:underline underline-offset-4">
                     管理画面
                   </Link>
                 </li>
@@ -74,7 +84,7 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-2 border-t border-chrome-line pt-6 text-xs text-white sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} WEB-XR.STUDIO. All rights reserved.</p>
           {settings?.address && <p>{settings.address}</p>}
         </div>

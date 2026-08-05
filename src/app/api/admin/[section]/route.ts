@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { asc, getTableColumns } from "drizzle-orm";
 import { db } from "@/db";
 import { getSection } from "@/lib/sections";
 import { reindexRow } from "@/lib/rag";
+import { publishContentChange } from "@/lib/realtime";
 
 export const runtime = "nodejs";
 
@@ -60,5 +62,9 @@ export async function POST(
   if (def.indexed && row?.id != null) {
     await reindexRow(def.slug, row.id);
   }
+
+  revalidatePath("/", "layout");
+  publishContentChange({ section: def.slug, action: "create", id: row?.id });
+
   return NextResponse.json({ row }, { status: 201 });
 }

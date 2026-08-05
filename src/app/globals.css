@@ -1,20 +1,29 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   WEB-XR.STUDIO design tokens — light theme, ink-on-white to match the logo.
-   The brand mark is a stroked black "XR" on white; the palette stays minimal
-   and editorial with a single blue accent for calls to action.
+   WEB-XR.STUDIO design tokens — white theme with a bright blue accent.
+   The page is ink-on-white to match the logo; the palette stays minimal and
+   editorial, and every call to action carries the bright blue.
+   --accent is the button fill; --accent-ink is the darker shade used whenever
+   the blue has to work as *text* (small labels, links) and needs AA contrast.
 --------------------------------------------------------------------------- */
 :root {
   --background: #ffffff;
   --surface: #f7f8fa;
   --surface-2: #eef1f5;
+  --card: #ffffff;
   --ink: #0d1017;
   --ink-soft: #3a4152;
   --muted: #5a6479;
   --line: #e3e7ee;
-  --accent: #0a84ff;
-  --accent-ink: #0060df;
+  --accent: #0066ff;
+  --accent-ink: #0052cc;
+  --accent-hover: #0052cc;
+  /* Footer chrome — the same bright blue as the buttons. Only pure white
+     clears AA on it (4.83:1); any translucent white drops below, so footer
+     text must be solid `text-white`, never `text-white/85`. */
+  --chrome: #0066ff;
+  --chrome-line: #3d8bff;
   --radius: 16px;
 }
 
@@ -22,14 +31,19 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-card: var(--card);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
-  --font-sans: var(--font-noto-sans-jp), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Helvetica, Arial, sans-serif;
+  --color-accent-hover: var(--accent-hover);
+  --color-chrome: var(--chrome);
+  --color-chrome-line: var(--chrome-line);
+  --font-sans: "游ゴシック体", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic Pro",
+    "ヒラギノ角ゴ Pro W3", "ヒラギノ角ゴ Pro", "メイリオ", "Meiryo", Osaka,
+    "ＭＳ Ｐゴシック", "Helvetica", "Verdana", sans-serif;
   --radius-brand: var(--radius);
 }
 
@@ -54,6 +68,46 @@ body {
 /* The public site is intentionally light-only; do not invert in dark mode. */
 ::selection {
   background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   Hero background. The illustration is decorative, so it is painted as a CSS
+   background instead of an <img>. Two layers in one declaration (first paints
+   on top): a left-to-right wash that keeps the copy legible, then the artwork
+   anchored right so its subject is never cropped by the copy's column.
+--------------------------------------------------------------------------- */
+.hero-bg {
+  background-image:
+    linear-gradient(
+      to right,
+      var(--background) 0%,
+      var(--background) 42%,
+      color-mix(in srgb, var(--background) 90%, transparent) 55%,
+      color-mix(in srgb, var(--background) 40%, transparent) 68%,
+      transparent 82%
+    ),
+    url("/hero-bg.png");
+  background-position:
+    center,
+    right center;
+  background-size:
+    cover,
+    cover;
+  background-repeat: no-repeat, no-repeat;
+}
+
+/* Narrow viewports have no empty column for the copy to sit in, so the wash
+   covers the full width and the artwork falls back to a faint texture. */
+@media (max-width: 640px) {
+  .hero-bg {
+    background-image:
+      linear-gradient(
+        to right,
+        var(--background) 0%,
+        color-mix(in srgb, var(--background) 88%, transparent) 100%
+      ),
+      url("/hero-bg.png");
+  }
 }
 
 /* Utility: the site content waits behind the intro overlay, then fades up. */

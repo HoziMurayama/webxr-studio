@@ -12,6 +12,7 @@ export function Team({ members }: { members: TeamMember[] }) {
   return (
     <Section
       id="team"
+      align="center"
       eyebrow="Team"
       title="チーム紹介"
       description="少数精鋭で、企画から運用までを担うメンバーです。"

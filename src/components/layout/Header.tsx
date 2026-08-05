@@ -1,18 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
-import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
+// Bilingual nav: an uppercase English label above its Japanese reading, the
+// convention used across Japanese corporate sites.
+//
+// COMPANY has no section of its own yet and shares #about with ABOUT US; give
+// it a dedicated section and this entry just needs a new href.
 const NAV = [
-  { href: "#about", label: "会社概要" },
-  { href: "#services", label: "サービス" },
-  { href: "#portfolio", label: "制作実績" },
-  { href: "#reviews", label: "お客様の声" },
-  { href: "#team", label: "チーム" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#about", en: "ABOUT US", label: "私たちについて" },
+  { href: "#about", en: "COMPANY", label: "会社案内" },
+  { href: "#services", en: "SERVICE", label: "サービス" },
+  { href: "#portfolio", en: "CASE STUDY", label: "お客様事例" },
+  { href: "#team", en: "TEAM", label: "チーム" },
+  { href: "#faq", en: "FAQ", label: "よくある質問" },
+  { href: "#contact", en: "INQUIRY", label: "お問い合わせ" },
 ];
 
 export function Header() {
@@ -20,7 +24,13 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    // Hysteresis: shrink past 80px, only expand again below 40px. A single
+    // threshold makes the header flip back and forth when the user hovers
+    // right at the boundary or uses momentum scrolling.
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled((prev) => (prev ? y > 40 : y > 80));
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -37,34 +47,62 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 border-b transition-colors",
-        scrolled ? "border-line bg-white/85 backdrop-blur-md" : "border-transparent bg-white/0",
+        "fixed inset-x-0 top-0 z-40 border-b transition-colors duration-300",
+        // A frosted wash even at rest: the hero illustration runs dark on its
+        // right side, where the nav sits, and plain transparency leaves those
+        // items unreadable.
+        scrolled
+          ? "border-line bg-card/90 backdrop-blur-md"
+          : "border-transparent bg-card/70 backdrop-blur-sm",
       )}
     >
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5">
-        <Logo />
+      <div
+        className={cn(
+          "flex w-full items-center justify-between px-6 lg:px-10",
+          "transition-[height] duration-300 ease-out",
+          scrolled ? "h-16" : "h-24",
+        )}
+      >
+        <Logo
+          markClassName={scrolled ? "h-8 w-8" : "h-12 w-12"}
+          nameClassName={scrolled ? "text-sm" : "text-lg"}
+        />
 
-        <nav className="hidden items-center gap-7 md:flex">
+        {/* Bilingual nav with hairline separators, as in the reference. */}
+        <nav className="hidden items-stretch lg:flex">
           {NAV.map((item) => (
             <a
-              key={item.href}
+              key={item.en}
               href={item.href}
-              className="text-sm text-muted transition-colors hover:text-ink"
+              className={cn(
+                "group relative flex flex-col items-center justify-center px-3 text-center xl:px-5",
+                "border-l border-line/70 last:border-r",
+                "transition-colors duration-200 hover:bg-ink/5",
+              )}
             >
-              {item.label}
+              <span
+                className={cn(
+                  "font-bold tracking-wide text-ink transition-all duration-300",
+                  scrolled ? "text-xs" : "text-sm",
+                )}
+              >
+                {item.en}
+              </span>
+              <span
+                className={cn(
+                  "mt-0.5 text-muted transition-all duration-300",
+                  scrolled ? "text-[10px]" : "text-xs",
+                )}
+              >
+                {item.label}
+              </span>
             </a>
           ))}
         </nav>
 
-        <div className="hidden md:block">
-          <ButtonLink href="#contact" size="sm">
-            お問い合わせ
-          </ButtonLink>
-        </div>
-
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink lg:hidden"
           aria-label={open ? "メニューを閉じる" : "メニューを開く"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -78,25 +116,19 @@ export function Header() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="border-t border-line bg-white md:hidden">
-          <nav className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-5 py-4">
+        <div className="border-t border-line bg-card lg:hidden">
+          <nav className="flex w-full flex-col px-6 py-2">
             {NAV.map((item) => (
               <a
-                key={item.href}
+                key={item.en}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-base text-ink-soft hover:bg-surface"
+                className="flex items-baseline gap-3 border-b border-line/70 py-3.5 last:border-b-0 hover:bg-surface"
               >
-                {item.label}
+                <span className="text-sm font-bold tracking-wide text-ink">{item.en}</span>
+                <span className="text-xs text-muted">{item.label}</span>
               </a>
             ))}
-            <Link
-              href="#contact"
-              onClick={() => setOpen(false)}
-              className="mt-2 rounded-full bg-ink px-3 py-3 text-center text-base font-semibold text-white"
-            >
-              お問い合わせ
-            </Link>
           </nav>
         </div>
       )}

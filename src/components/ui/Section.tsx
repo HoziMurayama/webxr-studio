@@ -10,6 +10,7 @@ export function Section({
   children,
   className,
   tone = "default",
+  align = "left",
 }: {
   id?: string;
   eyebrow?: string;
@@ -18,21 +19,27 @@ export function Section({
   children: ReactNode;
   className?: string;
   tone?: "default" | "muted";
+  /** Header alignment. "center" also centers the header block itself. */
+  align?: "left" | "center";
 }) {
+  const centered = align === "center";
   return (
     <section
       id={id}
       className={cn(
-        "scroll-mt-24 px-5 py-20 sm:py-28",
+        // scroll-mt clears the fixed header when an anchor link lands here.
+        "scroll-mt-20 px-5 py-20 sm:py-28",
         tone === "muted" && "bg-surface",
         className,
       )}
     >
       <div className="mx-auto w-full max-w-6xl">
         {(eyebrow || title || description) && (
-          <header className="mb-12 max-w-2xl">
+          <header
+            className={cn("mb-12 max-w-2xl", centered && "mx-auto text-center")}
+          >
             {eyebrow && (
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-ink">
                 {eyebrow}
               </p>
             )}

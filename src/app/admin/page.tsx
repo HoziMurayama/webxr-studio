@@ -51,7 +51,7 @@ export default async function AdminDashboard() {
           <Link
             key={t.href}
             href={t.href}
-            className="relative rounded-2xl border border-line bg-white p-5 transition-shadow hover:shadow-md"
+            className="relative rounded-2xl border border-line bg-card p-5 transition-shadow hover:shadow-md"
           >
             {!!t.badge && t.badge > 0 && (
               <span className="absolute right-4 top-4 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
@@ -64,7 +64,7 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      <div className="mt-8 rounded-2xl border border-line bg-white p-6">
+      <div className="mt-8 rounded-2xl border border-line bg-card p-6">
         <h2 className="text-base font-semibold text-ink">はじめに</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-muted">
           <li>左メニューから各セクションのコンテンツを追加・編集・削除できます。</li>

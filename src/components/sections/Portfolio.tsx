@@ -7,8 +7,9 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
   return (
     <Section
       id="portfolio"
-      eyebrow="Portfolio"
-      title="制作実績"
+      align="center"
+      eyebrow="Case Study"
+      title="お客様事例"
       description="これまでに手がけたプロジェクトの一部をご紹介します。"
     >
       <div className="grid gap-6 sm:grid-cols-2">
@@ -52,7 +53,7 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
           );
 
           const cls =
-            "group block overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-[0_10px_40px_rgb(13,16,23,0.08)]";
+            "group block overflow-hidden rounded-2xl border border-line bg-card transition-shadow hover:shadow-[0_10px_40px_rgb(13,16,23,0.08)]";
 
           return p.link ? (
             <a key={p.id} href={p.link} target="_blank" rel="noopener noreferrer" className={cls}>

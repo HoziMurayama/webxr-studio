@@ -63,14 +63,14 @@ export function SectionEditor({
       {!singleton && (
         <ul className="mb-6 space-y-2">
           {rows.length === 0 && (
-            <li className="rounded-xl border border-dashed border-line bg-white px-4 py-8 text-center text-sm text-muted">
+            <li className="rounded-xl border border-dashed border-line bg-card px-4 py-8 text-center text-sm text-muted">
               まだ項目がありません。「新規追加」から作成してください。
             </li>
           )}
           {rows.map((r) => (
             <li
               key={r.id}
-              className="flex items-center justify-between gap-4 rounded-xl border border-line bg-white px-4 py-3"
+              className="flex items-center justify-between gap-4 rounded-xl border border-line bg-card px-4 py-3"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-ink">{primaryLabel(r, fields)}</p>
@@ -160,7 +160,7 @@ function EditorForm({
   }
 
   return (
-    <div className={cn("rounded-2xl border border-line bg-white p-6", !singleton && "shadow-sm")}>
+    <div className={cn("rounded-2xl border border-line bg-card p-6", !singleton && "shadow-sm")}>
       {!singleton && (
         <h2 className="mb-4 text-base font-semibold text-ink">
           {values.id != null ? "項目を編集" : "新規項目"}

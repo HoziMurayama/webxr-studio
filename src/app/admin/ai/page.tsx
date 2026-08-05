@@ -19,7 +19,7 @@ export default async function AdminAiPage() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-line bg-white p-6">
+      <div className="rounded-2xl border border-line bg-card p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted">現在のインデックス</p>

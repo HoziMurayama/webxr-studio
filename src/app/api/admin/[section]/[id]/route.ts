@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { eq, getTableColumns } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import { getSection } from "@/lib/sections";
 import { reindexRow, reindexTable } from "@/lib/rag";
+import { publishContentChange } from "@/lib/realtime";
 
 export const runtime = "nodejs";
 
@@ -73,6 +75,11 @@ export async function PATCH(
   if (def.indexed && row?.id != null) {
     await reindexRow(def.slug, row.id);
   }
+
+  // Drop the cached render of the public site, then tell open pages to refetch.
+  revalidatePath("/", "layout");
+  publishContentChange({ section: def.slug, action: "update", id: row?.id });
+
   return NextResponse.json({ row });
 }
 
@@ -101,5 +108,9 @@ export async function DELETE(
   if (def.indexed) {
     await reindexTable(def.slug);
   }
+
+  revalidatePath("/", "layout");
+  publishContentChange({ section: def.slug, action: "delete", id: numId });
+
   return NextResponse.json({ ok: true });
 }
