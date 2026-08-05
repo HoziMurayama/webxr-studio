@@ -58,12 +58,15 @@ export function Header() {
     >
       <div
         className={cn(
-          "flex w-full items-center justify-between px-6 lg:px-10",
+          // `items-stretch` lets the nav tabs fill the full header height so
+          // their hover underline sits on the header's bottom edge.
+          "flex w-full items-stretch justify-between px-6 lg:px-10",
           "transition-[height] duration-300 ease-out",
           scrolled ? "h-16" : "h-24",
         )}
       >
         <Logo
+          className="self-center"
           markClassName={scrolled ? "h-8 w-8" : "h-12 w-12"}
           nameClassName={scrolled ? "text-sm" : "text-lg"}
         />
@@ -75,15 +78,14 @@ export function Header() {
               key={item.en}
               href={item.href}
               className={cn(
-                "group relative flex flex-col items-center justify-center px-3 text-center xl:px-5",
+                "group relative flex flex-col items-center justify-center self-stretch px-3 text-center xl:px-5",
                 "border-l border-line/70 last:border-r",
-                "transition-colors duration-200 hover:bg-ink/5",
               )}
             >
               <span
                 className={cn(
                   "font-bold tracking-wide text-ink transition-all duration-300",
-                  scrolled ? "text-xs" : "text-sm",
+                  scrolled ? "text-sm" : "text-base",
                 )}
               >
                 {item.en}
@@ -91,18 +93,29 @@ export function Header() {
               <span
                 className={cn(
                   "mt-0.5 text-muted transition-all duration-300",
-                  scrolled ? "text-[10px]" : "text-xs",
+                  scrolled ? "text-xs" : "text-sm",
                 )}
               >
                 {item.label}
               </span>
+              {/* Underline wipe: grows from the left on hover, then retracts to
+                  the right on leave. The origin flips with the hover state so
+                  each phase runs from the correct edge. Written as inline
+                  custom properties because Tailwind's `scale-x-0` and
+                  `group-hover:scale-x-100` utilities have equal specificity —
+                  whichever ships later in the sheet wins, and the hover variant
+                  loses. */}
+              <span
+                aria-hidden
+                className="nav-underline pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-accent"
+              />
             </a>
           ))}
         </nav>
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink lg:hidden"
+          className="inline-flex h-10 w-10 self-center items-center justify-center rounded-lg text-ink lg:hidden"
           aria-label={open ? "メニューを閉じる" : "メニューを開く"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}

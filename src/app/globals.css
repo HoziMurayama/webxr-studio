@@ -110,6 +110,39 @@ body {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Header nav underline. Wipes in from the left on hover and retracts to the
+   right on leave — the origin flips with the state so each phase travels the
+   correct way. Hand-written rather than composed from `scale-x-*` +
+   `group-hover:scale-x-*` utilities: those carry equal specificity, so the
+   base rule wins purely by source order and the hover state never applies.
+--------------------------------------------------------------------------- */
+/* Resting / leaving: anchored at the right edge, so shrinking to scaleX(0)
+   collapses the bar rightward — it vanishes to the right. The origin must flip
+   with no delay, otherwise the retract runs while the origin is still `left`
+   and the bar appears to vanish to the left instead. */
+.nav-underline {
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition:
+    transform 0.3s ease-out,
+    transform-origin 0s;
+}
+/* Entering: anchored left, so growing to scaleX(1) wipes in left-to-right. */
+.group:hover .nav-underline {
+  transform: scaleX(1);
+  transform-origin: left center;
+  transition:
+    transform 0.3s ease-out,
+    transform-origin 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-underline,
+  .group:hover .nav-underline {
+    transition: none;
+  }
+}
+
 /* Utility: the site content waits behind the intro overlay, then fades up. */
 .reveal {
   opacity: 1;
