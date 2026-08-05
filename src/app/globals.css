@@ -76,24 +76,44 @@ body {
    on top): a left-to-right wash that keeps the copy legible, then the artwork
    anchored right so its subject is never cropped by the copy's column.
 --------------------------------------------------------------------------- */
-.hero-bg {
-  background-image:
-    linear-gradient(
-      to right,
-      var(--background) 0%,
-      var(--background) 42%,
-      color-mix(in srgb, var(--background) 90%, transparent) 55%,
-      color-mix(in srgb, var(--background) 40%, transparent) 68%,
-      transparent 82%
-    ),
-    url("/hero-bg.png");
-  background-position:
-    center,
-    right center;
-  background-size:
-    cover,
-    cover;
-  background-repeat: no-repeat, no-repeat;
+/* `relative` + `isolate` already come from the section's utility classes; the
+   pseudo-elements below rely on that stacking context to sit behind the copy. */
+
+/* The artwork lives on a pseudo-element so it can carry its own opacity —
+   setting `opacity` on the section itself would fade the copy with it.
+   The PNG's white background has been stripped to real alpha, so the artwork
+   renders at full strength; `--hero-bg-opacity` still tunes it if needed. */
+.hero-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: url("/hero-bg.png");
+  /* Full section width, height following the artwork's own ratio, so the entire
+     illustration is on screen the moment the page loads — nothing cropped on
+     any edge. The section carries the matching `aspect-[1376/768]`, so these
+     line up exactly; `top` keeps the artwork flush with the section's upper
+     edge (immediately below the fixed header) on the narrow screens where
+     `min-h` makes the section taller than the scaled artwork. */
+  background-size: 100% auto;
+  background-position: center top;
+  background-repeat: no-repeat;
+  opacity: var(--hero-bg-opacity, 1);
+}
+
+/* A light scrim behind the heading only. The artwork now spans the full width,
+   so this stays narrow and fades out well before the illustration's subjects. */
+.hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--background) 85%, transparent) 0%,
+    color-mix(in srgb, var(--background) 40%, transparent) 18%,
+    transparent 32%
+  );
 }
 
 /* Narrow viewports have no empty column for the copy to sit in, so the wash
