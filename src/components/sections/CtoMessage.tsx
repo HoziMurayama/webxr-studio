@@ -35,7 +35,7 @@ export function CtoMessage() {
             scale the banner up and make the card taller, not shorter. */}
         <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] lg:gap-10">
           <Image
-            src="/cto-banner.jpg"
+            src="/cto-banner.png"
             alt="最高技術責任者 村山ほじ。お気軽にお問い合わせください。"
             width={1120}
             height={698}
@@ -57,8 +57,7 @@ export function CtoMessage() {
               お気軽にお問い合わせください
             </h2>
             <p className="mt-3 text-base leading-relaxed text-ink-soft sm:text-lg">
-              〜10年以上にわたり培ってきたWEB制作の経験をもとに、
-              高品質なプロジェクトを完成させます。〜
+            Web制作・システム開発・アプリ開発・AI開発まで幅広く対応。弊社の最高技術責任者（CTO）が直接ご相談を承り、お客様に最適な技術をご提案いたします。小規模なご相談から大規模開発まで、お気軽にお問い合わせください。
             </p>
 
             <div className="mt-4 border-t border-line pt-4">

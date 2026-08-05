@@ -53,7 +53,7 @@ export function Hero({ company }: { company: Company | null }) {
               at `xl`) so this paragraph never widens the auto-sized column and
               squeezes the map. */}
           <p className="mt-5 max-w-md text-lg leading-relaxed text-white sm:mt-6 sm:text-xl xl:max-w-xl xl:text-2xl">
-            株式会社WEB-XR.STUDIOは、お客様のビジネスを成功へと導くITパートナーです。豊富なWeb開発の経験を礎に、システム・アプリ・AIまで一気通貫でご支援します。
+          株式会社WEB-XR.STUDIOは、お客様のビジネス成長を加速させるITパートナーです。豊富なWeb開発実績を強みに、システム構築からアプリ開発、AI実装までワンストップで最適なソリューションをご提供いたします。
           </p>
         </div>
         {/*拠点マップ. Decorative — the locations are conveyed by the
