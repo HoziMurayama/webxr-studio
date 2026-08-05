@@ -1,4 +1,5 @@
 import { Hero } from "@/components/sections/Hero";
+import { CtoMessage } from "@/components/sections/CtoMessage";
 import { About } from "@/components/sections/About";
 import { Services } from "@/components/sections/Services";
 import { Portfolio } from "@/components/sections/Portfolio";
@@ -34,6 +35,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero company={company} />
+      <CtoMessage />
       <div className="reveal">
         <About company={company} />
         <Services services={services} />

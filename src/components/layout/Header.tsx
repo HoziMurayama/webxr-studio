@@ -22,6 +22,11 @@ const NAV = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // Whether the header is currently over the hero's blue field. Tracked
+  // separately from `scrolled` because the two switch at different points: the
+  // bar shrinks after 80px, but its colours must not invert until the blue
+  // actually ends — otherwise a white header sits on the blue for ~560px.
+  const [onHero, setOnHero] = useState(true);
 
   useEffect(() => {
     // Hysteresis: shrink past 80px, only expand again below 40px. A single
@@ -30,10 +35,20 @@ export function Header() {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled((prev) => (prev ? y > 40 : y > 80));
+
+      // Invert on the hero's real bottom edge, measured from the DOM so it
+      // stays correct however the hero is sized.
+      const hero = document.querySelector<HTMLElement>(".hero-bg");
+      const headerH = y > 80 ? 64 : 96; // h-16 / h-24
+      setOnHero(hero ? hero.getBoundingClientRect().bottom > headerH : false);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   // Lock body scroll while the mobile menu is open.
@@ -48,11 +63,12 @@ export function Header() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-40 border-b transition-colors duration-300",
-        // Solid white in both states; only the border and blur change once the
-        // header is scrolled over page content rather than the hero.
-        scrolled
-          ? "border-line bg-card/90 backdrop-blur-md"
-          : "border-transparent bg-card",
+        // Transparent over the blue hero so the field runs behind it, then
+        // solid white once scrolled onto the page's white content. Nav colours
+        // invert with it (see `onHero` below).
+        onHero
+          ? "border-white/20 bg-transparent"
+          : "border-line bg-card/95 backdrop-blur-md",
       )}
     >
       <div
@@ -65,7 +81,7 @@ export function Header() {
         )}
       >
         <Logo
-          className="self-center"
+          className={cn("self-center transition-colors duration-300", onHero ? "text-white" : "text-ink")}
           markClassName={scrolled ? "h-8 w-8" : "h-12 w-12"}
           nameClassName={scrolled ? "text-sm" : "text-lg"}
         />
@@ -78,12 +94,14 @@ export function Header() {
               href={item.href}
               className={cn(
                 "group relative flex flex-col items-center justify-center self-stretch px-3 text-center xl:px-5",
-                "border-l border-line/70 last:border-r",
+                "border-l last:border-r",
+                onHero ? "border-white/25" : "border-line/70",
               )}
             >
               <span
                 className={cn(
-                  "font-bold tracking-wide text-ink transition-all duration-300",
+                  "font-bold tracking-wide transition-all duration-300",
+                  onHero ? "text-white" : "text-ink",
                   scrolled ? "text-sm" : "text-base",
                 )}
               >
@@ -91,7 +109,8 @@ export function Header() {
               </span>
               <span
                 className={cn(
-                  "mt-0.5 text-muted transition-all duration-300",
+                  "mt-0.5 transition-all duration-300",
+                  onHero ? "text-white/90" : "text-muted",
                   scrolled ? "text-xs" : "text-sm",
                 )}
               >
@@ -106,7 +125,11 @@ export function Header() {
                   loses. */}
               <span
                 aria-hidden
-                className="nav-underline pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-accent"
+                className={cn(
+                  "nav-underline pointer-events-none absolute inset-x-0 bottom-0 h-0.5",
+                  // `bg-accent` is near-invisible on the blue field (1.13:1).
+                  onHero ? "bg-white" : "bg-accent",
+                )}
               />
             </a>
           ))}
@@ -114,7 +137,10 @@ export function Header() {
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 self-center items-center justify-center rounded-lg text-ink lg:hidden"
+          className={cn(
+            "inline-flex h-10 w-10 self-center items-center justify-center rounded-lg lg:hidden",
+            onHero ? "text-white" : "text-ink",
+          )}
           aria-label={open ? "メニューを閉じる" : "メニューを開く"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}

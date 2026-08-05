@@ -1,21 +1,26 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   WEB-XR.STUDIO design tokens — white theme with a bright blue accent.
-   The page is ink-on-white to match the logo; the palette stays minimal and
-   editorial, and every call to action carries the bright blue.
+   WEB-XR.STUDIO design tokens — a saturated corporate blue over white.
+   The hero is a deep blue field carrying white copy; the page below it returns
+   to white with ink text, so the blue reads as a banner rather than a theme.
+
+   Contrast rule for the blue field: only #1565d8 and darker clear AA for white
+   text (5.41:1). Anything lighter — #2f80e8 is 3.91 — fails, so the hero
+   gradient must not lighten past `--hero-to` where copy sits.
+
    --accent is the button fill; --accent-ink is the darker shade used whenever
    the blue has to work as *text* (small labels, links) and needs AA contrast.
 --------------------------------------------------------------------------- */
 :root {
   --background: #ffffff;
-  --surface: #f7f8fa;
-  --surface-2: #eef1f5;
+  --surface: #f4f8fd;
+  --surface-2: #e7eff9;
   --card: #ffffff;
   --ink: #0d1017;
   --ink-soft: #3a4152;
   --muted: #5a6479;
-  --line: #e3e7ee;
+  --line: #dce6f2;
   --accent: #0066ff;
   --accent-ink: #0052cc;
   --accent-hover: #0052cc;
@@ -24,8 +29,10 @@
      text must be solid `text-white`, never `text-white/85`. */
   --chrome: #0066ff;
   --chrome-line: #3d8bff;
-  /* Light sky blue — the hero wash's top stop. */
-  --sky: #d6ecfb;
+  /* Hero field: deep blue at the left where the copy sits, easing to a lighter
+     blue on the right behind the artwork. */
+  --hero-from: #0f56c4;
+  --hero-to: #1063c2;
   --radius: 16px;
 }
 
@@ -43,7 +50,8 @@
   --color-accent-hover: var(--accent-hover);
   --color-chrome: var(--chrome);
   --color-chrome-line: var(--chrome-line);
-  --color-sky: var(--sky);
+  --color-hero-from: var(--hero-from);
+  --color-hero-to: var(--hero-to);
   --font-sans: "游ゴシック体", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic Pro",
     "ヒラギノ角ゴ Pro W3", "ヒラギノ角ゴ Pro", "メイリオ", "Meiryo", Osaka,
     "ＭＳ Ｐゴシック", "Helvetica", "Verdana", sans-serif;
@@ -83,13 +91,14 @@ body {
    uses a plain min-height).
 --------------------------------------------------------------------------- */
 .hero-bg {
-  /* Starts on `--sky`, the same tone the fixed header uses at rest, so the two
-     meet with no visible seam and fade to the page white together. */
+  /* A saturated blue field, deepest at the left where the white copy sits and
+     easing lighter toward the artwork on the right. Both stops are dark enough
+     that white text clears AA anywhere on the band. */
   background-image: linear-gradient(
-    to bottom,
-    var(--sky) 0%,
-    color-mix(in srgb, var(--sky) 45%, var(--background)) 55%,
-    var(--background) 100%
+    115deg,
+    var(--hero-from) 0%,
+    var(--hero-from) 34%,
+    var(--hero-to) 100%
   );
 }
 
