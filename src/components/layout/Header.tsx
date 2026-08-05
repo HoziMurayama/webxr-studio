@@ -1,22 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
 // Bilingual nav: an uppercase English label above its Japanese reading, the
-// convention used across Japanese corporate sites.
-//
-// COMPANY has no section of its own yet and shares #about with ABOUT US; give
-// it a dedicated section and this entry just needs a new href.
+// convention used across Japanese corporate sites. Each tab is a standalone
+// route; the top page keeps the same content as a one-page summary.
 const NAV = [
-  { href: "#about", en: "ABOUT US", label: "私たちについて" },
-  { href: "#about", en: "COMPANY", label: "会社案内" },
-  { href: "#services", en: "SERVICE", label: "サービス" },
-  { href: "#portfolio", en: "CASE STUDY", label: "お客様事例" },
-  { href: "#team", en: "TEAM", label: "チーム" },
-  { href: "#faq", en: "FAQ", label: "よくある質問" },
-  { href: "#contact", en: "INQUIRY", label: "お問い合わせ" },
+  { href: "/about", en: "ABOUT US", label: "私たちについて" },
+  { href: "/company", en: "COMPANY", label: "会社案内" },
+  { href: "/service", en: "SERVICE", label: "サービス" },
+  { href: "/case-study", en: "CASE STUDY", label: "お客様事例" },
+  { href: "/team", en: "TEAM", label: "チーム" },
+  { href: "/faq", en: "FAQ", label: "よくある質問" },
+  { href: "/contact", en: "INQUIRY", label: "お問い合わせ" },
 ];
 
 export function Header() {
@@ -89,7 +88,7 @@ export function Header() {
         {/* Bilingual nav with hairline separators, as in the reference. */}
         <nav className="hidden items-stretch lg:flex">
           {NAV.map((item) => (
-            <a
+            <Link
               key={item.en}
               href={item.href}
               className={cn(
@@ -131,7 +130,7 @@ export function Header() {
                   onHero ? "bg-white" : "bg-accent",
                 )}
               />
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -157,7 +156,7 @@ export function Header() {
         <div className="border-t border-line bg-card lg:hidden">
           <nav className="flex w-full flex-col px-6 py-2">
             {NAV.map((item) => (
-              <a
+              <Link
                 key={item.en}
                 href={item.href}
                 onClick={() => setOpen(false)}
@@ -165,7 +164,7 @@ export function Header() {
               >
                 <span className="text-sm font-bold tracking-wide text-ink">{item.en}</span>
                 <span className="text-xs text-muted">{item.label}</span>
-              </a>
+              </Link>
             ))}
           </nav>
         </div>

@@ -2,16 +2,15 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import type { SiteSettings } from "@/db/schema";
 
-// Mirrors the header nav. The sitemap keeps a link to お客様の声, which the
-// header nav no longer lists, so the section stays reachable from the page.
+// Mirrors the header nav, plus 会社案内 which the sitemap also lists.
 const NAV = [
-  { href: "#about", label: "私たちについて" },
-  { href: "#services", label: "サービス" },
-  { href: "#portfolio", label: "お客様事例" },
-  { href: "#reviews", label: "お客様の声" },
-  { href: "#team", label: "チーム" },
-  { href: "#faq", label: "よくある質問" },
-  { href: "#contact", label: "お問い合わせ" },
+  { href: "/about", label: "私たちについて" },
+  { href: "/company", label: "会社案内" },
+  { href: "/service", label: "サービス" },
+  { href: "/case-study", label: "お客様事例" },
+  { href: "/team", label: "チーム" },
+  { href: "/faq", label: "よくある質問" },
+  { href: "/contact", label: "お問い合わせ" },
 ];
 
 export function Footer({ settings }: { settings: SiteSettings | null }) {
@@ -52,9 +51,9 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
               <ul className="space-y-2">
                 {NAV.map((item) => (
                   <li key={item.href}>
-                    <a href={item.href} className="text-white hover:underline underline-offset-4">
+                    <Link href={item.href} className="text-white hover:underline underline-offset-4">
                       {item.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

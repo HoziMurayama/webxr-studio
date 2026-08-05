@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 /**
  * CTO message card: banner image on the left, copy on the right, sitting in a
@@ -23,8 +24,8 @@ export function CtoMessage() {
 
           `max-w-7xl` (was 6xl) widens the card; the tighter padding and gap
           below take height out of it. */}
-      <a
-        href="#contact"
+      <Link
+        href="/contact"
         // The link wraps a heading and body copy; without an explicit name the
         // announced label would be the whole block read as one run-on string.
         aria-label="お気軽にお問い合わせください。お問い合わせフォームへ移動します。"
@@ -71,7 +72,7 @@ export function CtoMessage() {
             </div>
           </div>
         </div>
-      </a>
+      </Link>
     </section>
   );
 }
