@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "チーム",
-  description: "企画から運用までを担う、WEB-XR.STUDIOのメンバーをご紹介します。",
+  description: "企画から運用までを担う、WEB-XR.studioのメンバーをご紹介します。",
 };
 
 export default async function TeamPage() {

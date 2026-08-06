@@ -8,7 +8,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 const GREETING: Msg = {
   role: "assistant",
   content:
-    "こんにちは！WEB-XR.STUDIOのAIアシスタントです。サービス内容や制作実績、料金の目安など、お気軽にお尋ねください。",
+    "こんにちは！WEB-XR.studioのAIアシスタントです。サービス内容や制作実績、料金の目安など、お気軽にお尋ねください。",
 };
 
 export function ChatWidget() {

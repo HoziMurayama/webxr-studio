@@ -84,7 +84,7 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
         </div>
 
         <div className="mt-12 flex flex-col gap-2 border-t border-chrome-line pt-6 text-xs text-white sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} WEB-XR.STUDIO. All rights reserved.</p>
+          <p>© {year} WEB-XR.studio. All rights reserved.</p>
           {settings?.address && <p>{settings.address}</p>}
         </div>
       </div>

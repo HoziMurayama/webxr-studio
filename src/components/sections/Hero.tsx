@@ -38,7 +38,7 @@ export function Hero({ company }: { company: Company | null }) {
               tagline as text, not as prose interrupted by an image. */}
           <h1
             aria-label={tagline}
-            // `whitespace-nowrap` keeps "WEB-XR.STUDIO" on one line — the inline
+            // `whitespace-nowrap` keeps "WEB-XR.studio" on one line — the inline
             // mark is ~1.6x wider than the letters it replaces, so the name would
             // otherwise wrap after the mark in the narrower heading column.
             // `text-[7.5vw]` below `sm` keeps the un-wrappable name inside even a
@@ -53,14 +53,14 @@ export function Hero({ company }: { company: Company | null }) {
               at `xl`) so this paragraph never widens the auto-sized column and
               squeezes the map. */}
           <p className="mt-5 max-w-md text-lg leading-relaxed text-white sm:mt-6 sm:text-xl xl:max-w-xl xl:text-2xl">
-          株式会社WEB-XR.STUDIOは、お客様のビジネス成長を加速させるITパートナーです。豊富なWeb制作実績を強みに、システム構築からアプリ開発、AI実装までワンストップで最適なソリューションをご提供いたします。
+          株式会社WEB-XR.studioは、お客様のビジネス成長を加速させるITパートナーです。豊富なWeb制作実績を強みに、システム構築からアプリ開発、AI実装までワンストップで最適なソリューションをご提供いたします。
           </p>
         </div>
         {/*拠点マップ. Decorative — the locations are conveyed by the
             surrounding copy, so the alt text stays descriptive but brief. */}
         <Image
           src="/japan-map.png"
-          alt="日本地図。全国の拠点にWEB-XR.STUDIOのロゴを表示。"
+          alt="日本地図。全国の拠点にWEB-XR.studioのロゴを表示。"
           width={900}
           height={801}
           priority

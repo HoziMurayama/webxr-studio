@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * The WEB-XR.STUDIO mark: a bold "XR" wrapped by two rotation arrows
+ * The WEB-XR.studio mark: a bold "XR" wrapped by two rotation arrows
  * (top-right + bottom-left), drawn inline from the brand asset geometry so it
  * scales crisply and inherits the ink color. Optionally followed by the name.
  */
@@ -27,7 +27,7 @@ export function Logo({
         viewBox="0 0 200 200"
         className={cn("shrink-0 transition-[width,height] duration-300 ease-out", markClassName)}
         role="img"
-        aria-label={showName ? undefined : "WEB-XR.STUDIO"}
+        aria-label={showName ? undefined : "WEB-XR.studio"}
         aria-hidden={showName ? true : undefined}
       >
         {/* Top-right arrow */}
@@ -62,7 +62,7 @@ export function Logo({
             nameClassName,
           )}
         >
-          WEB-XR.STUDIO
+          WEB-XR.studio
         </span>
       )}
     </span>
@@ -76,7 +76,7 @@ export function Logo({
 
   if (href === null) return content;
   return (
-    <Link href={href} className="inline-flex items-center" aria-label="WEB-XR.STUDIO ホーム">
+    <Link href={href} className="inline-flex items-center" aria-label="WEB-XR.studio ホーム">
       {content}
     </Link>
   );

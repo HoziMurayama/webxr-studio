@@ -1,4 +1,4 @@
-# WEB-XR.STUDIO
+# WEB-XR.studio
 
 株式会社 WEB-XR.studio のコーポレートサイト。Web制作・システム開発・アプリ開発・AIソリューションを紹介する、日本語のライトテーマのサイトです。
 

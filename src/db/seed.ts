@@ -33,10 +33,10 @@ async function seed() {
 
   await db.insert(company).values({
     id: 1,
-    name: "WEB-XR.STUDIO",
+    name: "WEB-XR.studio",
     tagline: "Web・アプリ・AIで、事業の次の一手をつくる。",
     about:
-      "私たちWEB-XR.STUDIOは、単なる制作会社ではなく、お客様のITパートナーです。豊富なWeb制作の経験を礎に、システム・アプリ・AIまで一気通貫でご支援します。納品して終わりではなく、公開後の運用・改善まで伴走することを大切にしています。",
+      "私たちWEB-XR.studioは、単なる制作会社ではなく、お客様のITパートナーです。豊富なWeb制作の経験を礎に、システム・アプリ・AIまで一気通貫でご支援します。納品して終わりではなく、公開後の運用・改善まで伴走することを大切にしています。",
     mission:
       "テクノロジーの力で、お客様のビジネスに新しい可能性を届けること。作って終わりではなく、育て続けるパートナーであること。",
     history:
@@ -189,9 +189,9 @@ async function seed() {
     phone: "",
     address: "",
     socials: [{ label: "Lancers", url: "https://www.lancers.jp/profile/WEB-XR_studio" }],
-    seoTitle: "WEB-XR.STUDIO｜Web・アプリ・AI開発スタジオ",
+    seoTitle: "WEB-XR.studio｜Web・アプリ・AI開発スタジオ",
     seoDescription:
-      "WEB-XR.STUDIOは、Web制作・システム開発・アプリ開発・AIソリューションを一気通貫で提供する開発スタジオです。",
+      "WEB-XR.studioは、Web制作・システム開発・アプリ開発・AIソリューションを一気通貫で提供する開発スタジオです。",
   });
 
   console.log("✅ Content seeded. Building RAG index (first run downloads the embedding model)...");

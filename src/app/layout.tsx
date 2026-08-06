@@ -4,18 +4,18 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://web-xr.studio"),
   title: {
-    default: "WEB-XR.STUDIO｜Web・アプリ・AI開発スタジオ",
-    template: "%s｜WEB-XR.STUDIO",
+    default: "WEB-XR.studio｜Web・アプリ・AI開発スタジオ",
+    template: "%s｜WEB-XR.studio",
   },
   description:
-    "WEB-XR.STUDIOは、Web制作・システム開発・アプリ開発・AIソリューションを一気通貫で提供する開発スタジオです。作って終わりではなく、育て続けるITパートナー。",
+    "WEB-XR.studioは、Web制作・システム開発・アプリ開発・AIソリューションを一気通貫で提供する開発スタジオです。作って終わりではなく、育て続けるITパートナー。",
   openGraph: {
-    title: "WEB-XR.STUDIO｜Web・アプリ・AI開発スタジオ",
+    title: "WEB-XR.studio｜Web・アプリ・AI開発スタジオ",
     description:
       "Web制作・システム開発・アプリ開発・AIソリューションを一気通貫で提供する開発スタジオ。",
     type: "website",
     locale: "ja_JP",
-    siteName: "WEB-XR.STUDIO",
+    siteName: "WEB-XR.studio",
   },
   robots: { index: true, follow: true },
 };

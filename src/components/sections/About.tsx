@@ -412,7 +412,7 @@ export function About({
             として価値を提供しています。
           </p>
           <p>
-            Web制作からシステム・アプリ・AIまで、一つの窓口で一貫して対応できることがWEB-XR.STUDIOの強みです。
+            Web制作からシステム・アプリ・AIまで、一つの窓口で一貫して対応できることがWEB-XR.studioの強みです。
           </p>
         </div>
       </div>

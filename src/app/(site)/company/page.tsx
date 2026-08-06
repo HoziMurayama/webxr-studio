@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "会社案内",
-  description: "WEB-XR.STUDIOの会社概要。所在地、連絡先、沿革、企業理念をご案内します。",
+  description: "WEB-XR.studioの会社概要。所在地、連絡先、沿革、企業理念をご案内します。",
 };
 
 export default async function CompanyPage() {

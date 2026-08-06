@@ -18,7 +18,7 @@ import {
 /** Singleton row (id = 1): 会社概要 / About Us. */
 export const company = pgTable("company", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull().default("WEB-XR.STUDIO"),
+  name: text("name").notNull().default("WEB-XR.studio"),
   tagline: text("tagline").notNull().default(""),
   about: text("about").notNull().default(""),
   mission: text("mission").notNull().default(""),
@@ -106,7 +106,7 @@ export const siteSettings = pgTable("site_settings", {
   phone: text("phone").notNull().default(""),
   address: text("address").notNull().default(""),
   socials: jsonb("socials").$type<{ label: string; url: string }[]>().notNull().default([]),
-  seoTitle: text("seo_title").notNull().default("WEB-XR.STUDIO"),
+  seoTitle: text("seo_title").notNull().default("WEB-XR.studio"),
   seoDescription: text("seo_description").notNull().default(""),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
