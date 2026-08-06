@@ -257,35 +257,21 @@ export function About({
       title={showHeader ? "私たちについて" : undefined}
     >
       {/* 導入文と写真を左右に。写真は透過PNGの重ね組みなので、白背景の上で
-          そのまま成立する。狭い画面では写真が下に回る。 */}
-      <div className="grid items-center gap-10 text-left lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16">
-        <div className="space-y-5 text-base leading-relaxed text-ink-soft sm:text-lg">
+          そのまま成立する。狭い画面では写真が下に回る。
+
+          `lg:items-start` で上端を揃える。テキストは4行程度にしかならず写真の
+          高さ（約580px）には届かないため、上下中央にすると写真だけが上下には
+          み出して見える。 */}
+      <div className="grid items-center gap-10 text-left lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-start lg:gap-16">
+        {/* `lg:pt-25`（100px）で写真の上端より下から始める。狭い画面では
+            写真が下に回るため、オフセットは `lg` 以上でのみ適用する。 */}
+        <div className="space-y-6 text-lg leading-relaxed text-ink-soft sm:text-xl lg:pt-25 xl:text-2xl">
           <p>
             私たちは、Web・システム・アプリ・AIを専門とするエンジニア・デザイナーで構成された開発チームです。
           </p>
           <p>
             それぞれの専門領域を持つプロフェッショナルが連携し、企画から設計、開発、運用までワンストップで提供しています。
           </p>
-
-          {/* 提供価値を表す3アイコン。テキストは既存の文言から変えていない。 */}
-          <ul className="flex flex-wrap gap-6 pt-2">
-            {[
-              { src: "/about/icon-01.webp", alt: "" },
-              { src: "/about/icon-02.webp", alt: "" },
-              { src: "/about/icon-03.webp", alt: "" },
-            ].map((ic) => (
-              <li key={ic.src}>
-                <Image
-                  src={ic.src}
-                  alt={ic.alt}
-                  width={64}
-                  height={64}
-                  aria-hidden
-                  className="h-14 w-14 object-contain"
-                />
-              </li>
-            ))}
-          </ul>
         </div>
 
         <Image
@@ -409,11 +395,15 @@ export function About({
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 bg-card/90"
         />
-        <p className="text-sm font-bold tracking-wide text-accent-ink">最後に</p>
-        <h3 className="mt-2 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+        {/* 英語を小さなラベル、日本語を主見出しに。ナビや PageHero・チーム
+            カードと同じ「英語（小）→ 日本語（大）」の並びに揃えている。 */}
+        <p className="text-lg font-bold tracking-[0.08em] text-accent-ink sm:text-xl">
           One Team, Multiple Expertise
+        </p>
+        <h3 className="mt-3 text-[1.75rem] font-black leading-tight tracking-tight text-ink sm:text-4xl xl:text-5xl">
+          ひとつのチーム、多様な専門性
         </h3>
-        <div className="mx-auto mt-6 max-w-3xl space-y-4 text-base leading-relaxed text-ink-soft sm:text-lg">
+        <div className="mx-auto mt-6 max-w-3xl space-y-4 text-[1.25rem] leading-relaxed text-ink-soft sm:text-[1.375rem]">
           <p>
             私たちは4つの専門チームが連携することで、単なる制作会社ではなく、
             <strong className="font-bold text-ink">
