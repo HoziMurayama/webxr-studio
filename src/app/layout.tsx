@@ -29,7 +29,13 @@ export default function RootLayout({
     // `suppressHydrationWarning` guards against browser extensions that mutate
     // <html> before React hydrates — a common source of spurious warnings.
     <html lang="ja" className="h-full antialiased" suppressHydrationWarning>
-      <body className="min-h-full">{children}</body>
+      {/* Extensions (Grammarly and similar) stamp attributes such as
+          `bis_register` and `__processed_*` onto <body> before React hydrates,
+          which React reports as a mismatch. Suppressing here covers this
+          element's own attributes; it does not cascade to descendants. */}
+      <body className="min-h-full" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

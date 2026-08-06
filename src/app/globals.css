@@ -24,15 +24,16 @@
   --accent: #0066ff;
   --accent-ink: #0052cc;
   --accent-hover: #0052cc;
-  /* Footer chrome — the same bright blue as the buttons. Only pure white
-     clears AA on it (4.83:1); any translucent white drops below, so footer
-     text must be solid `text-white`, never `text-white/85`. */
-  --chrome: #0066ff;
-  --chrome-line: #3d8bff;
   /* Hero field: deep blue at the left where the copy sits, easing to a lighter
      blue on the right behind the artwork. */
   --hero-from: #0f56c4;
   --hero-to: #1063c2;
+  /* Footer chrome — the same blue as the hero, so the page opens and closes on
+     one colour. Declared after `--hero-from` for readability; only pure white
+     clears AA on it, so footer text must stay solid `text-white`, never
+     `text-white/85`. */
+  --chrome: var(--hero-from);
+  --chrome-line: #2a72d4;
   --radius: 16px;
 }
 
@@ -90,10 +91,9 @@ body {
    `background-image` on this rule (and an aspect ratio on the section, which now
    uses a plain min-height).
 --------------------------------------------------------------------------- */
+/* 全ページ共通の青の帯。ヘッダーはこのクラスの有無で白文字状態を切り替える
+   ため、トップ・下層を問わず必ず付与する。 */
 .hero-bg {
-  /* A saturated blue field, deepest at the left where the white copy sits and
-     easing lighter toward the artwork on the right. Both stops are dark enough
-     that white text clears AA anywhere on the band. */
   background-image: linear-gradient(
     115deg,
     var(--hero-from) 0%,

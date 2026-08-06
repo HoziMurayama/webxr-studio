@@ -19,6 +19,7 @@ export default async function ServicePage() {
         en="SERVICE"
         title="サービス"
         description="Web制作からシステム・アプリ・AIまで。一社で一気通貫にご支援します。"
+        image="/about/fv-service.webp"
       />
       <Services services={services} />
     </>

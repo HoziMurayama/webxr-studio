@@ -19,6 +19,7 @@ export default async function CaseStudyPage() {
         en="CASE STUDY"
         title="お客様事例"
         description="これまでに手がけたプロジェクトの一部と、お客様の声をご紹介します。"
+        image="/about/fv-case-study.webp"
       />
       <Portfolio items={portfolio} />
       <Reviews reviews={reviews} />

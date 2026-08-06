@@ -1,26 +1,28 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { About } from "@/components/sections/About";
-import { getCompany } from "@/lib/content";
 
+// The ABOUT US content is editorial copy held in the component, not DB-backed,
+// so this page needs no data fetch — but the shared layout still reads settings,
+// so `force-dynamic` stays.
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "私たちについて",
   description:
-    "WEB-XR.STUDIOの理念と歩み。Web制作・システム開発・アプリ開発・AIソリューションを一気通貫でご提供します。",
+    "Web・システム・アプリ・AIの4つの専門チームが連携し、企画から運用までワンストップでご提供します。",
 };
 
-export default async function AboutPage() {
-  const company = await getCompany();
+export default function AboutPage() {
   return (
     <>
       <PageHero
         en="ABOUT US"
         title="私たちについて"
-        description="お客様のITパートナーとして、企画から開発、運用・改善までご一緒します。"
+        description="Web・システム・アプリ・AIを専門とするエンジニア・デザイナーの開発チームです。"
+        image="/about/hero.webp"
       />
-      <About company={company} />
+      <About showHeader={false} />
     </>
   );
 }

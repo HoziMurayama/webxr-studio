@@ -18,6 +18,7 @@ export default async function ContactPage() {
         en="INQUIRY"
         title="お問い合わせ"
         description="ご相談・お見積もりは無料です。お気軽にご連絡ください。"
+        image="/about/fv-contact.webp"
       />
       <Contact contactEmail={settings?.contactEmail || undefined} />
     </>

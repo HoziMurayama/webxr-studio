@@ -18,6 +18,7 @@ export default async function TeamPage() {
         en="TEAM"
         title="チーム"
         description="少数精鋭で、企画から運用までを担うメンバーです。"
+        image="/about/fv-team.webp"
       />
       <Team members={team} />
     </>

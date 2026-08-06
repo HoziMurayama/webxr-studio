@@ -37,7 +37,7 @@ export default async function HomePage() {
       <Hero company={company} />
       <CtoMessage />
       <div className="reveal">
-        <About company={company} />
+        <About />
         <Services services={services} />
         <Portfolio items={portfolio} />
         <Reviews reviews={reviews} />

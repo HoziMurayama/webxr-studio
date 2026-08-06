@@ -18,6 +18,7 @@ export default async function FaqPage() {
         en="FAQ"
         title="よくある質問"
         description="お問い合わせの前に、よくいただくご質問をまとめました。"
+        image="/about/fv-faq.webp"
       />
       <Faq faqs={faqs} />
     </>

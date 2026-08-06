@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="800" height="380">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#0a3f92"/><stop offset="1" stop-color="#1f7ae0"/></linearGradient></defs>
+<rect width="800" height="380" fill="url(#g)"/>
+
+  <circle cx="180" cy="110" r="16" fill="#fff" opacity=".6"/><circle cx="180" cy="190" r="16" fill="#fff" opacity=".6"/><circle cx="180" cy="270" r="16" fill="#fff" opacity=".6"/>
+  <circle cx="330" cy="150" r="16" fill="#fff" opacity=".6"/><circle cx="330" cy="230" r="16" fill="#fff" opacity=".6"/>
+  <circle cx="480" cy="190" r="20" fill="#fff" opacity=".7"/>
+  <g stroke="#fff" stroke-width="3.5" opacity=".38">
+   <path d="M196 110 L314 150 M196 110 L314 230 M196 190 L314 150 M196 190 L314 230 M196 270 L314 150 M196 270 L314 230"/>
+   <path d="M346 150 L462 190 M346 230 L462 190"/>
+  </g>
+  <rect x="600" y="130" width="120" height="120" rx="14" fill="none" stroke="#fff" stroke-width="6" opacity=".45"/>
+  <text x="660" y="205" text-anchor="middle" font-family="Arial Black, Arial" font-size="46" font-weight="900" fill="#fff" opacity=".5">AI</text>
+ 
+</svg>

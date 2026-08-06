@@ -29,6 +29,7 @@ export default async function CompanyPage() {
         en="COMPANY"
         title="会社案内"
         description="会社概要と沿革、私たちが大切にしている考え方をご紹介します。"
+        image="/about/fv-company.webp"
       />
 
       <Section id="profile" align="center" eyebrow="Profile" title="会社概要">
