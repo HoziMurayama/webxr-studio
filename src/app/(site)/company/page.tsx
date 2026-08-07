@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section } from "@/components/ui/Section";
+import { CompanyHistory } from "@/components/sections/CompanyHistory";
 import { getCompany, getSiteSettings } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
@@ -155,13 +156,7 @@ export default async function CompanyPage() {
         )}
       </Section>
 
-      {company?.history && (
-        <Section id="history" tone="muted" align="center" eyebrow="History" title="沿革">
-          <p className="mx-auto max-w-3xl whitespace-pre-line text-base leading-relaxed text-ink-soft">
-            {company.history}
-          </p>
-        </Section>
-      )}
+      <CompanyHistory />
 
       {/* ビジョンとミッションを対で見せる。ミッションは DB（管理画面で編集可）、
           ビジョンは対応する項目がないためこのページの定数。 */}
