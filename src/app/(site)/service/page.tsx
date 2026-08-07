@@ -1,27 +1,27 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
-import { Services } from "@/components/sections/Services";
-import { getServices } from "@/lib/content";
+import { ServiceDetail } from "@/components/sections/ServiceDetail";
 
+// 本文はコンポーネント内の定数（DB 非依存）だが、共有レイアウトが設定を読むため
+// `force-dynamic` は残す。
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "サービス",
   description:
-    "Web制作からシステム開発・アプリ開発・AIソリューションまで、一社で一気通貫にご支援します。",
+    "Web制作・システム開発・アプリ開発・AI開発の4つの専門チームで、企画から運用まで一貫してご支援します。",
 };
 
-export default async function ServicePage() {
-  const services = await getServices();
+export default function ServicePage() {
   return (
     <>
       <PageHero
-        en="SERVICE"
-        title="サービス"
-        description="Web制作からシステム・アプリ・AIまで。一社で一気通貫にご支援します。"
+        en="OUR SERVICES"
+        title="4つの専門チームで、ビジネスの可能性をカタチに。"
+        description="Web・システム・アプリ・AIを組み合わせ、企画から設計、開発、運用まで一貫してサポートします。"
         image="/about/fv-service.webp"
       />
-      <Services services={services} />
+      <ServiceDetail />
     </>
   );
 }

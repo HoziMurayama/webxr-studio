@@ -1,0 +1,476 @@
+import { Section } from "@/components/ui/Section";
+
+/**
+ * OUR SERVICES — the four development domains in depth.
+ *
+ * Editorial copy rather than DB-driven, so it lives here as a typed constant;
+ * move it to a table if it ever needs to be admin-editable. The DB-backed
+ * `Services` section still drives the short summary on the top page.
+ */
+
+type Domain = {
+  en: string;
+  /** Short verb-phrase headline, e.g.「Webで「届ける」」. */
+  title: string;
+  lead: string;
+  /** Flat list of offerings. */
+  services: string[];
+  /** Industry-specific project examples. */
+  industries: { name: string; items: string[] }[];
+};
+
+const DOMAINS: Domain[] = [
+  {
+    en: "WEB DEVELOPMENT",
+    title: "Webで「届ける」",
+    lead: "企業やサービスの魅力を伝え、集客・販売・採用・顧客との接点を生み出すWebサービスを開発します。",
+    services: [
+      "コーポレートサイト",
+      "サービスサイト",
+      "採用サイト",
+      "ランディングページ（LP）",
+      "ECサイト",
+      "ポータルサイト",
+      "予約・問い合わせサイト",
+      "会員サイト・マイページ",
+      "WordPress・CMS構築",
+      "Shopify・EC-CUBE・WooCommerce",
+      "SEO・アクセス解析",
+      "Web広告・マーケティング",
+      "CRM・外部サービス連携",
+      "AIチャットボット導入",
+    ],
+    industries: [
+      {
+        name: "Healthcare & Medical",
+        items: [
+          "クリニック・医院サイト",
+          "医療サービスLP",
+          "診療・予約サイト",
+          "医療機関向けSEOサイト",
+        ],
+      },
+      {
+        name: "Architecture & Construction",
+        items: [
+          "建設会社・工務店サイト",
+          "施工事例サイト",
+          "住宅・建築商品LP",
+          "3D・VRビジュアライゼーション",
+        ],
+      },
+      {
+        name: "Real Estate",
+        items: [
+          "不動産会社サイト",
+          "物件検索ポータル",
+          "物件販売LP",
+          "内見予約サイト",
+        ],
+      },
+      {
+        name: "Education",
+        items: [
+          "学校・スクールサイト",
+          "オンライン講座サイト",
+          "LMS・会員サイト",
+          "教育サービスLP",
+        ],
+      },
+      {
+        name: "Recruitment & HR",
+        items: ["採用サイト", "求人サイト", "採用LP", "応募・エントリーサイト"],
+      },
+      {
+        name: "Retail & E-commerce",
+        items: [
+          "Shopify",
+          "EC-CUBE",
+          "WooCommerce",
+          "ブランドEC・キャンペーンサイト",
+        ],
+      },
+      {
+        name: "Hotels & Travel",
+        items: [
+          "ホテル公式サイト",
+          "宿泊予約サイト",
+          "観光情報サイト",
+          "多言語Webサイト",
+        ],
+      },
+    ],
+  },
+  {
+    en: "SYSTEM DEVELOPMENT",
+    title: "システムで「支える」",
+    lead: "企業の業務を効率化し、顧客・商品・データ・業務プロセスをつなぐ業務システムを開発します。",
+    services: [
+      "CRM・顧客管理システム",
+      "ERP・基幹システム",
+      "業務管理システム",
+      "予約・受付システム",
+      "会員管理システム",
+      "在庫・商品管理システム",
+      "生産管理システム",
+      "受発注管理システム",
+      "ワークフロー・申請システム",
+      "管理画面・ダッシュボード",
+      "API開発・外部サービス連携",
+      "データベース設計・開発",
+      "BI・データ分析",
+      "業務自動化",
+    ],
+    industries: [
+      {
+        name: "Healthcare & Medical",
+        items: ["患者・顧客管理", "予約管理", "医療機関向けCRM", "問い合わせ管理"],
+      },
+      {
+        name: "Architecture & Construction",
+        items: ["建築・施工管理", "顧客管理CRM", "見積・案件管理", "工程・進捗管理"],
+      },
+      {
+        name: "Real Estate",
+        items: ["物件管理システム", "顧客管理CRM", "内見予約管理", "契約・営業管理"],
+      },
+      {
+        name: "Education",
+        items: ["LMS", "生徒・受講者管理", "講座・教材管理", "出席・成績管理"],
+      },
+      {
+        name: "Recruitment & HR",
+        items: ["ATS・採用管理", "求職者管理", "求人管理", "AIマッチングシステム"],
+      },
+      {
+        name: "Manufacturing",
+        items: ["ERP", "生産管理", "在庫管理", "品質管理", "BIダッシュボード"],
+      },
+      {
+        name: "Logistics & Transportation",
+        items: ["配送管理", "車両・フリート管理", "荷物追跡", "物流ダッシュボード"],
+      },
+    ],
+  },
+  {
+    en: "APP DEVELOPMENT",
+    title: "アプリで「つなぐ」",
+    lead: "ユーザーとサービス、企業と顧客、現場と管理者をつなぐスマートフォン・モバイルアプリを開発します。",
+    services: [
+      "iOSアプリ",
+      "Androidアプリ",
+      "クロスプラットフォームアプリ",
+      "業務用モバイルアプリ",
+      "会員アプリ",
+      "EC・ショッピングアプリ",
+      "予約・Bookingアプリ",
+      "マッチングアプリ",
+      "SNS・コミュニティアプリ",
+      "GPS・位置情報アプリ",
+      "Push通知",
+      "決済・会員システム連携",
+      "Web・API・CRM連携",
+    ],
+    industries: [
+      {
+        name: "Healthcare & Medical",
+        items: [
+          "健康管理アプリ",
+          "予約アプリ",
+          "患者向けアプリ",
+          "医療スタッフ向け業務アプリ",
+        ],
+      },
+      {
+        name: "Real Estate",
+        items: [
+          "物件検索アプリ",
+          "内見予約アプリ",
+          "入居者向けアプリ",
+          "不動産営業支援アプリ",
+        ],
+      },
+      {
+        name: "Education",
+        items: [
+          "学習アプリ",
+          "オンライン授業アプリ",
+          "学生・講師向けアプリ",
+          "AI学習アプリ",
+        ],
+      },
+      {
+        name: "Recruitment & HR",
+        items: [
+          "求人検索アプリ",
+          "求職者向けアプリ",
+          "採用管理アプリ",
+          "AI求人マッチングアプリ",
+        ],
+      },
+      {
+        name: "Retail & E-commerce",
+        items: [
+          "ECアプリ",
+          "会員・ポイントアプリ",
+          "ショッピングアプリ",
+          "店舗連携アプリ",
+        ],
+      },
+      {
+        name: "Fitness & Sports",
+        items: [
+          "フィットネスアプリ",
+          "トレーニング管理アプリ",
+          "会員アプリ",
+          "スポーツチーム管理アプリ",
+        ],
+      },
+      {
+        name: "Hotels & Travel",
+        items: [
+          "ホテル予約アプリ",
+          "旅行予約アプリ",
+          "観光ガイドアプリ",
+          "デジタルチェックインアプリ",
+        ],
+      },
+      {
+        name: "Logistics & Transportation",
+        items: [
+          "配送管理アプリ",
+          "ドライバーアプリ",
+          "荷物追跡アプリ",
+          "車両管理アプリ",
+        ],
+      },
+    ],
+  },
+  {
+    en: "AI DEVELOPMENT",
+    title: "AIで「進化させる」",
+    lead: "生成AI・機械学習・データ分析・AI自動化を既存のWeb・システム・アプリに組み込み、企業の業務とサービスをさらに進化させます。",
+    services: [
+      "AIチャットボット",
+      "AIアシスタント",
+      "AIエージェント",
+      "生成AIシステム",
+      "RAG・社内ナレッジ検索",
+      "AIレコメンド",
+      "AIマッチング",
+      "AI画像認識・画像解析",
+      "OCR・文書解析",
+      "AIデータ分析",
+      "需要予測・予測分析",
+      "AI業務自動化",
+      "AI × CRM / ERP",
+      "AI × Web / App",
+    ],
+    industries: [
+      {
+        name: "Healthcare & Medical",
+        items: [
+          "AI問い合わせ対応",
+          "医療・健康相談AI",
+          "医療文書の要約",
+          "FAQ・ナレッジ検索AI",
+        ],
+      },
+      {
+        name: "Real Estate",
+        items: [
+          "AI物件検索",
+          "物件レコメンド",
+          "AI顧客マッチング",
+          "物件情報自動生成",
+        ],
+      },
+      {
+        name: "Education",
+        items: ["AIチューター", "AI講師", "教材生成AI", "個別最適化学習"],
+      },
+      {
+        name: "Recruitment & HR",
+        items: [
+          "AI求人マッチング",
+          "履歴書・職務経歴書解析",
+          "AI採用アシスタント",
+          "求人文章生成AI",
+        ],
+      },
+      {
+        name: "Retail & E-commerce",
+        items: [
+          "AI商品レコメンド",
+          "AI接客チャット",
+          "商品説明自動生成",
+          "需要予測・購買分析",
+        ],
+      },
+      {
+        name: "Manufacturing",
+        items: ["AI品質検査", "画像認識", "設備異常検知", "生産・需要予測"],
+      },
+      {
+        name: "Logistics & Transportation",
+        items: [
+          "配送ルート最適化",
+          "需要予測",
+          "物流データ分析",
+          "AI業務自動化",
+        ],
+      },
+    ],
+  },
+];
+
+/** The four domains summarised for the closing one-stop block. */
+const ONE_STOP = [
+  { en: "Web", role: "集客・情報発信・顧客接点" },
+  { en: "System", role: "業務管理・データ・業務効率化" },
+  { en: "App", role: "顧客・社員・現場との接点" },
+  { en: "AI", role: "自動化・分析・予測・新しい価値" },
+];
+
+/** Checkmark used before every list item. */
+function Tick() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden
+      className="mt-[0.15em] h-4 w-4 shrink-0 text-accent"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 10.5l4 4 8-9" />
+    </svg>
+  );
+}
+
+export function ServiceDetail({
+  /** /service では PageHero が同じ見出しを出すため抑制する。 */
+  showHeader = false,
+}: {
+  showHeader?: boolean;
+} = {}) {
+  return (
+    <>
+      <Section
+        id="services"
+        align="center"
+        eyebrow={showHeader ? "OUR SERVICES" : undefined}
+        title={
+          showHeader ? "4つの専門チームで、ビジネスの可能性をカタチに。" : undefined
+        }
+      >
+        <div className="mx-auto max-w-3xl space-y-5 text-left text-base leading-relaxed text-ink-soft sm:text-lg">
+          <p>
+            株式会社WEB-XR.studioは、Web制作・システム開発・アプリ開発・AI開発の4つの専門チームを擁しています。
+          </p>
+          <p>
+            Webサイトの制作から業務システム、スマートフォンアプリ、AIを活用した業務効率化まで、企業の課題や事業フェーズに合わせて最適なテクノロジーを組み合わせ、企画・設計・開発・運用まで一貫してサポートします。
+          </p>
+        </div>
+
+        <div className="mt-16 space-y-16 text-left">
+          {DOMAINS.map((d) => (
+            <article key={d.en} className="border border-line bg-card">
+              {/* 見出し帯。フッターと同じ青を敷き、文字は白に反転。 */}
+              <header className="bg-chrome p-6 sm:p-8">
+                <p className="text-sm font-bold tracking-[0.18em] text-white/90">
+                  {d.en}
+                </p>
+                <h3 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  {d.title}
+                </h3>
+                <p className="mt-4 max-w-3xl text-base leading-relaxed text-white sm:text-lg">
+                  {d.lead}
+                </p>
+              </header>
+
+              <div className="space-y-10 p-6 sm:p-8">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
+                    対応サービス
+                  </h4>
+                  <ul className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {d.services.map((s) => (
+                      <li
+                        key={s}
+                        className="flex items-start gap-2 text-sm leading-relaxed text-ink-soft"
+                      >
+                        <Tick />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
+                    対応プロジェクト
+                  </h4>
+                  <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {d.industries.map((ind) => (
+                      <div key={ind.name} className="border border-line bg-surface p-5">
+                        <p className="text-sm font-bold tracking-tight text-accent-ink">
+                          {ind.name}
+                        </p>
+                        <ul className="mt-3 space-y-1.5">
+                          {ind.items.map((it) => (
+                            <li
+                              key={it}
+                              className="flex items-start gap-2 text-sm leading-relaxed text-ink-soft"
+                            >
+                              <Tick />
+                              {it}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </Section>
+
+      <Section
+        id="one-stop"
+        tone="muted"
+        align="center"
+        eyebrow="ONE-STOP DEVELOPMENT"
+        title="Web × System × App × AI"
+      >
+        <div className="mx-auto max-w-3xl space-y-5 text-left text-base leading-relaxed text-ink-soft sm:text-lg">
+          <p>私たちは、4つのサービスを個別に提供するだけではありません。</p>
+          <p>
+            Webサイトを入口として、業務システム、スマートフォンアプリ、AIまでを一つのプロジェクトとして設計・開発できます。
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-4 text-left sm:grid-cols-2 lg:grid-cols-4">
+          {ONE_STOP.map((o) => (
+            <div key={o.en} className="border border-line bg-card p-6">
+              <p className="text-xl font-black tracking-tight text-accent-ink">
+                {o.en}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                → {o.role}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mx-auto mt-12 max-w-3xl text-left text-base leading-relaxed text-ink-soft sm:text-lg">
+          企業の「やりたいこと」を起点に、必要な技術を組み合わせ、最適なデジタルソリューションを提供します。
+        </p>
+      </Section>
+    </>
+  );
+}
