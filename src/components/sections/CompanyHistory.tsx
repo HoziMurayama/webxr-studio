@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 
 /**
@@ -17,11 +18,14 @@ type Era = {
   items?: string[];
   /** Optional label above the chip list. */
   itemsLabel?: string;
+  /** Banner image for the era. */
+  image: string;
 };
 
 const ERAS: Era[] = [
   {
     period: "2004 — 2013",
+    image: "/history/2004-2013.webp",
     title: "ゲーム・コンテンツ開発から始まった経験",
     body: [
       "CEOは2004年から2013年までゲーム会社に在籍し、プロデューサー・ディレクターとしてゲームシナリオやイベント制作など、コンテンツ開発の企画・ディレクションに携わりました。",
@@ -31,44 +35,55 @@ const ERAS: Era[] = [
   },
   {
     period: "2016",
+    image: "/history/2016.webp",
     title: "フリーランスとしてWeb・XR開発へ",
     body: [
       "2016年からはフリーランスとして活動を開始。",
       "ゲーム業界で培ったデザインやコンテンツ制作の経験をWeb領域へ展開し、Webサイト制作をはじめ、Three.jsなどの技術を活用した3D・XRコンテンツの開発にも取り組み始めました。",
       "「Webで何ができるのか」という可能性を追求しながら、デザインとテクノロジーを組み合わせた開発を進めました。",
     ],
+    itemsLabel: "この時期の対応領域",
+    items: ["Web制作", "3D・XRコンテンツ開発"],
   },
   {
     period: "2018",
+    image: "/history/2018.webp",
     title: "Web・システム開発チームの形成",
     body: [
       "2018年、現在のCTOが開発に加わり、ReactやNode.jsなどのモダンな技術を活用したシステム開発を本格的に開始しました。",
       "当時はまだ会社という形ではなく、CEOとCTOを中心とした小規模な開発チームとして活動。",
       "Web制作だけでなく、業務システムやWebアプリケーションなど、企業の業務やサービスを支えるシステム開発へと領域を広げていきました。",
     ],
+    itemsLabel: "この時期の対応領域",
+    items: ["Web制作", "システム開発"],
   },
   {
     period: "2020",
+    image: "/history/2020.webp",
     title: "WEB-XR.studioの設立",
     body: [
       "2020年、スマートフォンを中心としたモバイル技術の進化を背景に、モバイルアプリ開発にも本格的に取り組み始めました。",
       "Web制作、システム開発に加えてアプリ開発まで対応領域が広がり、開発チームもさらに拡大。",
       "このタイミングで正式に会社を設立し、現在のWEB-XR.studioにつながる本格的な組織づくりが始まりました。",
     ],
-    itemsLabel: "会社設立当初からの主要な開発領域",
+    itemsLabel: "この時期の対応領域",
     items: ["Web制作", "システム開発", "アプリ開発"],
   },
   {
     period: "2023",
+    image: "/history/2023.webp",
     title: "AI開発への挑戦",
     body: [
       "2023年、ChatGPTやClaudeをはじめとする生成AIが急速に進化。",
       "私たちはAIが単なる新しい技術ではなく、これからの企業活動やソフトウェア開発そのものを大きく変える存在になると考え、AI技術の研究・開発を本格的に開始しました。",
       "既存のWeb・システム・アプリ開発の知見とAI技術を組み合わせ、AIを活用したシステム、業務効率化、サービス開発など、新しい領域への挑戦を進めています。",
     ],
+    itemsLabel: "この時期の対応領域",
+    items: ["Web制作", "システム開発", "アプリ開発", "AI開発"],
   },
   {
     period: "2026",
+    image: "/history/2026.webp",
     title: "4つの専門領域へ",
     body: [
       "現在のWEB-XR.studioは、Web制作 × システム開発 × アプリ開発 × AI開発の4つの開発領域を持つ組織へと成長しました。",
@@ -125,6 +140,17 @@ export function CompanyHistory() {
             </p>
 
             <div>
+              {/* 各年のバナー。装飾なので alt は空にし、見出しと本文が内容を
+                  伝える。年表の最初の1枚以外は遅延読み込みにする。 */}
+              <Image
+                src={era.image}
+                alt=""
+                aria-hidden
+                width={1280}
+                height={853}
+                sizes="(min-width: 1024px) 46rem, 100vw"
+                className="mb-6 h-auto w-full border border-line"
+              />
               <h3 className="text-xl font-bold tracking-tight text-ink sm:text-2xl">
                 {era.title}
               </h3>
