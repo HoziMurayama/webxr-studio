@@ -128,29 +128,31 @@ export function CompanyHistory() {
         </p>
       </div>
 
-      {/* 年表。左に年、右に本文。狭い画面では年が上に回る。 */}
-      <ol className="mx-auto mt-16 max-w-4xl space-y-10 text-left">
+      {/* 年表。左にバナー＋年、右に解説。狭い画面では縦積みになる。 */}
+      <ol className="mx-auto mt-16 max-w-5xl space-y-14 text-left">
         {ERAS.map((era) => (
           <li
             key={era.period}
-            className="grid gap-4 border-t border-line pt-8 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-10"
+            className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-10"
           >
-            <p className="text-lg font-black tracking-tight text-accent-ink sm:text-xl">
-              {era.period}
-            </p>
-
-            <div>
-              {/* 各年のバナー。装飾なので alt は空にし、見出しと本文が内容を
-                  伝える。年表の最初の1枚以外は遅延読み込みにする。 */}
+            {/* バナーと年。年は画像の下端をまたぐ位置に置き、高さの半分が
+                画像に重なる。`-mt-[1em]` が文字高の半分ぶんの引き上げ。 */}
+            <div className="relative">
               <Image
                 src={era.image}
                 alt=""
                 aria-hidden
                 width={1280}
                 height={853}
-                sizes="(min-width: 1024px) 46rem, 100vw"
-                className="mb-6 h-auto w-full border border-line"
+                sizes="(min-width: 1024px) 28rem, 100vw"
+                className="h-auto w-full border border-line"
               />
+              <p className="relative z-10 -mt-[0.5em] pl-4 text-4xl font-black leading-none tracking-tight text-accent-ink drop-shadow-[0_2px_8px_rgb(255,255,255,0.9)] sm:text-5xl">
+                {era.period}
+              </p>
+            </div>
+
+            <div className="lg:pt-2">
               <h3 className="text-xl font-bold tracking-tight text-ink sm:text-2xl">
                 {era.title}
               </h3>
