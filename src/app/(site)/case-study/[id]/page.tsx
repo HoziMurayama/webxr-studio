@@ -78,16 +78,34 @@ export default async function CaseStudyDetailPage({
                   className="h-[22rem] w-full bg-surface-2 object-contain sm:h-[28rem]"
                 />
               )}
-              {clientLabel(item) && (
+              {(clientLabel(item) || item.review) && (
                 <div className="border-t border-line p-6 sm:p-8">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
-                    お客様
-                  </p>
-                  <p className="mt-2 text-lg font-bold tracking-tight text-ink sm:text-xl">
-                    {clientLabel(item)}
-                  </p>
-                  {item.industry && (
-                    <p className="mt-1 text-sm text-muted">{item.industry}</p>
+                  {clientLabel(item) && (
+                    <>
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
+                        お客様
+                      </p>
+                      <p className="mt-2 text-lg font-bold tracking-tight text-ink sm:text-xl">
+                        {clientLabel(item)}
+                      </p>
+                      {item.industry && (
+                        <p className="mt-1 text-sm text-muted">{item.industry}</p>
+                      )}
+                    </>
+                  )}
+
+                  {/* お客様の声はお名前のすぐ下に。誰の言葉かが分かるようにする。 */}
+                  {item.review && (
+                    <div
+                      className={clientLabel(item) ? "mt-6 border-t border-line pt-6" : ""}
+                    >
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
+                        お客様の声
+                      </p>
+                      <p className="mt-3 whitespace-pre-line text-base leading-relaxed text-ink-soft sm:text-lg">
+                        「{item.review}」
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
@@ -127,17 +145,6 @@ export default async function CaseStudyDetailPage({
             </div>
           )}
 
-          {item.review && (
-            <div className="border-l-2 border-accent bg-surface p-6 sm:p-8">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
-                お客様の声
-              </p>
-              <p className="mt-3 whitespace-pre-line text-base leading-relaxed text-ink-soft sm:text-lg">
-                「{item.review}」
-              </p>
-            </div>
-          )}
-
           {(item.tags ?? []).length > 0 && (
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
@@ -147,30 +154,6 @@ export default async function CaseStudyDetailPage({
                 <Stack tags={item.tags ?? []} />
               </div>
             </div>
-          )}
-
-          {item.link && (
-            <a
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-base font-semibold text-accent-ink underline-offset-4 hover:underline"
-            >
-              サイトを見る
-              <svg
-                viewBox="0 0 20 20"
-                aria-hidden
-                className="h-4 w-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M7 4h9v9M16 4L5 15" />
-              </svg>
-              <span className="sr-only">（新しいタブで開きます）</span>
-            </a>
           )}
 
           <div className="border-t border-line pt-8">
