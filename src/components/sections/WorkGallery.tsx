@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
  *
  * 既定の表示枠は高さを固定し、比率の違う画像（横長のFigma画面と縦長のLP）を
  * 同じ高さに揃える。枠をクリックするとモーダルで原寸を開き、そこでは
- * ホイールで拡大縮小、スペースキー＋ドラッグで移動できる。
+ * ホイールでカーソル基点の拡大縮小、ドラッグで移動、ダブルクリックで
+ * 等倍と2倍の切り替えができる。
  */
 
 const MIN_SCALE = 0.2;
@@ -26,25 +27,58 @@ function Viewer({
   onIndexChange: (i: number) => void;
   onClose: () => void;
 }) {
-  const [scale, setScale] = useState(1);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  // 表示上の倍率だけ state で持つ（ヘッダーの % 表示用）。実際の変形は
+  // ref に持った値から直接 style を書き換える — ドラッグのたびに React の
+  // 再描画を挟むとカクつくため。
+  const [shownScale, setShownScale] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
-  const dragging = useRef<{ x: number; y: number } | null>(null);
+  const view = useRef({ scale: 1, x: 0, y: 0 });
+  const dragFrom = useRef<{ x: number; y: number } | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const total = items.length;
   const current = items[index] ?? items[0];
   const src = current.value;
   const label = current.label;
 
-  const reset = useCallback(() => {
-    setScale(1);
-    setPos({ x: 0, y: 0 });
+  /** ref の値を DOM に反映する。`animate` はボタン操作など離散的な変化のみ。 */
+  const apply = useCallback((animate = false) => {
+    const el = imgRef.current;
+    if (!el) return;
+    const { scale, x, y } = view.current;
+    el.style.transition = animate ? "transform 0.18s ease-out" : "none";
+    el.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), 0) scale(${scale})`;
   }, []);
+
+  const setScaleAt = useCallback(
+    (next: number, originX?: number, originY?: number, animate = false) => {
+      const v = view.current;
+      const clamped = Math.min(MAX_SCALE, Math.max(MIN_SCALE, next));
+      if (originX !== undefined && originY !== undefined) {
+        // カーソル位置を基点に拡大する。基点と画像中心の相対距離を倍率比で伸ばす。
+        const k = clamped / v.scale;
+        v.x = originX - (originX - v.x) * k;
+        v.y = originY - (originY - v.y) * k;
+      }
+      v.scale = clamped;
+      apply(animate);
+      setShownScale(clamped);
+    },
+    [apply],
+  );
+
+  const reset = useCallback(() => {
+    view.current = { scale: 1, x: 0, y: 0 };
+    apply(true);
+    setShownScale(1);
+  }, [apply]);
 
   // 画像を切り替えたら倍率と位置を初期化する。
   useEffect(() => {
-    reset();
-  }, [src, reset]);
+    view.current = { scale: 1, x: 0, y: 0 };
+    apply(false);
+    setShownScale(1);
+  }, [src, apply]);
 
   // 端で止めず循環させる。
   const go = useCallback(
@@ -73,13 +107,18 @@ function Viewer({
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      setScale((s) =>
-        Math.min(MAX_SCALE, Math.max(MIN_SCALE, s * (e.deltaY < 0 ? 1.15 : 1 / 1.15))),
-      );
+      const r = el.getBoundingClientRect();
+      // ステージ中心を原点とした座標。ここを基点に拡大するとカーソル下の
+      // 位置が動かず、狙った場所を寄って見られる。
+      const ox = e.clientX - (r.left + r.width / 2);
+      const oy = e.clientY - (r.top + r.height / 2);
+      // deltaY の大きさに追従させ、細かいホイールでも滑らかに効くようにする。
+      const factor = Math.exp(-e.deltaY * 0.0016);
+      setScaleAt(view.current.scale * factor, ox, oy);
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, []);
+  }, [setScaleAt]);
 
   return (
     <div
@@ -95,7 +134,7 @@ function Viewer({
             ホイールで拡大縮小 / ドラッグで移動
           </span>
           <span className="min-w-14 text-center text-xs tabular-nums text-white/80">
-            {Math.round(scale * 100)}%
+            {Math.round(shownScale * 100)}%
           </span>
           <button
             type="button"
@@ -136,33 +175,50 @@ function Viewer({
           // ボタン上での押下ではドラッグを始めない。ここで setPointerCapture を
           // 呼ぶとポインタを奪ってしまい、送りボタンの click が発火しなくなる。
           if ((e.target as HTMLElement).closest("button")) return;
-          dragging.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+          dragFrom.current = {
+            x: e.clientX - view.current.x,
+            y: e.clientY - view.current.y,
+          };
           setIsDragging(true);
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
         onPointerMove={(e) => {
-          const d = dragging.current;
+          const d = dragFrom.current;
           if (!d) return;
-          setPos({ x: e.clientX - d.x, y: e.clientY - d.y });
+          // 再描画を挟まず直接 style を書き換える。これが滑らかさの要。
+          view.current.x = e.clientX - d.x;
+          view.current.y = e.clientY - d.y;
+          apply(false);
         }}
         onPointerUp={() => {
-          dragging.current = null;
+          dragFrom.current = null;
           setIsDragging(false);
         }}
         onPointerCancel={() => {
-          dragging.current = null;
+          dragFrom.current = null;
           setIsDragging(false);
+        }}
+        onDoubleClick={(e) => {
+          if ((e.target as HTMLElement).closest("button")) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          const ox = e.clientX - (r.left + r.width / 2);
+          const oy = e.clientY - (r.top + r.height / 2);
+          // ダブルクリックで等倍と2倍を往復する。
+          if (view.current.scale > 1.01) reset();
+          else setScaleAt(2, ox, oy, true);
         }}
       >
         {/* 画像は中央を基準に拡大し、ドラッグ量ぶん平行移動する。
             原寸を見るための表示なので next/image の最適化は通さない。 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          ref={imgRef}
           src={src}
           alt={label}
           draggable={false}
           style={{
-            transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px)) scale(${scale})`,
+            transform: "translate3d(-50%, -50%, 0) scale(1)",
+            willChange: "transform",
           }}
           className="absolute left-1/2 top-1/2 max-h-none max-w-none select-none"
           // 初期表示で画面に収まるよう、幅の上限だけ与える。
