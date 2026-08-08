@@ -16,18 +16,25 @@ const MIN_SCALE = 0.2;
 const MAX_SCALE = 8;
 
 function Viewer({
-  src,
-  label,
+  items,
+  index,
+  onIndexChange,
   onClose,
 }: {
-  src: string;
-  label: string;
+  items: { label: string; value: string }[];
+  index: number;
+  onIndexChange: (i: number) => void;
   onClose: () => void;
 }) {
   const [scale, setScale] = useState(1);
   const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [spaceHeld, setSpaceHeld] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const dragging = useRef<{ x: number; y: number } | null>(null);
+
+  const total = items.length;
+  const current = items[index] ?? items[0];
+  const src = current.value;
+  const label = current.label;
 
   const reset = useCallback(() => {
     setScale(1);
@@ -39,30 +46,25 @@ function Viewer({
     reset();
   }, [src, reset]);
 
+  // 端で止めず循環させる。
+  const go = useCallback(
+    (d: number) => onIndexChange((index + d + total) % total),
+    [index, total, onIndexChange],
+  );
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (e.code === "Space") {
-        // スペースでページがスクロールしないよう抑止する。
-        e.preventDefault();
-        setSpaceHeld(true);
-      }
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.code === "Space") setSpaceHeld(false);
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") go(-1);
+      else if (e.key === "ArrowRight") go(1);
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
     };
-  }, [onClose]);
+  }, [onClose, go]);
 
   // ホイールで拡大縮小。ページスクロールに流さないよう passive: false で登録する。
   const stageRef = useRef<HTMLDivElement>(null);
@@ -90,7 +92,7 @@ function Viewer({
         <p className="truncate text-sm font-semibold">{label}</p>
         <div className="flex items-center gap-2">
           <span className="hidden text-xs text-white/70 sm:inline">
-            ホイールで拡大縮小 / スペース＋ドラッグで移動
+            ホイールで拡大縮小 / ドラッグで移動
           </span>
           <span className="min-w-14 text-center text-xs tabular-nums text-white/80">
             {Math.round(scale * 100)}%
@@ -128,11 +130,11 @@ function Viewer({
         ref={stageRef}
         className={cn(
           "relative flex-1 overflow-hidden",
-          spaceHeld ? (dragging.current ? "cursor-grabbing" : "cursor-grab") : "cursor-default",
+          isDragging ? "cursor-grabbing" : "cursor-grab",
         )}
         onPointerDown={(e) => {
-          if (!spaceHeld) return;
           dragging.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+          setIsDragging(true);
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
         onPointerMove={(e) => {
@@ -142,6 +144,11 @@ function Viewer({
         }}
         onPointerUp={() => {
           dragging.current = null;
+          setIsDragging(false);
+        }}
+        onPointerCancel={() => {
+          dragging.current = null;
+          setIsDragging(false);
         }}
       >
         {/* 画像は中央を基準に拡大し、ドラッグ量ぶん平行移動する。
@@ -158,6 +165,56 @@ function Viewer({
           // 初期表示で画面に収まるよう、幅の上限だけ与える。
           width={1000}
         />
+
+        {/* 画像送り。拡大中も常に見えるよう、ステージに固定して重ねる。 */}
+        {total > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              aria-label="前の画像"
+              className="absolute left-4 top-1/2 z-10 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-ink/60 text-white backdrop-blur-sm transition-colors hover:bg-ink/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 5l-7 7 7 7" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => go(1)}
+              aria-label="次の画像"
+              className="absolute right-4 top-1/2 z-10 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-ink/60 text-white backdrop-blur-sm transition-colors hover:bg-ink/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full bg-ink/60 px-4 py-1.5 text-sm text-white backdrop-blur-sm">
+              {index + 1} / {total}　{label}
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -309,8 +366,9 @@ export function WorkGallery({
 
       {zoomOpen && (
         <Viewer
-          src={current.value}
-          label={current.label}
+          items={items}
+          index={active}
+          onIndexChange={setActive}
           onClose={() => setZoomOpen(false)}
         />
       )}
