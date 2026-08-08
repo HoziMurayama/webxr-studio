@@ -8,7 +8,6 @@ const NAV = [
   { href: "/company", label: "会社案内" },
   { href: "/service", label: "サービス" },
   { href: "/case-study", label: "お客様事例" },
-  { href: "/team", label: "チーム" },
   { href: "/faq", label: "よくある質問" },
   { href: "/contact", label: "お問い合わせ" },
 ];

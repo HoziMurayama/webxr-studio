@@ -13,7 +13,6 @@ const NAV = [
   { href: "/company", en: "COMPANY", label: "会社案内" },
   { href: "/service", en: "SERVICE", label: "サービス" },
   { href: "/case-study", en: "CASE STUDY", label: "お客様事例" },
-  { href: "/team", en: "TEAM", label: "チーム" },
   { href: "/faq", en: "FAQ", label: "よくある質問" },
   { href: "/contact", en: "INQUIRY", label: "お問い合わせ" },
 ];
