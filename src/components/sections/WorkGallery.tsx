@@ -133,6 +133,9 @@ function Viewer({
           isDragging ? "cursor-grabbing" : "cursor-grab",
         )}
         onPointerDown={(e) => {
+          // ボタン上での押下ではドラッグを始めない。ここで setPointerCapture を
+          // 呼ぶとポインタを奪ってしまい、送りボタンの click が発火しなくなる。
+          if ((e.target as HTMLElement).closest("button")) return;
           dragging.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
           setIsDragging(true);
           e.currentTarget.setPointerCapture(e.pointerId);
