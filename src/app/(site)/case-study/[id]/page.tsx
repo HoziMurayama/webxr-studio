@@ -62,28 +62,33 @@ export default async function CaseStudyDetailPage({
             </h2>
           </div>
 
-          {/* お客様のお写真とお名前を最上部に。制作物より先に人が見えるようにする。 */}
+          {/* お客様のお写真を全幅のバナーとして最上部に。制作物より先に人が
+              見えるようにする。写真は縦長なので `object-contain` で全体を収め、
+              お名前などは画像の下に置く。 */}
           {(item.imageUrl || clientLabel(item)) && (
-            <div className="flex flex-col items-center gap-5 border border-line bg-surface p-6 text-center sm:flex-row sm:items-center sm:gap-8 sm:p-8 sm:text-left">
+            <div className="border border-line bg-surface">
               {item.imageUrl && (
                 <Image
                   src={item.imageUrl}
                   alt={clientLabel(item) || "お客様"}
                   width={900}
                   height={1207}
-                  sizes="(min-width: 640px) 12rem, 10rem"
+                  sizes="(min-width: 768px) 48rem, 100vw"
                   priority
-                  className="h-40 w-40 shrink-0 rounded-full object-cover object-top sm:h-48 sm:w-48"
+                  className="h-[22rem] w-full bg-surface-2 object-contain sm:h-[28rem]"
                 />
               )}
               {clientLabel(item) && (
-                <div>
+                <div className="border-t border-line p-6 sm:p-8">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
                     お客様
                   </p>
                   <p className="mt-2 text-lg font-bold tracking-tight text-ink sm:text-xl">
                     {clientLabel(item)}
                   </p>
+                  {item.industry && (
+                    <p className="mt-1 text-sm text-muted">{item.industry}</p>
+                  )}
                 </div>
               )}
             </div>
