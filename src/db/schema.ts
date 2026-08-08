@@ -53,6 +53,11 @@ export const portfolio = pgTable("portfolio", {
   workImageUrl: text("work_image_url").notNull().default(""),
   // 一覧カード用のサムネイル。未設定なら workImageUrl を使う。
   thumbnailUrl: text("thumbnail_url").notNull().default(""),
+  // 制作物のギャラリー。詳細ページで切り替えて閲覧する。
+  gallery: jsonb("gallery")
+    .$type<{ label: string; value: string }[]>()
+    .notNull()
+    .default([]),
   link: text("link").notNull().default(""),
   // お客様の声。カードに要約、展開時に全文が出る。
   review: text("review").notNull().default(""),

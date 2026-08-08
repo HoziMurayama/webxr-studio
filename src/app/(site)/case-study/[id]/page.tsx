@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section } from "@/components/ui/Section";
 import { clientLabel, Stack } from "@/components/sections/CaseStudies";
+import { WorkGallery } from "@/components/sections/WorkGallery";
 import { getPortfolioItem } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
@@ -88,23 +89,26 @@ export default async function CaseStudyDetailPage({
             </div>
           )}
 
-          {/* 制作物のスクリーンショット。縦長のページ全体が入ることが多いので
-              高さは制限せず、そのまま流す。 */}
-          {item.workImageUrl && (
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
-                制作物
-              </p>
-              <Image
-                src={item.workImageUrl}
-                alt=""
-                aria-hidden
-                width={1000}
-                height={7182}
-                sizes="(min-width: 768px) 48rem, 100vw"
-                className="mt-3 h-auto w-full border border-line"
-              />
-            </div>
+          {/* 制作物。ギャラリーがあれば切り替え表示、無ければ単一画像。 */}
+          {(item.gallery ?? []).length > 0 ? (
+            <WorkGallery items={item.gallery} />
+          ) : (
+            item.workImageUrl && (
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
+                  制作物
+                </p>
+                <Image
+                  src={item.workImageUrl}
+                  alt=""
+                  aria-hidden
+                  width={1000}
+                  height={7182}
+                  sizes="(min-width: 768px) 48rem, 100vw"
+                  className="mt-3 h-auto w-full border border-line"
+                />
+              </div>
+            )
           )}
 
           {item.description && (
