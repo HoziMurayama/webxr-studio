@@ -1,21 +1,175 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /**
  * 制作物のギャラリー。左右の矢印で送り、下のサムネイルからも直接選べる。
  *
- * LP のスクリーンショットは縦に非常に長いことが多いので、表示領域の高さを
- * 制限して中でスクロールさせる。全体像は「原寸で開く」から確認できる。
+ * 既定の表示枠は高さを固定し、比率の違う画像（横長のFigma画面と縦長のLP）を
+ * 同じ高さに揃える。枠をクリックするとモーダルで原寸を開き、そこでは
+ * ホイールで拡大縮小、スペースキー＋ドラッグで移動できる。
  */
+
+const MIN_SCALE = 0.2;
+const MAX_SCALE = 8;
+
+function Viewer({
+  src,
+  label,
+  onClose,
+}: {
+  src: string;
+  label: string;
+  onClose: () => void;
+}) {
+  const [scale, setScale] = useState(1);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [spaceHeld, setSpaceHeld] = useState(false);
+  const dragging = useRef<{ x: number; y: number } | null>(null);
+
+  const reset = useCallback(() => {
+    setScale(1);
+    setPos({ x: 0, y: 0 });
+  }, []);
+
+  // 画像を切り替えたら倍率と位置を初期化する。
+  useEffect(() => {
+    reset();
+  }, [src, reset]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.code === "Space") {
+        // スペースでページがスクロールしないよう抑止する。
+        e.preventDefault();
+        setSpaceHeld(true);
+      }
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "Space") setSpaceHeld(false);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
+  }, [onClose]);
+
+  // ホイールで拡大縮小。ページスクロールに流さないよう passive: false で登録する。
+  const stageRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setScale((s) =>
+        Math.min(MAX_SCALE, Math.max(MIN_SCALE, s * (e.deltaY < 0 ? 1.15 : 1 / 1.15))),
+      );
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${label}（拡大表示）`}
+      className="fixed inset-0 z-50 flex flex-col bg-ink/90 backdrop-blur-sm"
+    >
+      <div className="flex items-center justify-between gap-4 px-4 py-3 text-white sm:px-6">
+        <p className="truncate text-sm font-semibold">{label}</p>
+        <div className="flex items-center gap-2">
+          <span className="hidden text-xs text-white/70 sm:inline">
+            ホイールで拡大縮小 / スペース＋ドラッグで移動
+          </span>
+          <span className="min-w-14 text-center text-xs tabular-nums text-white/80">
+            {Math.round(scale * 100)}%
+          </span>
+          <button
+            type="button"
+            onClick={reset}
+            className="border border-white/30 px-3 py-1.5 text-xs transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          >
+            リセット
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="閉じる"
+            className="inline-flex h-9 w-9 items-center justify-center transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div
+        ref={stageRef}
+        className={cn(
+          "relative flex-1 overflow-hidden",
+          spaceHeld ? (dragging.current ? "cursor-grabbing" : "cursor-grab") : "cursor-default",
+        )}
+        onPointerDown={(e) => {
+          if (!spaceHeld) return;
+          dragging.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }}
+        onPointerMove={(e) => {
+          const d = dragging.current;
+          if (!d) return;
+          setPos({ x: e.clientX - d.x, y: e.clientY - d.y });
+        }}
+        onPointerUp={() => {
+          dragging.current = null;
+        }}
+      >
+        {/* 画像は中央を基準に拡大し、ドラッグ量ぶん平行移動する。
+            原寸を見るための表示なので next/image の最適化は通さない。 */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={label}
+          draggable={false}
+          style={{
+            transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px)) scale(${scale})`,
+          }}
+          className="absolute left-1/2 top-1/2 max-h-none max-w-none select-none"
+          // 初期表示で画面に収まるよう、幅の上限だけ与える。
+          width={1000}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function WorkGallery({
   items,
 }: {
   items: { label: string; value: string }[];
 }) {
   const [active, setActive] = useState(0);
+  const [zoomOpen, setZoomOpen] = useState(false);
   if (items.length === 0) return null;
 
   const total = items.length;
@@ -29,9 +183,14 @@ export function WorkGallery({
         制作物
       </p>
 
-      {/* メイン表示。矢印は画像の左右に重ねる。 */}
+      {/* メイン表示。高さを固定し、比率の違う画像を同じ枠に収める。 */}
       <div className="relative mt-3">
-        <div className="max-h-[36rem] overflow-y-auto border border-line bg-surface">
+        <button
+          type="button"
+          onClick={() => setZoomOpen(true)}
+          aria-label={`${current.label}を拡大表示`}
+          className="block h-[24rem] w-full cursor-zoom-in overflow-hidden border border-line bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 sm:h-[30rem]"
+        >
           <Image
             key={current.value}
             src={current.value}
@@ -39,9 +198,9 @@ export function WorkGallery({
             width={1000}
             height={7182}
             sizes="(min-width: 768px) 48rem, 100vw"
-            className="h-auto w-full"
+            className="h-full w-full object-contain"
           />
-        </div>
+        </button>
 
         {total > 1 && (
           <>
@@ -126,13 +285,12 @@ export function WorkGallery({
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-medium text-ink">{current.label}</p>
-        <a
-          href={current.value}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={() => setZoomOpen(true)}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink underline-offset-4 hover:underline"
         >
-          原寸で開く
+          拡大して見る
           <svg
             viewBox="0 0 20 20"
             aria-hidden
@@ -143,11 +301,19 @@ export function WorkGallery({
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="M7 4h9v9M16 4L5 15" />
+            <circle cx="9" cy="9" r="5.5" />
+            <path d="M13 13l4 4M9 7v4M7 9h4" />
           </svg>
-          <span className="sr-only">（新しいタブで開きます）</span>
-        </a>
+        </button>
       </div>
+
+      {zoomOpen && (
+        <Viewer
+          src={current.value}
+          label={current.label}
+          onClose={() => setZoomOpen(false)}
+        />
+      )}
     </div>
   );
 }
