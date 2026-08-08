@@ -45,15 +45,17 @@ export function CaseStudies({ items }: { items: Portfolio[] }) {
               href={`/case-study/${item.id}`}
               className="group flex h-full w-full flex-col border border-line bg-card text-left transition-shadow hover:shadow-[0_12px_40px_rgb(13,16,23,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
             >
-              {item.imageUrl ? (
+              {/* 一覧のサムネイル。thumbnailUrl があればそれを、無ければ
+                  制作物画像、それも無ければお客様写真を使う。 */}
+              {item.thumbnailUrl || item.workImageUrl || item.imageUrl ? (
                 <Image
-                  src={item.imageUrl}
+                  src={item.thumbnailUrl || item.workImageUrl || item.imageUrl}
                   alt=""
                   aria-hidden
                   width={800}
                   height={600}
                   sizes="(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
-                  className="aspect-[4/3] w-full object-cover"
+                  className="aspect-[4/3] w-full object-cover object-top"
                 />
               ) : (
                 <div

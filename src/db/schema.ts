@@ -47,7 +47,12 @@ export const portfolio = pgTable("portfolio", {
   description: text("description").notNull().default(""),
   // 技術スタック。カード下部にチップとして並ぶ。
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
+  // お客様のお写真。詳細ページでは最上部に置く。
   imageUrl: text("image_url").notNull().default(""),
+  // 制作物のスクリーンショット。詳細ページでお客様写真の下に置く。
+  workImageUrl: text("work_image_url").notNull().default(""),
+  // 一覧カード用のサムネイル。未設定なら workImageUrl を使う。
+  thumbnailUrl: text("thumbnail_url").notNull().default(""),
   link: text("link").notNull().default(""),
   // お客様の声。カードに要約、展開時に全文が出る。
   review: text("review").notNull().default(""),
