@@ -40,14 +40,22 @@ export const services = pgTable("services", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-/** 制作実績 / Portfolio. */
+/** 制作実績 / Portfolio. お客様事例ページのカードとして表示される。 */
 export const portfolio = pgTable("portfolio", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull().default(""),
+  // 技術スタック。カード下部にチップとして並ぶ。
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
   imageUrl: text("image_url").notNull().default(""),
   link: text("link").notNull().default(""),
+  // お客様の声。カードに要約、展開時に全文が出る。
+  review: text("review").notNull().default(""),
+  // 企業名。個人のお客様の場合は空にして clientName だけを使う。
+  companyName: text("company_name").notNull().default(""),
+  clientName: text("client_name").notNull().default(""),
+  // 業界（医療・不動産など）。
+  industry: text("industry").notNull().default(""),
   order: integer("order").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

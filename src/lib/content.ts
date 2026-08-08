@@ -2,7 +2,7 @@
 // returns the section's rows in display order. Kept in one place so the public
 // pages and the RAG indexer read content the same way.
 import "server-only";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import {
   company,
@@ -45,6 +45,15 @@ export async function getPortfolio() {
     () => db.select().from(portfolio).orderBy(asc(portfolio.order), asc(portfolio.id)),
     [],
   );
+}
+
+/** 事例1件。存在しない ID では null を返し、呼び出し側で 404 にする。 */
+export async function getPortfolioItem(id: number) {
+  const rows = await safe(
+    () => db.select().from(portfolio).where(eq(portfolio.id, id)).limit(1),
+    [],
+  );
+  return rows[0] ?? null;
 }
 
 export async function getReviews() {

@@ -10,7 +10,7 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
       align="center"
       eyebrow="Case Study"
       title="お客様事例"
-      description="これまでに手がけたプロジェクトの一部をご紹介します。"
+      description="2026年に手がけたプロジェクトの一部をご紹介します。"
     >
       <div className="grid gap-6 sm:grid-cols-2">
         {items.map((p) => {
