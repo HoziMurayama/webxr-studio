@@ -16,8 +16,8 @@ export default function ServicePage() {
   return (
     <>
       <PageHero
-        en="OUR SERVICES"
-        title="4つの専門チームで、ビジネスの可能性をカタチに。"
+        en="SERVICE"
+        title="サービス"
         description="Web・システム・アプリ・AIを組み合わせ、企画から設計、開発、運用まで一貫してサポートします。"
         image="/about/fv-service.webp"
       />

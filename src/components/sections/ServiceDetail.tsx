@@ -1,7 +1,7 @@
 import { Section } from "@/components/ui/Section";
 
 /**
- * OUR SERVICES — the four development domains in depth.
+ * SERVICE — the four development domains in depth.
  *
  * Editorial copy rather than DB-driven, so it lives here as a typed constant;
  * move it to a table if it ever needs to be admin-editable. The DB-backed
@@ -42,7 +42,7 @@ const DOMAINS: Domain[] = [
     ],
     industries: [
       {
-        name: "Healthcare & Medical",
+        name: "医療・ヘルスケア",
         items: [
           "クリニック・医院サイト",
           "医療サービスLP",
@@ -51,7 +51,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Architecture & Construction",
+        name: "建築・建設",
         items: [
           "建設会社・工務店サイト",
           "施工事例サイト",
@@ -60,7 +60,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Real Estate",
+        name: "不動産",
         items: [
           "不動産会社サイト",
           "物件検索ポータル",
@@ -69,7 +69,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Education",
+        name: "教育",
         items: [
           "学校・スクールサイト",
           "オンライン講座サイト",
@@ -78,11 +78,11 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Recruitment & HR",
+        name: "人材・採用",
         items: ["採用サイト", "求人サイト", "採用LP", "応募・エントリーサイト"],
       },
       {
-        name: "Retail & E-commerce",
+        name: "小売・EC",
         items: [
           "Shopify",
           "EC-CUBE",
@@ -91,7 +91,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Hotels & Travel",
+        name: "ホテル・旅行",
         items: [
           "ホテル公式サイト",
           "宿泊予約サイト",
@@ -123,31 +123,31 @@ const DOMAINS: Domain[] = [
     ],
     industries: [
       {
-        name: "Healthcare & Medical",
+        name: "医療・ヘルスケア",
         items: ["患者・顧客管理", "予約管理", "医療機関向けCRM", "問い合わせ管理"],
       },
       {
-        name: "Architecture & Construction",
+        name: "建築・建設",
         items: ["建築・施工管理", "顧客管理CRM", "見積・案件管理", "工程・進捗管理"],
       },
       {
-        name: "Real Estate",
+        name: "不動産",
         items: ["物件管理システム", "顧客管理CRM", "内見予約管理", "契約・営業管理"],
       },
       {
-        name: "Education",
+        name: "教育",
         items: ["LMS", "生徒・受講者管理", "講座・教材管理", "出席・成績管理"],
       },
       {
-        name: "Recruitment & HR",
+        name: "人材・採用",
         items: ["ATS・採用管理", "求職者管理", "求人管理", "AIマッチングシステム"],
       },
       {
-        name: "Manufacturing",
+        name: "製造業",
         items: ["ERP", "生産管理", "在庫管理", "品質管理", "BIダッシュボード"],
       },
       {
-        name: "Logistics & Transportation",
+        name: "物流・運輸",
         items: ["配送管理", "車両・フリート管理", "荷物追跡", "物流ダッシュボード"],
       },
     ],
@@ -173,7 +173,7 @@ const DOMAINS: Domain[] = [
     ],
     industries: [
       {
-        name: "Healthcare & Medical",
+        name: "医療・ヘルスケア",
         items: [
           "健康管理アプリ",
           "予約アプリ",
@@ -182,7 +182,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Real Estate",
+        name: "不動産",
         items: [
           "物件検索アプリ",
           "内見予約アプリ",
@@ -191,7 +191,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Education",
+        name: "教育",
         items: [
           "学習アプリ",
           "オンライン授業アプリ",
@@ -200,7 +200,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Recruitment & HR",
+        name: "人材・採用",
         items: [
           "求人検索アプリ",
           "求職者向けアプリ",
@@ -209,7 +209,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Retail & E-commerce",
+        name: "小売・EC",
         items: [
           "ECアプリ",
           "会員・ポイントアプリ",
@@ -218,7 +218,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Fitness & Sports",
+        name: "フィットネス・スポーツ",
         items: [
           "フィットネスアプリ",
           "トレーニング管理アプリ",
@@ -227,7 +227,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Hotels & Travel",
+        name: "ホテル・旅行",
         items: [
           "ホテル予約アプリ",
           "旅行予約アプリ",
@@ -236,7 +236,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Logistics & Transportation",
+        name: "物流・運輸",
         items: [
           "配送管理アプリ",
           "ドライバーアプリ",
@@ -268,7 +268,7 @@ const DOMAINS: Domain[] = [
     ],
     industries: [
       {
-        name: "Healthcare & Medical",
+        name: "医療・ヘルスケア",
         items: [
           "AI問い合わせ対応",
           "医療・健康相談AI",
@@ -277,7 +277,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Real Estate",
+        name: "不動産",
         items: [
           "AI物件検索",
           "物件レコメンド",
@@ -286,11 +286,11 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Education",
+        name: "教育",
         items: ["AIチューター", "AI講師", "教材生成AI", "個別最適化学習"],
       },
       {
-        name: "Recruitment & HR",
+        name: "人材・採用",
         items: [
           "AI求人マッチング",
           "履歴書・職務経歴書解析",
@@ -299,7 +299,7 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Retail & E-commerce",
+        name: "小売・EC",
         items: [
           "AI商品レコメンド",
           "AI接客チャット",
@@ -308,11 +308,11 @@ const DOMAINS: Domain[] = [
         ],
       },
       {
-        name: "Manufacturing",
+        name: "製造業",
         items: ["AI品質検査", "画像認識", "設備異常検知", "生産・需要予測"],
       },
       {
-        name: "Logistics & Transportation",
+        name: "物流・運輸",
         items: [
           "配送ルート最適化",
           "需要予測",
@@ -361,9 +361,9 @@ export function ServiceDetail({
       <Section
         id="services"
         align="center"
-        eyebrow={showHeader ? "OUR SERVICES" : undefined}
+        eyebrow={showHeader ? "SERVICE" : undefined}
         title={
-          showHeader ? "4つの専門チームで、ビジネスの可能性をカタチに。" : undefined
+          showHeader ? "サービス" : undefined
         }
       >
         <div className="mx-auto max-w-3xl space-y-5 text-left text-base leading-relaxed text-ink-soft sm:text-lg">
