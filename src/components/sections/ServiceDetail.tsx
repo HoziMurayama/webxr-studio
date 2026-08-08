@@ -17,11 +17,14 @@ type Domain = {
   services: string[];
   /** Industry-specific project examples. */
   industries: { name: string; items: string[] }[];
+  /** Decorative banner behind the blue header band. */
+  image: string;
 };
 
 const DOMAINS: Domain[] = [
   {
     en: "WEB DEVELOPMENT",
+    image: "/team/web.svg",
     title: "Webで「届ける」",
     lead: "企業やサービスの魅力を伝え、集客・販売・採用・顧客との接点を生み出すWebサービスを開発します。",
     services: [
@@ -103,6 +106,7 @@ const DOMAINS: Domain[] = [
   },
   {
     en: "SYSTEM DEVELOPMENT",
+    image: "/team/system.svg",
     title: "システムで「支える」",
     lead: "企業の業務を効率化し、顧客・商品・データ・業務プロセスをつなぐ業務システムを開発します。",
     services: [
@@ -154,6 +158,7 @@ const DOMAINS: Domain[] = [
   },
   {
     en: "APP DEVELOPMENT",
+    image: "/team/app.svg",
     title: "アプリで「つなぐ」",
     lead: "ユーザーとサービス、企業と顧客、現場と管理者をつなぐスマートフォン・モバイルアプリを開発します。",
     services: [
@@ -248,6 +253,7 @@ const DOMAINS: Domain[] = [
   },
   {
     en: "AI DEVELOPMENT",
+    image: "/team/ai.svg",
     title: "AIで「進化させる」",
     lead: "生成AI・機械学習・データ分析・AI自動化を既存のWeb・システム・アプリに組み込み、企業の業務とサービスをさらに進化させます。",
     services: [
@@ -375,18 +381,32 @@ export function ServiceDetail({
           </p>
         </div>
 
-        <div className="mt-16 space-y-16 text-left">
+        {/* カードだけ Section の max-w-6xl を超えて広げる。青帯が縦に伸びすぎ
+            ないよう、右カラムに業界カード3列ぶんの幅を確保するため。 */}
+        <div className="mt-16 space-y-16 text-left xl:-mx-[7rem] 2xl:-mx-[11rem]">
           {DOMAINS.map((d) => (
-            <article key={d.en} className="border border-line bg-card">
-              {/* 見出し帯。フッターと同じ青を敷き、文字は白に反転。 */}
-              <header className="bg-chrome p-6 sm:p-8">
-                <p className="text-sm font-bold tracking-[0.18em] text-white/90">
+            <article
+              key={d.en}
+              // 左に青の見出し帯、右に内容。狭い画面では縦積みに戻る。
+              // `items-stretch` で青帯が右カラムの高さいっぱいまで伸びる。
+              className="grid items-stretch border border-line bg-card lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.6fr)]"
+            >
+              {/* 見出し帯。フッターと同じ青を敷き、文字は白に反転。背景に領域ごとの
+                  バナーを低い不透明度で重ねる（ABOUT US のチームカードと同じ手法）。
+                  内容は上下・左右とも中央に置く。 */}
+              <header className="relative isolate flex flex-col items-center justify-center bg-chrome p-8 text-center sm:p-10">
+                <div
+                  aria-hidden
+                  style={{ backgroundImage: `url(${d.image})` }}
+                  className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center opacity-25 mix-blend-luminosity"
+                />
+                <p className="text-base font-bold tracking-[0.18em] text-white/90 sm:text-lg">
                   {d.en}
                 </p>
-                <h3 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                <h3 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
                   {d.title}
                 </h3>
-                <p className="mt-4 max-w-3xl text-base leading-relaxed text-white sm:text-lg">
+                <p className="mt-5 text-lg leading-relaxed text-white sm:text-xl">
                   {d.lead}
                 </p>
               </header>
@@ -396,7 +416,7 @@ export function ServiceDetail({
                   <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
                     対応サービス
                   </h4>
-                  <ul className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+                  <ul className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2 xl:grid-cols-3">
                     {d.services.map((s) => (
                       <li
                         key={s}
@@ -413,7 +433,7 @@ export function ServiceDetail({
                   <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
                     対応プロジェクト
                   </h4>
-                  <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {d.industries.map((ind) => (
                       <div key={ind.name} className="border border-line bg-surface p-5">
                         <p className="text-sm font-bold tracking-tight text-accent-ink">
