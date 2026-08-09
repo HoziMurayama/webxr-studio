@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { TechChip } from "@/components/ui/TechIcon";
+import { TeamCarousel } from "@/components/sections/TeamCarousel";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,7 +29,7 @@ type Team = {
   image: string;
 };
 
-const TEAMS: Team[] = [
+export const TEAMS: Team[] = [
   {
     no: "01",
     en: "Web Production Team",
@@ -248,9 +249,15 @@ export function About({
   showHeader = true,
   /** 締めの「ひとつのチーム、多様な専門性」。トップページでは出さない。 */
   showClosing = true,
+  /**
+   * チームの見せ方。トップページは概要を1枚ずつ送る "carousel"、
+   * /about は全チームを並べる "list"。
+   */
+  teamLayout = "list",
 }: {
   showHeader?: boolean;
   showClosing?: boolean;
+  teamLayout?: "list" | "carousel";
 } = {}) {
   return (
     <Section
@@ -288,105 +295,109 @@ export function About({
         />
       </div>
 
-      <ol className="mt-16 space-y-10">
-        {TEAMS.map((team) => (
-          <li key={team.no} className="border border-line bg-card text-left">
-            {/* ヘッダー帯: フッターと同じ青 (--chrome) を敷き、文字は白に反転。
+      {teamLayout === "carousel" ? (
+        <TeamCarousel teams={TEAMS} />
+      ) : (
+        <ol className="mt-16 space-y-10">
+          {TEAMS.map((team) => (
+            <li key={team.no} className="border border-line bg-card text-left">
+              {/* ヘッダー帯: フッターと同じ青 (--chrome) を敷き、文字は白に反転。
                 背景画像は青の上では埋もれるため、低い不透明度のテクスチャとして
                 重ねている。白文字は青の上で 6.67:1 と AA を満たす。 */}
-            <div className="relative isolate bg-chrome p-6 sm:p-8">
-              <div
-                aria-hidden
-                style={{ backgroundImage: `url(${team.image})` }}
-                className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center opacity-25 mix-blend-luminosity"
-              />
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-                <p className="text-3xl font-black leading-none tracking-tight text-white/45 sm:text-4xl">
-                  {team.no}
-                </p>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold tracking-wide text-white/90">
-                    {team.en}
+              <div className="relative isolate bg-chrome p-6 sm:p-8">
+                <div
+                  aria-hidden
+                  style={{ backgroundImage: `url(${team.image})` }}
+                  className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center opacity-25 mix-blend-luminosity"
+                />
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+                  <p className="text-3xl font-black leading-none tracking-tight text-white/45 sm:text-4xl">
+                    {team.no}
                   </p>
-                  <h3 className="mt-1 text-xl font-bold tracking-tight text-white sm:text-2xl">
-                    {team.ja}
-                  </h3>
-                  <div className="mt-4">
-                    <BlockLabel tone="onDark">私たちの使命</BlockLabel>
-                    <p className="mt-2 text-base font-medium leading-relaxed text-white sm:text-lg">
-                      {team.mission}
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold tracking-wide text-white/90">
+                      {team.en}
                     </p>
-                  </div>
-                  <div className="mt-5">
-                    <BlockLabel tone="onDark">チーム紹介</BlockLabel>
-                    <p className="mt-2 text-base leading-relaxed text-white/90">
-                      {team.intro}
-                    </p>
+                    <h3 className="mt-1 text-xl font-bold tracking-tight text-white sm:text-2xl">
+                      {team.ja}
+                    </h3>
+                    <div className="mt-4">
+                      <BlockLabel tone="onDark">私たちの使命</BlockLabel>
+                      <p className="mt-2 text-base font-medium leading-relaxed text-white sm:text-lg">
+                        {team.mission}
+                      </p>
+                    </div>
+                    <div className="mt-5">
+                      <BlockLabel tone="onDark">チーム紹介</BlockLabel>
+                      <p className="mt-2 text-base leading-relaxed text-white/90">
+                        {team.intro}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-8 p-6 sm:p-8">
-              {/* 3つのブロックを横一列に。狭い画面では縦積みに戻る。
+              <div className="space-y-8 p-6 sm:p-8">
+                {/* 3つのブロックを横一列に。狭い画面では縦積みに戻る。
                   `items-start` で各カラムの高さを揃えず、内容の量に応じた
                   自然な高さにしている。 */}
-              <div className="grid items-start gap-8 lg:grid-cols-3">
-                <div>
-                  <BlockLabel>対応業界</BlockLabel>
-                  <ul className="mt-3 flex flex-wrap gap-2">
-                    {team.industries.map((i) => (
-                      <li
-                        key={i}
-                        className="bg-surface px-3 py-1 text-sm text-ink-soft"
-                      >
-                        {i}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <BlockLabel>主なサービス</BlockLabel>
-                  <ul className="mt-3 space-y-1.5">
-                    {team.services.map((s) => (
-                      <li
-                        key={s}
-                        className="flex items-start gap-2 text-sm leading-relaxed text-ink-soft"
-                      >
-                        {/* チェックマーク。`mt-[0.15em]` で先頭行のベースラインに
-                            合わせている。装飾なので aria-hidden。 */}
-                        <svg
-                          viewBox="0 0 20 20"
-                          aria-hidden
-                          className="mt-[0.15em] h-4 w-4 shrink-0 text-accent"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2.5}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                <div className="grid items-start gap-8 lg:grid-cols-3">
+                  <div>
+                    <BlockLabel>対応業界</BlockLabel>
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {team.industries.map((i) => (
+                        <li
+                          key={i}
+                          className="bg-surface px-3 py-1 text-sm text-ink-soft"
                         >
-                          <path d="M4 10.5l4 4 8-9" />
-                        </svg>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                          {i}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-                <div>
-                  <BlockLabel>技術スタック</BlockLabel>
-                  <ul className="mt-3 flex flex-wrap gap-2">
-                    {team.stack.map((t) => (
-                      <TechChip key={t} name={t} />
-                    ))}
-                  </ul>
+                  <div>
+                    <BlockLabel>主なサービス</BlockLabel>
+                    <ul className="mt-3 space-y-1.5">
+                      {team.services.map((s) => (
+                        <li
+                          key={s}
+                          className="flex items-start gap-2 text-sm leading-relaxed text-ink-soft"
+                        >
+                          {/* チェックマーク。`mt-[0.15em]` で先頭行のベースラインに
+                            合わせている。装飾なので aria-hidden。 */}
+                          <svg
+                            viewBox="0 0 20 20"
+                            aria-hidden
+                            className="mt-[0.15em] h-4 w-4 shrink-0 text-accent"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M4 10.5l4 4 8-9" />
+                          </svg>
+                          {s}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <BlockLabel>技術スタック</BlockLabel>
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {team.stack.map((t) => (
+                        <TechChip key={t} name={t} />
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        ))}
-      </ol>
+            </li>
+          ))}
+        </ol>
+      )}
 
       {/* 最後に — 背景に集合写真を敷き、白の scrim で本文の可読性を確保。
           scrim なしでは text-ink-soft が AA を割る。 */}
