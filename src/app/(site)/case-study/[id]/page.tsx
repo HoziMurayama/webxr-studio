@@ -94,7 +94,9 @@ export default async function CaseStudyDetailPage({
                         {clientLabel(item)}
                       </p>
                       {item.industry && (
-                        <p className="mt-1 text-sm text-muted">{item.industry}</p>
+                        <p className="mt-1 text-sm text-muted">
+                          {item.industry}
+                        </p>
                       )}
                     </>
                   )}
@@ -102,7 +104,11 @@ export default async function CaseStudyDetailPage({
                   {/* お客様の声はお名前のすぐ下に。誰の言葉かが分かるようにする。 */}
                   {item.review && (
                     <div
-                      className={clientLabel(item) ? "mt-6 border-t border-line pt-6" : ""}
+                      className={
+                        clientLabel(item)
+                          ? "mt-6 border-t border-line pt-6"
+                          : ""
+                      }
                     >
                       <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
                         お客様の声
@@ -137,6 +143,23 @@ export default async function CaseStudyDetailPage({
                 />
               </div>
             )
+          )}
+
+          {/* 公開中のサイト。URL をそのまま出し、新しいタブで開く。 */}
+          {item.link && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
+                URL
+              </p>
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-block break-all text-base font-semibold text-accent-ink underline-offset-4 hover:underline sm:text-lg"
+              >
+                {item.link}
+              </a>
+            </div>
           )}
 
           {item.description && (
