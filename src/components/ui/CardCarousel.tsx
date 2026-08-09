@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const SIDE_SCALE = 0.88;
 const SIDE_OPACITY = 0.35;
 
-/** 自動送りの間隔。 */
+/** 自動送りの間隔の既定値。読ませる文量が多いカード向け。 */
 const AUTOPLAY_MS = 10_000;
 
 export function CardCarousel<T>({
@@ -29,12 +29,15 @@ export function CardCarousel<T>({
   getLabel,
   /** スクリーンリーダー向けのカルーセル名。例:「専門チーム」 */
   label,
+  /** 自動送りの間隔(ms)。文量の少ないカードは短くできる。 */
+  autoplayMs = AUTOPLAY_MS,
 }: {
   items: T[];
   renderCard: (item: T, isCenter: boolean) => React.ReactNode;
   getKey: (item: T) => string;
   getLabel: (item: T) => string;
   label: string;
+  autoplayMs?: number;
 }) {
   const [index, setIndex] = useState(0);
   // ポインタが乗っている / フォーカスがある間は自動送りを止める。読んでいる
@@ -68,9 +71,9 @@ export function CardCarousel<T>({
     ).matches;
     if (reduced) return;
 
-    const id = setInterval(() => setIndex((i) => (i + 1) % total), AUTOPLAY_MS);
+    const id = setInterval(() => setIndex((i) => (i + 1) % total), autoplayMs);
     return () => clearInterval(id);
-  }, [paused, total, tick]);
+  }, [paused, total, tick, autoplayMs]);
 
   // 左右キーでも送れるようにする。カルーセルにフォーカスがあるときだけ拾う。
   const onKeyDown = (e: React.KeyboardEvent) => {

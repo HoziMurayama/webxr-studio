@@ -33,11 +33,10 @@ export default async function HomePage() {
           showPageLink
         />
         <Services />
-        {/* 事例が増えてもトップページは 4 件までに抑える。 */}
+        {/* 件数が増えても縦に伸びないよう、全件を1枚ずつ送って見せる。 */}
         <CaseStudies
           items={portfolio}
-          limit={4}
-          columns={4}
+          carousel
           showStack={false}
           tone="muted"
           eyebrow="CASE STUDY"
