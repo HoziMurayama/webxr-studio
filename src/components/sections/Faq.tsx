@@ -24,8 +24,8 @@ export function Faq({
     >
       <div className="mx-auto max-w-3xl divide-y divide-line rounded-2xl border border-line bg-card">
         {faqs.map((f) => (
-          <details key={f.id} className="group px-6 py-5 [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-semibold text-ink">
+          <details key={f.id} className="group px-6 py-6 [&_summary::-webkit-details-marker]:hidden sm:px-8">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold text-ink sm:text-xl">
               {f.question}
               <svg
                 viewBox="0 0 24 24"
@@ -41,7 +41,7 @@ export function Faq({
                 <path d="M12 5v14M5 12h14" />
               </svg>
             </summary>
-            <p className="mt-3 text-sm leading-relaxed text-muted">{f.answer}</p>
+            <p className="mt-3 text-base leading-relaxed text-ink-soft sm:text-lg">{f.answer}</p>
           </details>
         ))}
       </div>
