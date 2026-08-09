@@ -114,7 +114,7 @@ export function CaseStudies({
                       ? "(min-width: 1024px) 17rem, (min-width: 640px) 50vw, 100vw"
                       : "(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
                   }
-                  className="aspect-[4/3] w-full object-cover object-top"
+                  className="aspect-[4/3] w-full bg-surface-2 object-contain"
                 />
               ) : (
                 <div
