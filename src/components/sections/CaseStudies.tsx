@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Section } from "@/components/ui/Section";
+import { SectionLink } from "@/components/ui/SectionLink";
 import type { Portfolio } from "@/db/schema";
 
 /**
@@ -37,16 +38,41 @@ export function CaseStudies({
   items,
   /** 一覧の上に出す一文。掲載が実績の一部である旨を伝える。 */
   description,
+  /** トップページではセクション見出しを出す（/case-study は PageHero が担う）。 */
+  eyebrow,
+  title,
+  tone,
+  /**
+   * 表示する最大件数。トップページは 4 件に絞る。指定がなければ全件。
+   * 事例が増えてもトップページの見た目が崩れないようにするための上限。
+   */
+  limit,
+  /** 一覧の下に置く /case-study への導線。 */
+  pageLink,
 }: {
   items: Portfolio[];
   description?: string;
+  eyebrow?: string;
+  title?: string;
+  tone?: "default" | "muted";
+  limit?: number;
+  pageLink?: boolean;
 }) {
   if (items.length === 0) return null;
 
+  const shown = limit ? items.slice(0, limit) : items;
+
   return (
-    <Section id="case-study" align="center" description={description}>
+    <Section
+      id="case-study"
+      align="center"
+      tone={tone}
+      eyebrow={eyebrow}
+      title={title}
+      description={description}
+    >
       <ul className="grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((item) => (
+        {shown.map((item) => (
           <li key={item.id}>
             <Link
               href={`/case-study/${item.id}`}
@@ -98,6 +124,10 @@ export function CaseStudies({
           </li>
         ))}
       </ul>
+
+      {pageLink && (
+        <SectionLink href="/case-study">お客様事例をすべて見る</SectionLink>
+      )}
     </Section>
   );
 }
