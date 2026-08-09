@@ -37,6 +37,7 @@ export default async function HomePage() {
         <CaseStudies
           items={portfolio}
           limit={4}
+          columns={4}
           tone="muted"
           eyebrow="CASE STUDY"
           title="お客様事例"

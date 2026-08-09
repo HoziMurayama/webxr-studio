@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Section } from "@/components/ui/Section";
 import { SectionLink } from "@/components/ui/SectionLink";
 import type { Portfolio } from "@/db/schema";
+import { cn } from "@/lib/utils";
 
 /**
  * お客様事例の一覧。カードをクリックすると個別ページ（/case-study/[id]）へ遷移する。
@@ -49,6 +50,11 @@ export function CaseStudies({
   limit,
   /** 一覧の下に置く /case-study への導線。 */
   pageLink,
+  /**
+   * 広い画面での列数。トップページは 4 件を1行に収めるため 4、
+   * /case-study は件数が増えるので既定の 3。
+   */
+  columns = 3,
 }: {
   items: Portfolio[];
   description?: string;
@@ -57,6 +63,7 @@ export function CaseStudies({
   tone?: "default" | "muted";
   limit?: number;
   pageLink?: boolean;
+  columns?: 3 | 4;
 }) {
   if (items.length === 0) return null;
 
@@ -71,7 +78,14 @@ export function CaseStudies({
       title={title}
       description={description}
     >
-      <ul className="grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-3">
+      {/* クラス名は静的に書く。Tailwind は文字列連結で組み立てたクラスを
+          検出できず、スタイルが生成されないため。 */}
+      <ul
+        className={cn(
+          "grid gap-6 text-left sm:grid-cols-2",
+          columns === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3",
+        )}
+      >
         {shown.map((item) => (
           <li key={item.id}>
             <Link
@@ -87,7 +101,12 @@ export function CaseStudies({
                   aria-hidden
                   width={800}
                   height={600}
-                  sizes="(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
+                  // 実際の表示幅に合わせる。ずれると過大な画像を読み込む。
+                  sizes={
+                    columns === 4
+                      ? "(min-width: 1024px) 17rem, (min-width: 640px) 50vw, 100vw"
+                      : "(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
+                  }
                   className="aspect-[4/3] w-full object-cover object-top"
                 />
               ) : (
