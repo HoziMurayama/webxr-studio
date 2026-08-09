@@ -36,6 +36,14 @@ export function CardCarousel<T>({
    * 既定より狭めて、画面を占めすぎないようにできる。
    */
   maxWidthClass = "max-w-3xl",
+  /**
+   * 矢印を置く、カード上端からの距離(px)。
+   *
+   * 中央（top-1/2）に置くとカードの高さに追従してしまい、送るたびに矢印が
+   * 上下に動く。文量はカードごとに違うので高さは揃わない。上端からの固定値に
+   * すれば、どのカードでも同じ位置に留まる。
+   */
+  arrowTop = 220,
 }: {
   items: T[];
   renderCard: (item: T, isCenter: boolean) => React.ReactNode;
@@ -44,6 +52,7 @@ export function CardCarousel<T>({
   label: string;
   autoplayMs?: number;
   maxWidthClass?: string;
+  arrowTop?: number;
 }) {
   const [index, setIndex] = useState(0);
   // ポインタが乗っている / フォーカスがある間は自動送りを止める。読んでいる
@@ -194,7 +203,8 @@ export function CardCarousel<T>({
           type="button"
           onClick={() => go(-1)}
           aria-label="前へ"
-          className="z-20 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 sm:absolute sm:left-0 sm:top-1/2 sm:mt-0 sm:-translate-y-1/2"
+          style={{ "--arrow-top": `${arrowTop}px` } as React.CSSProperties}
+          className="z-20 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 sm:absolute sm:left-0 sm:top-[var(--arrow-top)] sm:mt-0"
         >
           <Chevron dir="left" />
         </button>
@@ -223,7 +233,8 @@ export function CardCarousel<T>({
           type="button"
           onClick={() => go(1)}
           aria-label="次へ"
-          className="z-20 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 sm:absolute sm:right-0 sm:top-1/2 sm:mt-0 sm:-translate-y-1/2"
+          style={{ "--arrow-top": `${arrowTop}px` } as React.CSSProperties}
+          className="z-20 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 sm:absolute sm:right-0 sm:top-[var(--arrow-top)] sm:mt-0"
         >
           <Chevron dir="right" />
         </button>

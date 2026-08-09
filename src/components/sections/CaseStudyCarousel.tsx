@@ -34,6 +34,9 @@ export function CaseStudyCarousel({ items }: { items: Portfolio[] }) {
       // 既定の max-w-3xl(768px) より 100px 狭い。事例カードは画像が主で
       // 文量が少なく、広いと余白ばかりが目立つため。
       maxWidthClass="max-w-[668px]"
+      // 画像部が 400px なので、その中ほどに矢印を置く。カードの高さは
+      // お客様の声の文量で変わるため、上端からの固定値にしている。
+      arrowTop={200}
       getKey={(item) => String(item.id)}
       getLabel={(item) => clientLabel(item) || `事例 ${item.id}`}
       renderCard={(item, isCenter) => {
@@ -89,7 +92,7 @@ export function CaseStudyCarousel({ items }: { items: Portfolio[] }) {
                     矢印はホバーで右へ動かし、押せることを示す。 */}
                 <Link
                   href={`/case-study/${item.id}`}
-                  className="group/btn inline-flex items-center gap-2 border border-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2"
+                  className="group/btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-accent px-6 py-3 text-sm font-bold tracking-tight text-accent-ink transition-colors hover:bg-accent hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/50 sm:text-base"
                 >
                   この事例を見る
                   <svg
