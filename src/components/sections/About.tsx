@@ -265,6 +265,11 @@ export function About({
       align="center"
       eyebrow={showHeader ? "ABOUT US" : undefined}
       title={showHeader ? "私たちについて" : undefined}
+      description={
+        showHeader
+          ? "Web・システム・アプリ・AIを専門とするエンジニア・デザイナーの開発チームです。"
+          : undefined
+      }
     >
       {/* 導入文と写真を左右に。写真は透過PNGの重ね組みなので、白背景の上で
           そのまま成立する。狭い画面では写真が下に回る。

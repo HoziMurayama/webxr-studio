@@ -24,15 +24,16 @@ export default async function HomePage() {
       <CtoMessage />
       <div className="reveal">
         <About showClosing={false} teamLayout="carousel" />
-        <Services />
-        <Portfolio items={portfolio} />
         {/* 会社概要のみ。沿革と企業理念は /company に置く。地図もあちらだけ。 */}
         <CompanyProfile
           showMap={false}
           eyebrow="COMPANY"
           title="会社案内"
+          description="会社概要と沿革、私たちが大切にしている考え方をご紹介します。"
           tone="muted"
         />
+        <Services />
+        <Portfolio items={portfolio} />
         <Faq faqs={faqs} />
       </div>
     </>
