@@ -16,6 +16,14 @@ import type { PgTable } from "drizzle-orm/pg-core";
 
 const kv = z.object({ label: z.string(), value: z.string() });
 const linkItem = z.object({ label: z.string(), url: z.string() });
+/**
+ * 業界名とその案件例。/service の「対応プロジェクト」で使う。
+ * 入力欄では「業界名」と改行区切りの項目という2列で編集する。
+ */
+const industryGroup = z.object({
+  name: z.string(),
+  items: z.array(z.string()).default([]),
+});
 
 // Coerce common form values (numbers arrive as strings; arrays may need parsing).
 const num = z.coerce.number().int();
