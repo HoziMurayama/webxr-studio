@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FooterBanner } from "@/components/layout/FooterBanner";
 import { ChatWidget } from "@/components/ai/ChatWidget";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { LiveContent } from "@/components/LiveContent";
 import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/content";
@@ -48,6 +49,7 @@ export default async function SiteLayout({
       {/* 全ページ共通の問い合わせ導線。フッターの直前に置く。 */}
       <FooterBanner />
       <Footer settings={settings} />
+      <ScrollToTop />
       <ChatWidget />
     </div>
   );
