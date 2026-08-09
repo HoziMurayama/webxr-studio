@@ -13,7 +13,6 @@ export function Services() {
     <Section
       id="services"
       align="center"
-      tone="muted"
       eyebrow="SERVICE"
       title="サービス"
       description="Web・システム・アプリ・AIを組み合わせ、企画から設計、開発、運用まで一貫してサポートします。"

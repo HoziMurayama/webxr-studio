@@ -8,6 +8,7 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
     <Section
       id="portfolio"
       align="center"
+      tone="muted"
       eyebrow="CASE STUDY"
       title="お客様事例"
       description="課題の整理からデザイン、開発、その後の運用まで。お客様と伴走して形にしたプロジェクトと、いただいた声をご紹介します。"
