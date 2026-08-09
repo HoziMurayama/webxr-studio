@@ -80,22 +80,24 @@ export function CaseStudyCarousel({ items }: { items: Portfolio[] }) {
               {/* 左右の退色カードには出さない。読ませる対象ではないうえ、
                   幅が足りずボタンが潰れるため。 */}
               <div className={cn("mt-2", isCenter ? "block" : "hidden")}>
+                {/* サイト内の他の導線（SectionLink）と同じ枠線ボタン。
+                    矢印はホバーで右へ動かし、押せることを示す。 */}
                 <Link
                   href={`/case-study/${item.id}`}
-                  className="inline-flex items-center gap-2 text-sm font-bold tracking-tight text-accent-ink underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                  className="group/btn inline-flex items-center gap-2 border border-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2"
                 >
                   この事例を見る
                   <svg
                     viewBox="0 0 20 20"
                     aria-hidden
-                    className="h-4 w-4 shrink-0"
+                    className="h-4 w-4 shrink-0 transition-transform group-hover/btn:translate-x-1"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2.5}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M4 10h11M10 5l5 5-5 5" />
+                    <path d="M4 10h11M11 5l5 5-5 5" />
                   </svg>
                 </Link>
               </div>
