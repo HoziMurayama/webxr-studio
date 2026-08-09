@@ -112,7 +112,14 @@ export const contacts = pgTable("contacts", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   company: text("company").notNull().default(""),
+  phone: text("phone").notNull().default(""),
+  // 対応サービス（Web制作 / システム開発 / アプリ開発 / AI開発 など）。
+  service: text("service").notNull().default(""),
+  // 本文。太字・赤字は HTML として保存する。
   message: text("message").notNull(),
+  // 添付ファイル。data URL 形式で保存する（上限は API 側で 2MB）。
+  attachmentName: text("attachment_name").notNull().default(""),
+  attachmentData: text("attachment_data").notNull().default(""),
   handled: boolean("handled").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
