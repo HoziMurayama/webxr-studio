@@ -49,11 +49,19 @@ export function Header() {
     };
   }, []);
 
-  // Lock body scroll while the mobile menu is open.
+  // Lock body scroll while the mobile menu is open, and let Escape close it —
+  // the panel covers the whole viewport, so there is no obvious way out
+  // otherwise for keyboard users.
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
 
@@ -79,7 +87,10 @@ export function Header() {
         )}
       >
         <Logo
-          className={cn("self-center transition-colors duration-300", onHero ? "text-white" : "text-ink")}
+          className={cn(
+            "self-center transition-colors duration-300",
+            onHero ? "text-white" : "text-ink",
+          )}
           markClassName={scrolled ? "h-8 w-8" : "h-12 w-12"}
           nameClassName={scrolled ? "text-sm" : "text-lg"}
         />
@@ -144,25 +155,77 @@ export function Header() {
           onClick={() => setOpen((v) => !v)}
         >
           <span className="sr-only">メニュー</span>
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
-            {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+          <svg
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            {open ? (
+              <path d="M6 6l12 12M18 6L6 18" />
+            ) : (
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            )}
           </svg>
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu: a full-screen panel rather than a dropdown, so the tabs
+          get the room to be read at a glance. Fixed to the viewport and
+          scrollable on its own, which keeps long nav lists usable on short
+          screens without moving the page behind it. */}
       {open && (
-        <div className="border-t border-line bg-card lg:hidden">
-          <nav className="flex w-full flex-col px-6 py-2">
+        <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-card lg:hidden">
+          {/* The panel carries its own logo and close button: the header bar
+              sits behind this layer, so its controls are not reachable. */}
+          <div className="flex items-center justify-between px-6 py-5">
+            <Logo
+              className="text-ink"
+              markClassName="h-9 w-9"
+              nameClassName="text-base"
+            />
+            <button
+              type="button"
+              className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-lg text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+              aria-label="メニューを閉じる"
+              onClick={() => setOpen(false)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="26"
+                height="26"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              >
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
+
+          <nav className="flex flex-col px-6 pb-16">
             {NAV.map((item) => (
               <Link
                 key={item.en}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="flex items-baseline gap-3 border-b border-line/70 py-3.5 last:border-b-0 hover:bg-surface"
+                // `items-baseline` sits the small Japanese reading on the
+                // English baseline, as in the reference. Wrapping is allowed so
+                // long readings drop to a second line instead of overflowing.
+                className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
               >
-                <span className="text-sm font-bold tracking-wide text-ink">{item.en}</span>
-                <span className="text-xs text-muted">{item.label}</span>
+                <span className="text-[2rem] font-extrabold uppercase leading-none tracking-tight text-ink">
+                  {item.en}
+                </span>
+                <span className="text-sm text-muted">
+                  <span aria-hidden className="mr-2 text-line">
+                    /
+                  </span>
+                  {item.label}
+                </span>
               </Link>
             ))}
           </nav>
