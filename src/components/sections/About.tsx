@@ -27,6 +27,11 @@ type Team = {
   stack: string[];
   /** Decorative background for the card's header band. */
   image: string;
+  /**
+   * /about 上のカードに振る id。トップページのカルーセルの
+   * 「チームの詳細を見る」から `/about#<slug>` で直接飛んでくる。
+   */
+  slug: string;
 };
 
 export const TEAMS: Team[] = [
@@ -34,6 +39,7 @@ export const TEAMS: Team[] = [
     no: "01",
     en: "Web Production Team",
     image: "/team/web.svg",
+    slug: "team-web",
     ja: "Web制作チーム",
     mission: "企業の想いをカタチにし、成果につながるWebサイトを創造します。",
     intro:
@@ -81,6 +87,7 @@ export const TEAMS: Team[] = [
     no: "02",
     en: "System Development Team",
     image: "/team/system.svg",
+    slug: "team-system",
     ja: "システム開発チーム",
     mission: "企業の業務をデジタルの力で最適化し、持続的な成長を支えます。",
     intro:
@@ -131,6 +138,7 @@ export const TEAMS: Team[] = [
     no: "03",
     en: "App Development Team",
     image: "/team/app.svg",
+    slug: "team-app",
     ja: "アプリ開発チーム",
     mission: "人とテクノロジーをつなぎ、快適なモバイル体験を実現します。",
     intro:
@@ -170,6 +178,7 @@ export const TEAMS: Team[] = [
     no: "04",
     en: "AI Development Team",
     image: "/team/ai.svg",
+    slug: "team-ai",
     ja: "AI開発チーム",
     mission: "AI技術で企業の可能性を広げ、新たな価値を創造します。",
     intro:
@@ -305,7 +314,13 @@ export function About({
       ) : (
         <ol className="mt-16 space-y-10">
           {TEAMS.map((team) => (
-            <li key={team.no} className="border border-line bg-card text-left">
+            <li
+              key={team.no}
+              // トップページの「チームの詳細を見る」からの着地点。
+              // `scroll-mt` は固定ヘッダーぶんの逃げ。
+              id={team.slug}
+              className="scroll-mt-28 border border-line bg-card text-left"
+            >
               {/* ヘッダー帯: フッターと同じ青 (--chrome) を敷き、文字は白に反転。
                 背景画像は青の上では埋もれるため、低い不透明度のテクスチャとして
                 重ねている。白文字は青の上で 6.67:1 と AA を満たす。 */}
