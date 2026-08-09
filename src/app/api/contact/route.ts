@@ -9,25 +9,21 @@ export const runtime = "nodejs";
 const MAX_ATTACHMENT = 2 * 1024 * 1024 * 1.4;
 
 /**
- * 本文は太字・赤字だけを許す簡易サニタイズを通す。エディタ由来の HTML を
- * そのまま保存すると、管理画面で表示したときに任意のマークアップが動くため。
+ * 本文は改行だけを持つ素のテキストとして保存する。エディタ由来の HTML を
+ * そのまま保存すると、管理画面で表示したときに任意のマークアップが動くため、
+ * <br> を改行に戻したうえでタグを全て除去する。
  */
 function sanitize(html: string): string {
   return html
-    // script/style は中身ごと落とす
     .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
-    // execCommand は色を <font color> で出すので span に寄せる
-    .replace(/<font[^>]*color=["']?#?dc2626["']?[^>]*>/gi, '<span style="color:#dc2626">')
-    .replace(/<font[^>]*>/gi, "<span>")
-    .replace(/<\/font>/gi, "</span>")
-    // 許可タグ以外を除去（b/strong/span/br のみ残す）
-    .replace(/<(?!\/?(b|strong|span|br)\b)[^>]*>/gi, "")
-    // span は赤字指定のみ許可し、他の属性は落とす
-    .replace(/<span[^>]*>/gi, (m) =>
-      /#dc2626/i.test(m) ? '<span style="color:#dc2626">' : "<span>",
-    )
-    // 残ったタグから属性を除去
-    .replace(/<(b|strong|br)[^>]*>/gi, "<$1>");
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(div|p)>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .trim();
 }
 
 const schema = z.object({

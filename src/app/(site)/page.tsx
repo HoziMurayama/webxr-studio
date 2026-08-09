@@ -5,7 +5,7 @@ import { Services } from "@/components/sections/Services";
 import { Portfolio } from "@/components/sections/Portfolio";
 import { Team } from "@/components/sections/Team";
 import { Faq } from "@/components/sections/Faq";
-import { Inquiry } from "@/components/sections/Inquiry";
+import { Contact } from "@/components/sections/Contact";
 import {
   getCompany,
   getServices,
@@ -37,7 +37,7 @@ export default async function HomePage() {
         <Portfolio items={portfolio} />
         <Team members={team} />
         <Faq faqs={faqs} />
-        <Inquiry />
+        <Contact />
       </div>
     </>
   );

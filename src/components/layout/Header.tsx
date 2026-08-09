@@ -14,7 +14,7 @@ const NAV = [
   { href: "/service", en: "SERVICE", label: "サービス" },
   { href: "/case-study", en: "CASE STUDY", label: "お客様事例" },
   { href: "/faq", en: "FAQ", label: "よくある質問" },
-  { href: "/contact", en: "INQUIRY", label: "お問い合わせ" },
+  { href: "/contact", en: "CONTACT", label: "お問い合わせ" },
 ];
 
 export function Header() {

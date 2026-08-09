@@ -20,7 +20,7 @@ const SERVICES = [
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
-export function Inquiry({
+export function Contact({
   /** /contact では PageHero が同じ見出しを出すため抑制する。 */
   showHeader = true,
 }: {
@@ -31,15 +31,6 @@ export function Inquiry({
   const [file, setFile] = useState<{ name: string; data: string } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-
-  /** 選択範囲に太字／赤字を適用する。エディタに焦点を戻してから実行する。 */
-  const format = (cmd: "bold" | "red") => {
-    const el = editorRef.current;
-    if (!el) return;
-    el.focus();
-    if (cmd === "bold") document.execCommand("bold");
-    else document.execCommand("foreColor", false, "#dc2626");
-  };
 
   async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -108,7 +99,7 @@ export function Inquiry({
     <Section
       id="contact"
       align="center"
-      eyebrow={showHeader ? "Inquiry" : undefined}
+      eyebrow={showHeader ? "Contact" : undefined}
       title={showHeader ? "お問い合わせ" : undefined}
       description={
         showHeader ? "ご相談・お見積もりは無料です。お気軽にご連絡ください。" : undefined
@@ -188,30 +179,9 @@ export function Inquiry({
               内容（必須・10文字以上）
             </label>
 
-            {/* 書式ツールバー。選択範囲に太字／赤字を適用する。 */}
-            <div className="flex flex-wrap items-center gap-2 border border-b-0 border-line bg-card px-3 py-2">
-              <button
-                type="button"
-                onClick={() => format("bold")}
-                className="border border-line px-3 py-1 text-sm font-bold text-ink transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
-              >
-                B
-              </button>
-              <button
-                type="button"
-                onClick={() => format("red")}
-                className="border border-line px-3 py-1 text-sm font-semibold text-[#dc2626] transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
-              >
-                赤字
-              </button>
-              <span className="ml-auto text-xs text-muted">
-                Enter で改行できます
-              </span>
-            </div>
-
-            {/* contentEditable のエディタ。改行を確実に入れるため、Enter は
-                自前で <br> を挿入する（ブラウザ既定だと <div> が入り、
-                書式が意図せず途切れることがある）。 */}
+            {/* contentEditable のエディタ。Enter だけを受け付け、改行として
+                <br> を挿入する。太字などの書式ショートカット（Ctrl+B 等）は
+                無効化し、本文は書式なしのテキストとして扱う。 */}
             <div
               id="message-editor"
               ref={editorRef}
@@ -223,6 +193,11 @@ export function Inquiry({
                 if (e.key === "Enter") {
                   e.preventDefault();
                   document.execCommand("insertLineBreak");
+                  return;
+                }
+                // ブラウザ既定の書式ショートカットを塞ぐ。
+                if ((e.ctrlKey || e.metaKey) && ["b", "i", "u"].includes(e.key.toLowerCase())) {
+                  e.preventDefault();
                 }
               }}
               onPaste={(e) => {

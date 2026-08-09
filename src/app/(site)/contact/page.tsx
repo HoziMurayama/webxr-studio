@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
-import { Inquiry } from "@/components/sections/Inquiry";
+import { Contact } from "@/components/sections/Contact";
 
 export const dynamic = "force-dynamic";
 
@@ -15,12 +15,12 @@ export default function ContactPage() {
   return (
     <>
       <PageHero
-        en="INQUIRY"
+        en="CONTACT"
         title="お問い合わせ"
         description="ご相談・お見積もりは無料です。お気軽にご連絡ください。"
         image="/about/fv-contact.webp"
       />
-      <Inquiry showHeader={false} />
+      <Contact showHeader={false} />
     </>
   );
 }
