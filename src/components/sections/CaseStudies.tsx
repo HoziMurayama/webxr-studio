@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 /**
  * お客様事例の一覧。カードをクリックすると個別ページ（/case-study/[id]）へ遷移する。
  *
- * カード表面: お客様画像 / お客様の声（抜粋）/ 企業名・お名前 / 業界 / 技術スタック
+ * カード表面: お客様画像 / お客様の声（抜粋）/ 企業名・お名前 / 業界
+ * 技術スタックは詳細ページ（/case-study/[id]）に置く。
  */
 
 /** 企業名と個人名を組み立てる。企業名が空なら個人名のみ。 */
@@ -136,7 +137,6 @@ export function CaseStudies({
                       {item.industry}
                     </p>
                   )}
-                  <Stack tags={item.tags ?? []} />
                 </div>
               </div>
             </Link>
