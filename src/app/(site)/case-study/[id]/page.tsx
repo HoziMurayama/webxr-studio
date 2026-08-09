@@ -44,7 +44,7 @@ export default async function CaseStudyDetailPage({
       <PageHero
         en="CASE STUDY"
         title="お客様事例"
-        description="2026年に手がけたプロジェクトの一部と、お客様の声をご紹介します。"
+        description="こちらでご紹介しているのは、2026年に当社が制作した実績の一部です。"
         image="/about/fv-faq.webp"
       />
 
