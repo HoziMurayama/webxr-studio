@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CardCarousel } from "@/components/ui/CardCarousel";
 import type { Domain } from "@/components/sections/ServiceDetail";
+import { cn } from "@/lib/utils";
 
 /**
  * 4つのサービス領域を1枚ずつ見せるカルーセル。
@@ -37,7 +38,7 @@ export function ServiceCarousel({ domains }: { domains: Domain[] }) {
       label="サービス"
       getKey={(d) => d.en}
       getLabel={(d) => d.title}
-      renderCard={(d) => (
+      renderCard={(d, isCenter) => (
         <>
           {/* ヘッダー帯。/service の詳細カードと同じ青とテクスチャ。 */}
           <div className="relative isolate bg-chrome p-6 text-center sm:p-8">
@@ -56,26 +57,57 @@ export function ServiceCarousel({ domains }: { domains: Domain[] }) {
               {d.lead}
             </p>
 
-            {/* 青帯に対し白地・青文字で最大の対比をとる。押されたサービスが
-                お問い合わせフォームで選択済みになる。 */}
-            <Link
-              href={`/contact?service=${encodeURIComponent(d.formService)}#service`}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold tracking-tight text-chrome shadow-lg transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 sm:text-base"
+            {/* 相談が主、詳細が従。白地の塗りと白枠線で主従を分けている。
+                狭い画面では縦積みにして、どちらも押しやすい幅を確保する。
+
+                左右の退色カードには出さない。幅が足りずボタンが縦に潰れるうえ、
+                読ませる対象でもないため。 */}
+            <div
+              className={cn(
+                "mt-6 flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center",
+                isCenter ? "flex" : "hidden",
+              )}
             >
-              このサービスを相談する
-              <svg
-                viewBox="0 0 20 20"
-                aria-hidden
-                className="h-4 w-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <Link
+                href={`/contact?service=${encodeURIComponent(d.formService)}#service`}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold tracking-tight text-chrome shadow-lg transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 sm:text-base"
               >
-                <path d="M4 10h11M10 5l5 5-5 5" />
-              </svg>
-            </Link>
+                このサービスを相談する
+                <svg
+                  viewBox="0 0 20 20"
+                  aria-hidden
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 10h11M10 5l5 5-5 5" />
+                </svg>
+              </Link>
+
+              {/* /service の該当カードへ。業界別の対応プロジェクトはあちらに
+                  載せているため、ここからは直接飛ばす。 */}
+              <Link
+                href={`/service#${d.slug}`}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/80 px-6 py-3 text-sm font-bold tracking-tight text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 sm:text-base"
+              >
+                対応プロジェクトを見る
+                <svg
+                  viewBox="0 0 20 20"
+                  aria-hidden
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 10h11M10 5l5 5-5 5" />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* 対応サービスのみ。対応プロジェクトは /service に置く。 */}

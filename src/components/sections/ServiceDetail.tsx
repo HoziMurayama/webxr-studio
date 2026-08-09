@@ -25,6 +25,11 @@ export type Domain = {
    * `Contact` の SERVICES と文字列が一致している必要がある。
    */
   formService: string;
+  /**
+   * /service 上のカードに振る id。トップページの「対応プロジェクトを見る」
+   * から `/service#<slug>` で直接飛んでくる。
+   */
+  slug: string;
 };
 
 export const DOMAINS: Domain[] = [
@@ -32,6 +37,7 @@ export const DOMAINS: Domain[] = [
     en: "WEB DEVELOPMENT",
     image: "/team/web.svg",
     formService: "Web制作",
+    slug: "web",
     title: "Webで「届ける」",
     lead: "企業やサービスの魅力を伝え、集客・販売・採用・顧客との接点を生み出すWebサービスを開発します。",
     services: [
@@ -115,6 +121,7 @@ export const DOMAINS: Domain[] = [
     en: "SYSTEM DEVELOPMENT",
     image: "/team/system.svg",
     formService: "システム開発",
+    slug: "system",
     title: "システムで「支える」",
     lead: "企業の業務を効率化し、顧客・商品・データ・業務プロセスをつなぐ業務システムを開発します。",
     services: [
@@ -136,15 +143,30 @@ export const DOMAINS: Domain[] = [
     industries: [
       {
         name: "医療・ヘルスケア",
-        items: ["患者・顧客管理", "予約管理", "医療機関向けCRM", "問い合わせ管理"],
+        items: [
+          "患者・顧客管理",
+          "予約管理",
+          "医療機関向けCRM",
+          "問い合わせ管理",
+        ],
       },
       {
         name: "建築・建設",
-        items: ["建築・施工管理", "顧客管理CRM", "見積・案件管理", "工程・進捗管理"],
+        items: [
+          "建築・施工管理",
+          "顧客管理CRM",
+          "見積・案件管理",
+          "工程・進捗管理",
+        ],
       },
       {
         name: "不動産",
-        items: ["物件管理システム", "顧客管理CRM", "内見予約管理", "契約・営業管理"],
+        items: [
+          "物件管理システム",
+          "顧客管理CRM",
+          "内見予約管理",
+          "契約・営業管理",
+        ],
       },
       {
         name: "教育",
@@ -152,7 +174,12 @@ export const DOMAINS: Domain[] = [
       },
       {
         name: "人材・採用",
-        items: ["ATS・採用管理", "求職者管理", "求人管理", "AIマッチングシステム"],
+        items: [
+          "ATS・採用管理",
+          "求職者管理",
+          "求人管理",
+          "AIマッチングシステム",
+        ],
       },
       {
         name: "製造業",
@@ -160,7 +187,12 @@ export const DOMAINS: Domain[] = [
       },
       {
         name: "物流・運輸",
-        items: ["配送管理", "車両・フリート管理", "荷物追跡", "物流ダッシュボード"],
+        items: [
+          "配送管理",
+          "車両・フリート管理",
+          "荷物追跡",
+          "物流ダッシュボード",
+        ],
       },
     ],
   },
@@ -168,6 +200,7 @@ export const DOMAINS: Domain[] = [
     en: "APP DEVELOPMENT",
     image: "/team/app.svg",
     formService: "アプリ開発",
+    slug: "app",
     title: "アプリで「つなぐ」",
     lead: "ユーザーとサービス、企業と顧客、現場と管理者をつなぐスマートフォン・モバイルアプリを開発します。",
     services: [
@@ -264,6 +297,7 @@ export const DOMAINS: Domain[] = [
     en: "AI DEVELOPMENT",
     image: "/team/ai.svg",
     formService: "AI開発",
+    slug: "ai",
     title: "AIで「進化させる」",
     lead: "生成AI・機械学習・データ分析・AI自動化を既存のWeb・システム・アプリに組み込み、企業の業務とサービスをさらに進化させます。",
     services: [
@@ -378,9 +412,7 @@ export function ServiceDetail({
         id="services"
         align="center"
         eyebrow={showHeader ? "SERVICE" : undefined}
-        title={
-          showHeader ? "サービス" : undefined
-        }
+        title={showHeader ? "サービス" : undefined}
       >
         <div className="mx-auto max-w-3xl space-y-5 text-left text-base leading-relaxed text-ink-soft sm:text-lg">
           <p>
@@ -397,9 +429,12 @@ export function ServiceDetail({
           {DOMAINS.map((d) => (
             <article
               key={d.en}
+              // トップページの「対応プロジェクトを見る」からの着地点。
+              id={d.slug}
               // 左に青の見出し帯、右に内容。狭い画面では縦積みに戻る。
               // `items-stretch` で青帯が右カラムの高さいっぱいまで伸びる。
-              className="grid items-stretch border border-line bg-card lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.6fr)]"
+              // `scroll-mt` は固定ヘッダーぶんの逃げ。
+              className="grid scroll-mt-28 items-stretch border border-line bg-card lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.6fr)]"
             >
               {/* 見出し帯。フッターと同じ青を敷き、文字は白に反転。背景に領域ごとの
                   バナーを低い不透明度で重ねる（ABOUT US のチームカードと同じ手法）。
@@ -466,7 +501,10 @@ export function ServiceDetail({
                   </h4>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {d.industries.map((ind) => (
-                      <div key={ind.name} className="border border-line bg-surface p-5">
+                      <div
+                        key={ind.name}
+                        className="border border-line bg-surface p-5"
+                      >
                         <p className="text-sm font-bold tracking-tight text-accent-ink">
                           {ind.name}
                         </p>
