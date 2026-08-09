@@ -1,5 +1,6 @@
 import { Section } from "@/components/ui/Section";
 import type { Portfolio as PortfolioItem } from "@/db/schema";
+import { SectionLink } from "@/components/ui/SectionLink";
 
 export function Portfolio({ items }: { items: PortfolioItem[] }) {
   if (items.length === 0) return null;
@@ -29,7 +30,10 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
                   <div className="flex h-full w-full items-center justify-center">
                     <span
                       className="font-black text-ink/10"
-                      style={{ fontFamily: '"Arial Black", sans-serif', fontSize: 64 }}
+                      style={{
+                        fontFamily: '"Arial Black", sans-serif',
+                        fontSize: 64,
+                      }}
                     >
                       XR
                     </span>
@@ -48,7 +52,9 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
                   ))}
                 </div>
                 <h3 className="text-lg font-bold text-ink">{p.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{p.description}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {p.description}
+                </p>
               </div>
             </>
           );
@@ -57,7 +63,13 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
             "group block overflow-hidden rounded-2xl border border-line bg-card transition-shadow hover:shadow-[0_10px_40px_rgb(13,16,23,0.08)]";
 
           return p.link ? (
-            <a key={p.id} href={p.link} target="_blank" rel="noopener noreferrer" className={cls}>
+            <a
+              key={p.id}
+              href={p.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cls}
+            >
               {inner}
             </a>
           ) : (
@@ -67,6 +79,8 @@ export function Portfolio({ items }: { items: PortfolioItem[] }) {
           );
         })}
       </div>
+
+      <SectionLink href="/case-study">お客様事例をすべて見る</SectionLink>
     </Section>
   );
 }

@@ -30,6 +30,7 @@ export default async function HomePage() {
           title="会社案内"
           description="会社概要と沿革、私たちが大切にしている考え方をご紹介します。"
           tone="muted"
+          showPageLink
         />
         <Services />
         <Portfolio items={portfolio} />

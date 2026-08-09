@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { TechChip } from "@/components/ui/TechIcon";
 import { TeamCarousel } from "@/components/sections/TeamCarousel";
+import { SectionLink } from "@/components/ui/SectionLink";
 import { cn } from "@/lib/utils";
 
 /**
@@ -451,6 +452,12 @@ export function About({
             </p>
           </div>
         </div>
+      )}
+
+      {/* トップページ（カルーセル表示）のときだけ、全チームを載せた /about へ
+          誘導する。/about 自身では自分へのリンクになるので出さない。 */}
+      {teamLayout === "carousel" && (
+        <SectionLink href="/about">私たちについて詳しく見る</SectionLink>
       )}
     </Section>
   );

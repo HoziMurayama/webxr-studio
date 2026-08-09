@@ -1,5 +1,6 @@
 import { Section } from "@/components/ui/Section";
 import type { Faq as FaqItem } from "@/db/schema";
+import { SectionLink } from "@/components/ui/SectionLink";
 
 export function Faq({
   faqs,
@@ -55,6 +56,11 @@ export function Faq({
           </details>
         ))}
       </div>
+
+      {/* /faq では自分自身へのリンクになるため出さない。 */}
+      {showHeader && (
+        <SectionLink href="/faq">よくある質問をすべて見る</SectionLink>
+      )}
     </Section>
   );
 }

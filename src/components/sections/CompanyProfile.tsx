@@ -1,5 +1,6 @@
 import { Section } from "@/components/ui/Section";
 import { getSiteSettings } from "@/lib/content";
+import { SectionLink } from "@/components/ui/SectionLink";
 
 /**
  * 会社概要の表。トップページと /company が共有する。
@@ -45,12 +46,15 @@ export async function CompanyProfile({
   title = "会社概要",
   description,
   tone = "default",
+  /** /company への導線。トップページでのみ出す（あちらでは自分自身）。 */
+  showPageLink = false,
 }: {
   showMap?: boolean;
   eyebrow?: string;
   title?: string;
   description?: string;
   tone?: "default" | "muted";
+  showPageLink?: boolean;
 } = {}) {
   const settings = await getSiteSettings();
 
@@ -149,6 +153,10 @@ export async function CompanyProfile({
         <p className="mx-auto max-w-3xl text-center text-sm text-muted">
           会社情報は管理画面から登録できます。
         </p>
+      )}
+
+      {showPageLink && (
+        <SectionLink href="/company">会社案内を詳しく見る</SectionLink>
       )}
     </Section>
   );
