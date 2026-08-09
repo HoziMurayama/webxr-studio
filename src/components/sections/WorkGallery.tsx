@@ -32,8 +32,14 @@ function Viewer({
   // 再描画を挟むとカクつくため。
   const [shownScale, setShownScale] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
+  // 実際に描画している値と、そこへ向かう目標値。ホイールやボタンは目標値だけ
+  // 動かし、rAF で毎フレーム近づける。こうすると入力が飛び飛びでも動きが繋がる。
   const view = useRef({ scale: 1, x: 0, y: 0 });
+  const target = useRef({ scale: 1, x: 0, y: 0 });
+  const raf = useRef<number | null>(null);
   const dragFrom = useRef<{ x: number; y: number } | null>(null);
+  // 直近のドラッグ速度(px/ms)。指を離したあとの滑りに使う。
+  const velocity = useRef({ x: 0, y: 0, t: 0 });
   const imgRef = useRef<HTMLImageElement>(null);
 
   const total = items.length;
@@ -41,44 +47,92 @@ function Viewer({
   const src = current.value;
   const label = current.label;
 
-  /** ref の値を DOM に反映する。`animate` はボタン操作など離散的な変化のみ。 */
-  const apply = useCallback((animate = false) => {
+  /** ref の値をそのまま DOM へ書き出す。CSS transition は使わない。 */
+  const paint = useCallback(() => {
     const el = imgRef.current;
     if (!el) return;
     const { scale, x, y } = view.current;
-    el.style.transition = animate ? "transform 0.18s ease-out" : "none";
     el.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), 0) scale(${scale})`;
   }, []);
 
+  /**
+   * 目標値へ毎フレーム一定割合だけ近づける。距離に比例して縮むので、
+   * 動き出しは速く終わり際はゆっくりになり、指を離しても自然に減速する。
+   */
+  const follow = useCallback(() => {
+    const v = view.current;
+    const t = target.current;
+    const ds = t.scale - v.scale;
+    const dx = t.x - v.x;
+    const dy = t.y - v.y;
+    // 十分近づいたら座標を合わせてループを止める。
+    if (Math.abs(ds) < 0.0005 && Math.abs(dx) < 0.15 && Math.abs(dy) < 0.15) {
+      v.scale = t.scale;
+      v.x = t.x;
+      v.y = t.y;
+      paint();
+      raf.current = null;
+      return;
+    }
+    const k = 0.22; // 1フレームで詰める割合。大きいほど機敏、小さいほど粘る。
+    v.scale += ds * k;
+    v.x += dx * k;
+    v.y += dy * k;
+    paint();
+    raf.current = requestAnimationFrame(follow);
+  }, [paint]);
+
+  /** 追従ループを起こす。すでに回っていれば何もしない。 */
+  const kick = useCallback(() => {
+    if (raf.current === null) raf.current = requestAnimationFrame(follow);
+  }, [follow]);
+
+  /** 補間を挟まず即座に反映する。ドラッグ中のように入力が連続する場面用。 */
+  const applyNow = useCallback(() => {
+    if (raf.current !== null) {
+      cancelAnimationFrame(raf.current);
+      raf.current = null;
+    }
+    view.current = { ...target.current };
+    paint();
+  }, [paint]);
+
+  useEffect(() => {
+    return () => {
+      if (raf.current !== null) cancelAnimationFrame(raf.current);
+    };
+  }, []);
+
   const setScaleAt = useCallback(
-    (next: number, originX?: number, originY?: number, animate = false) => {
-      const v = view.current;
+    (next: number, originX?: number, originY?: number) => {
+      const t = target.current;
       const clamped = Math.min(MAX_SCALE, Math.max(MIN_SCALE, next));
       if (originX !== undefined && originY !== undefined) {
         // カーソル位置を基点に拡大する。基点と画像中心の相対距離を倍率比で伸ばす。
-        const k = clamped / v.scale;
-        v.x = originX - (originX - v.x) * k;
-        v.y = originY - (originY - v.y) * k;
+        const k = clamped / t.scale;
+        t.x = originX - (originX - t.x) * k;
+        t.y = originY - (originY - t.y) * k;
       }
-      v.scale = clamped;
-      apply(animate);
+      t.scale = clamped;
+      kick();
       setShownScale(clamped);
     },
-    [apply],
+    [kick],
   );
 
   const reset = useCallback(() => {
-    view.current = { scale: 1, x: 0, y: 0 };
-    apply(true);
+    target.current = { scale: 1, x: 0, y: 0 };
+    kick();
     setShownScale(1);
-  }, [apply]);
+  }, [kick]);
 
-  // 画像を切り替えたら倍率と位置を初期化する。
+  // 画像を切り替えたら倍率と位置を初期化する。前の画像の位置を引きずらない
+  // よう、ここは補間せず即座に等倍へ戻す。
   useEffect(() => {
-    view.current = { scale: 1, x: 0, y: 0 };
-    apply(false);
+    target.current = { scale: 1, x: 0, y: 0 };
+    applyNow();
     setShownScale(1);
-  }, [src, apply]);
+  }, [src, applyNow]);
 
   // 端で止めず循環させる。
   const go = useCallback(
@@ -114,7 +168,8 @@ function Viewer({
       const oy = e.clientY - (r.top + r.height / 2);
       // deltaY の大きさに追従させ、細かいホイールでも滑らかに効くようにする。
       const factor = Math.exp(-e.deltaY * 0.0016);
-      setScaleAt(view.current.scale * factor, ox, oy);
+      // 基準は描画中の値ではなく目標値。補間の途中で回しても倍率が鈍らない。
+      setScaleAt(target.current.scale * factor, ox, oy);
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
@@ -175,24 +230,46 @@ function Viewer({
           // ボタン上での押下ではドラッグを始めない。ここで setPointerCapture を
           // 呼ぶとポインタを奪ってしまい、送りボタンの click が発火しなくなる。
           if ((e.target as HTMLElement).closest("button")) return;
+          // つかんだ瞬間に走行中の補間を止め、指の下へ吸い付かせる。
+          applyNow();
           dragFrom.current = {
             x: e.clientX - view.current.x,
             y: e.clientY - view.current.y,
           };
+          velocity.current = { x: 0, y: 0, t: e.timeStamp };
           setIsDragging(true);
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
         onPointerMove={(e) => {
           const d = dragFrom.current;
           if (!d) return;
-          // 再描画を挟まず直接 style を書き換える。これが滑らかさの要。
-          view.current.x = e.clientX - d.x;
-          view.current.y = e.clientY - d.y;
-          apply(false);
+          const nx = e.clientX - d.x;
+          const ny = e.clientY - d.y;
+          // 離した後の勢いに使うため、直近の移動速度を控えておく。
+          const dt = e.timeStamp - velocity.current.t;
+          if (dt > 0) {
+            velocity.current = {
+              x: (nx - view.current.x) / dt,
+              y: (ny - view.current.y) / dt,
+              t: e.timeStamp,
+            };
+          }
+          // 補間も再描画も挟まず直接書き換える。これが追従の要。
+          target.current.x = nx;
+          target.current.y = ny;
+          view.current.x = nx;
+          view.current.y = ny;
+          paint();
         }}
         onPointerUp={() => {
+          if (!dragFrom.current) return;
           dragFrom.current = null;
           setIsDragging(false);
+          // 指を離した勢いのぶんだけ目標値を先へ飛ばし、follow の減速に任せる。
+          const glide = 90; // ms 相当。大きいほど長く滑る。
+          target.current.x += velocity.current.x * glide;
+          target.current.y += velocity.current.y * glide;
+          kick();
         }}
         onPointerCancel={() => {
           dragFrom.current = null;
@@ -205,13 +282,16 @@ function Viewer({
           const oy = e.clientY - (r.top + r.height / 2);
           // ダブルクリックで等倍と2倍を往復する。
           if (view.current.scale > 1.01) reset();
-          else setScaleAt(2, ox, oy, true);
+          else setScaleAt(2, ox, oy);
         }}
       >
         {/* 画像は中央を基準に拡大し、ドラッグ量ぶん平行移動する。
             原寸を見るための表示なので next/image の最適化は通さない。 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          // key を src に結び付けると切り替えのたびに要素が作り直され、
+          // fade アニメーションが毎回頭から流れる。
+          key={src}
           ref={imgRef}
           src={src}
           alt={label}
@@ -219,6 +299,7 @@ function Viewer({
           style={{
             transform: "translate3d(-50%, -50%, 0) scale(1)",
             willChange: "transform",
+            animation: "wg-fade 0.22s ease-out",
           }}
           className="absolute left-1/2 top-1/2 max-h-none max-w-none select-none"
           // 初期表示で画面に収まるよう、幅の上限だけ与える。
