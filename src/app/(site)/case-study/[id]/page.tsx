@@ -44,12 +44,17 @@ export default async function CaseStudyDetailPage({
       <PageHero
         en="CASE STUDY"
         title="お客様事例"
-        description="こちらでご紹介しているのは、2026年に当社が制作した実績の一部です。"
+        description="2026年に手がけたプロジェクトの一部と、お客様の声をご紹介します。"
         image="/about/fv-faq.webp"
       />
 
       <Section align="center">
         <div className="mx-auto max-w-3xl space-y-10 text-left">
+          {/* 掲載が実績の一部である旨は、一覧と同じく第2セクションでも伝える。 */}
+          <p className="text-base leading-relaxed text-muted">
+            こちらでご紹介しているのは、2026年に当社が制作した実績の一部です。
+          </p>
+
           {/* 案件名と業界。第1セクションから移してきた見出し。 */}
           <div>
             {item.industry && (

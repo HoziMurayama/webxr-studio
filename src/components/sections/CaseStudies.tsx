@@ -33,11 +33,18 @@ export function Stack({ tags }: { tags: string[] }) {
   );
 }
 
-export function CaseStudies({ items }: { items: Portfolio[] }) {
+export function CaseStudies({
+  items,
+  /** 一覧の上に出す一文。掲載が実績の一部である旨を伝える。 */
+  description,
+}: {
+  items: Portfolio[];
+  description?: string;
+}) {
   if (items.length === 0) return null;
 
   return (
-    <Section id="case-study" align="center">
+    <Section id="case-study" align="center" description={description}>
       <ul className="grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
           <li key={item.id}>

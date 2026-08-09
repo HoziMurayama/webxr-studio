@@ -18,10 +18,13 @@ export default async function CaseStudyPage() {
       <PageHero
         en="CASE STUDY"
         title="お客様事例"
-        description="こちらでご紹介しているのは、2026年に当社が制作した実績の一部です。"
+        description="2026年に手がけたプロジェクトの一部と、お客様の声をご紹介します。"
         image="/about/fv-faq.webp"
       />
-      <CaseStudies items={portfolio} />
+      <CaseStudies
+        items={portfolio}
+        description="こちらでご紹介しているのは、2026年に当社が制作した実績の一部です。"
+      />
     </>
   );
 }

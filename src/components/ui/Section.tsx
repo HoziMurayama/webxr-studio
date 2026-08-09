@@ -49,7 +49,15 @@ export function Section({
               </h2>
             )}
             {description && (
-              <p className="mt-4 text-base leading-relaxed text-muted">{description}</p>
+              // 見出しが無いときは上の余白を詰める。
+              <p
+                className={cn(
+                  "text-base leading-relaxed text-muted",
+                  (eyebrow || title) && "mt-4",
+                )}
+              >
+                {description}
+              </p>
             )}
           </header>
         )}
