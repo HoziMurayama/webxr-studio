@@ -246,8 +246,11 @@ function BlockLabel({
 export function About({
   /** Hide the section header on /about, where PageHero already shows it. */
   showHeader = true,
+  /** 締めの「ひとつのチーム、多様な専門性」。トップページでは出さない。 */
+  showClosing = true,
 }: {
   showHeader?: boolean;
+  showClosing?: boolean;
 } = {}) {
   return (
     <Section
@@ -387,35 +390,37 @@ export function About({
 
       {/* 最後に — 背景に集合写真を敷き、白の scrim で本文の可読性を確保。
           scrim なしでは text-ink-soft が AA を割る。 */}
-      <div
-        className="relative isolate mt-16 overflow-hidden border border-line bg-surface bg-cover bg-center p-8 text-center sm:p-10"
-        style={{ backgroundImage: "url(/about/closing.webp)" }}
-      >
+      {showClosing && (
         <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 bg-card/90"
-        />
-        {/* 英語を小さなラベル、日本語を主見出しに。ナビや PageHero・チーム
+          className="relative isolate mt-16 overflow-hidden border border-line bg-surface bg-cover bg-center p-8 text-center sm:p-10"
+          style={{ backgroundImage: "url(/about/closing.webp)" }}
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 bg-card/90"
+          />
+          {/* 英語を小さなラベル、日本語を主見出しに。ナビや PageHero・チーム
             カードと同じ「英語（小）→ 日本語（大）」の並びに揃えている。 */}
-        <p className="text-lg font-bold tracking-[0.08em] text-accent-ink sm:text-xl">
-          One Team, Multiple Expertise
-        </p>
-        <h3 className="mt-3 text-[1.75rem] font-black leading-tight tracking-tight text-ink sm:text-4xl xl:text-5xl">
-          ひとつのチーム、多様な専門性
-        </h3>
-        <div className="mx-auto mt-6 max-w-3xl space-y-4 text-[1.25rem] leading-relaxed text-ink-soft sm:text-[1.375rem]">
-          <p>
-            私たちは4つの専門チームが連携することで、単なる制作会社ではなく、
-            <strong className="font-bold text-ink">
-              「ビジネス課題を技術で解決する開発パートナー」
-            </strong>
-            として価値を提供しています。
+          <p className="text-lg font-bold tracking-[0.08em] text-accent-ink sm:text-xl">
+            One Team, Multiple Expertise
           </p>
-          <p>
-            Web制作からシステム・アプリ・AIまで、一つの窓口で一貫して対応できることがWEB-XR.studioの強みです。
-          </p>
+          <h3 className="mt-3 text-[1.75rem] font-black leading-tight tracking-tight text-ink sm:text-4xl xl:text-5xl">
+            ひとつのチーム、多様な専門性
+          </h3>
+          <div className="mx-auto mt-6 max-w-3xl space-y-4 text-[1.25rem] leading-relaxed text-ink-soft sm:text-[1.375rem]">
+            <p>
+              私たちは4つの専門チームが連携することで、単なる制作会社ではなく、
+              <strong className="font-bold text-ink">
+                「ビジネス課題を技術で解決する開発パートナー」
+              </strong>
+              として価値を提供しています。
+            </p>
+            <p>
+              Web制作からシステム・アプリ・AIまで、一つの窓口で一貫して対応できることがWEB-XR.studioの強みです。
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </Section>
   );
 }
