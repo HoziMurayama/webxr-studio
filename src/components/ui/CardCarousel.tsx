@@ -100,6 +100,9 @@ export function CardCarousel<T>({
 
   if (total === 0) return null;
 
+  // items が減ったとき index が範囲外に残ることがあるので、参照前に丸める。
+  const safeIndex = Math.min(index, total - 1);
+
   return (
     <div
       className="relative mt-16"
