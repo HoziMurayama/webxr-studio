@@ -155,20 +155,32 @@ export function Header() {
           onClick={() => setOpen((v) => !v)}
         >
           <span className="sr-only">メニュー</span>
-          <svg
-            viewBox="0 0 24 24"
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            {open ? (
-              <path d="M6 6l12 12M18 6L6 18" />
-            ) : (
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            )}
-          </svg>
+          {/* Three bars that stay in the DOM and transform into the X, rather
+              than swapping one icon for another — only a persistent element can
+              be tweened. The outer two slide to the middle and rotate; the
+              centre one fades, so it does not show through the crossing. */}
+          <span aria-hidden className="relative block h-[18px] w-[22px]">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                // Every bar is pinned to the vertical centre and offset by
+                // `translate`, so open/closed differ only in the transform.
+                // Animating `top` against a static class would leave two
+                // competing values and no transition; one property, one value.
+                style={{
+                  transform: open
+                    ? i === 1
+                      ? "translateY(-50%)"
+                      : `translateY(-50%) rotate(${i === 0 ? 45 : -45}deg)`
+                    : `translateY(calc(-50% + ${(i - 1) * 8}px))`,
+                }}
+                className={cn(
+                  "absolute inset-x-0 top-1/2 h-0.5 rounded-full bg-current transition-[transform,opacity] duration-300 ease-out",
+                  open && i === 1 && "opacity-0",
+                )}
+              />
+            ))}
+          </span>
         </button>
       </div>
 
@@ -176,61 +188,71 @@ export function Header() {
           get the room to be read at a glance. Fixed to the viewport and
           scrollable on its own, which keeps long nav lists usable on short
           screens without moving the page behind it. */}
-      {open && (
-        <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-card lg:hidden">
-          {/* The panel carries its own logo and close button: the header bar
-              sits behind this layer, so its controls are not reachable. */}
-          <div className="flex items-center justify-between px-6 py-5">
-            <Logo
-              className="text-ink"
-              markClassName="h-9 w-9"
-              nameClassName="text-base"
-            />
-            <button
-              type="button"
-              className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-lg text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
-              aria-label="メニューを閉じる"
-              onClick={() => setOpen(false)}
+      {/* Kept mounted so it can fade both ways — unmounting on close removes
+          the element before any exit transition can run. `invisible` and
+          `pointer-events-none` take it out of the tab order and off the hit
+          test while hidden, so it behaves as if it were absent. */}
+      <div
+        aria-hidden={!open}
+        className={cn(
+          "fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-card transition-[opacity,visibility] duration-300 ease-out lg:hidden",
+          open
+            ? "visible opacity-100"
+            : "pointer-events-none invisible opacity-0",
+        )}
+      >
+        {/* The panel carries its own logo and close button: the header bar
+            sits behind this layer, so its controls are not reachable. */}
+        <div className="flex items-center justify-between px-6 py-5">
+          <Logo
+            className="text-ink"
+            markClassName="h-9 w-9"
+            nameClassName="text-base"
+          />
+          <button
+            type="button"
+            className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-lg text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+            aria-label="メニューを閉じる"
+            onClick={() => setOpen(false)}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="26"
+              height="26"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
             >
-              <svg
-                viewBox="0 0 24 24"
-                width="26"
-                height="26"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-              >
-                <path d="M6 6l12 12M18 6L6 18" />
-              </svg>
-            </button>
-          </div>
-
-          <nav className="flex flex-col px-6 pb-16">
-            {NAV.map((item) => (
-              <Link
-                key={item.en}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                // `items-baseline` sits the small Japanese reading on the
-                // English baseline, as in the reference. Wrapping is allowed so
-                // long readings drop to a second line instead of overflowing.
-                className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
-              >
-                <span className="text-[2rem] font-extrabold uppercase leading-none tracking-tight text-ink">
-                  {item.en}
-                </span>
-                <span className="text-sm text-muted">
-                  <span aria-hidden className="mr-2 text-line">
-                    /
-                  </span>
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </nav>
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
         </div>
-      )}
+
+        <nav className="flex flex-col px-6 pb-16">
+          {NAV.map((item) => (
+            <Link
+              key={item.en}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              // `items-baseline` sits the small Japanese reading on the
+              // English baseline, as in the reference. Wrapping is allowed so
+              // long readings drop to a second line instead of overflowing.
+              className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+            >
+              <span className="text-[2rem] font-extrabold uppercase leading-none tracking-tight text-ink">
+                {item.en}
+              </span>
+              <span className="text-sm text-muted">
+                <span aria-hidden className="mr-2 text-line">
+                  /
+                </span>
+                {item.label}
+              </span>
+            </Link>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 }
