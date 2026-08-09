@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TechChip } from "@/components/ui/TechIcon";
 import { cn } from "@/lib/utils";
 
@@ -26,14 +26,45 @@ export type CarouselTeam = {
 const SIDE_SCALE = 0.88;
 const SIDE_OPACITY = 0.35;
 
+/** 自動送りの間隔。 */
+const AUTOPLAY_MS = 10_000;
+
 export function TeamCarousel({ teams }: { teams: CarouselTeam[] }) {
   const [index, setIndex] = useState(0);
+  // ポインタが乗っている / フォーカスがある間は自動送りを止める。読んでいる
+  // 最中に切り替わるのを防ぐため。
+  const [paused, setPaused] = useState(false);
   const total = teams.length;
 
+  // 手動で送ったら、その時点から次の10秒を数え直す。切り替えた直後に自動送りが
+  // 来ると忙しないため。この値が変わるたびに下の useEffect がタイマーを張り直す。
+  const [tick, setTick] = useState(0);
+
   const go = useCallback(
-    (delta: number) => setIndex((i) => (i + delta + total) % total),
+    (delta: number) => {
+      setIndex((i) => (i + delta + total) % total);
+      setTick((t) => t + 1);
+    },
     [total],
   );
+
+  const jumpTo = useCallback((i: number) => {
+    setIndex(i);
+    setTick((t) => t + 1);
+  }, []);
+
+  useEffect(() => {
+    // 1枚しかないなら送る意味がない。
+    if (paused || total <= 1) return;
+    // 「動きを減らす」設定の利用者には自動再生しない。
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduced) return;
+
+    const id = setInterval(() => setIndex((i) => (i + 1) % total), AUTOPLAY_MS);
+    return () => clearInterval(id);
+  }, [paused, total, tick]);
 
   // 左右キーでも送れるようにする。カルーセルにフォーカスがあるときだけ拾う。
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -73,6 +104,12 @@ export function TeamCarousel({ teams }: { teams: CarouselTeam[] }) {
       onKeyDown={onKeyDown}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
+      // 読んでいる間は自動送りを止める。onFocus/onBlur は子孫のフォーカスも
+      // 拾うので、矢印やドットを操作している間も止まる。
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
     >
       {/* 中央カードだけをフローに置いて高さの基準にし、左右のカードは絶対配置で
           その背後に覗かせる。こうしないと3枚ぶんの幅がコンテナを超えて、中央の
@@ -178,7 +215,7 @@ export function TeamCarousel({ teams }: { teams: CarouselTeam[] }) {
             <li key={team.no}>
               <button
                 type="button"
-                onClick={() => setIndex(i)}
+                onClick={() => jumpTo(i)}
                 aria-label={`${team.ja}を表示`}
                 aria-current={i === index}
                 className={cn(
@@ -202,8 +239,9 @@ export function TeamCarousel({ teams }: { teams: CarouselTeam[] }) {
         </button>
       </div>
 
-      {/* 読み上げ用。矢印で送ったことが音声でも伝わるようにする。 */}
-      <p aria-live="polite" className="sr-only">
+      {/* 読み上げ用。自動送りのたびに喋ると邪魔になるため、操作中（＝自動送りを
+          止めている間）だけ通知する。 */}
+      <p aria-live={paused ? "polite" : "off"} className="sr-only">
         {`${index + 1} / ${total}　${teams[index].ja}`}
       </p>
     </div>
