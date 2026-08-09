@@ -14,8 +14,8 @@ export function Services() {
       id="services"
       align="center"
       tone="muted"
-      eyebrow="Services"
-      title="サービス内容"
+      eyebrow="SERVICE"
+      title="サービス"
       description="Web制作からシステム・アプリ・AIまで。一社で一気通貫にご支援します。"
     >
       <ServiceCarousel domains={DOMAINS} />
