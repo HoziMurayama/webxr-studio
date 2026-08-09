@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Section } from "@/components/ui/Section";
 
 /**
@@ -19,12 +20,18 @@ type Domain = {
   industries: { name: string; items: string[] }[];
   /** Decorative banner behind the blue header band. */
   image: string;
+  /**
+   * お問い合わせフォームの「対応サービス」に渡す値。
+   * `Contact` の SERVICES と文字列が一致している必要がある。
+   */
+  formService: string;
 };
 
 const DOMAINS: Domain[] = [
   {
     en: "WEB DEVELOPMENT",
     image: "/team/web.svg",
+    formService: "Web制作",
     title: "Webで「届ける」",
     lead: "企業やサービスの魅力を伝え、集客・販売・採用・顧客との接点を生み出すWebサービスを開発します。",
     services: [
@@ -107,6 +114,7 @@ const DOMAINS: Domain[] = [
   {
     en: "SYSTEM DEVELOPMENT",
     image: "/team/system.svg",
+    formService: "システム開発",
     title: "システムで「支える」",
     lead: "企業の業務を効率化し、顧客・商品・データ・業務プロセスをつなぐ業務システムを開発します。",
     services: [
@@ -159,6 +167,7 @@ const DOMAINS: Domain[] = [
   {
     en: "APP DEVELOPMENT",
     image: "/team/app.svg",
+    formService: "アプリ開発",
     title: "アプリで「つなぐ」",
     lead: "ユーザーとサービス、企業と顧客、現場と管理者をつなぐスマートフォン・モバイルアプリを開発します。",
     services: [
@@ -254,6 +263,7 @@ const DOMAINS: Domain[] = [
   {
     en: "AI DEVELOPMENT",
     image: "/team/ai.svg",
+    formService: "AI開発",
     title: "AIで「進化させる」",
     lead: "生成AI・機械学習・データ分析・AI自動化を既存のWeb・システム・アプリに組み込み、企業の業務とサービスをさらに進化させます。",
     services: [
@@ -409,6 +419,27 @@ export function ServiceDetail({
                 <p className="mt-5 text-lg leading-relaxed text-white sm:text-xl">
                   {d.lead}
                 </p>
+
+                {/* 青帯の中に置くので、白地に青文字で最大の対比をとる。
+                    遷移先で対応サービスが選択済みになる。 */}
+                <Link
+                  href={`/contact?service=${encodeURIComponent(d.formService)}#service`}
+                  className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-bold tracking-tight text-chrome shadow-lg transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60 sm:w-auto sm:text-lg"
+                >
+                  このサービスを相談する
+                  <svg
+                    viewBox="0 0 20 20"
+                    aria-hidden
+                    className="h-5 w-5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 10h11M10 5l5 5-5 5" />
+                  </svg>
+                </Link>
               </header>
 
               <div className="space-y-10 p-6 sm:p-8">

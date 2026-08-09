@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { Input, FieldGroup } from "@/components/ui/Field";
@@ -20,12 +21,42 @@ const SERVICES = [
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
-export function Contact({
+/**
+ * useSearchParams はプリレンダリング時に Suspense 境界を必要とするため、
+ * 中身を包んで公開する。呼び出し側は従来どおり `<Contact />` でよい。
+ */
+export function Contact(props: { showHeader?: boolean } = {}) {
+  return (
+    // fallback では ?service= を読めないため、未選択の状態を出しておく。
+    <Suspense fallback={<ContactForm {...props} preselected="" />}>
+      <ContactFormWithParams {...props} />
+    </Suspense>
+  );
+}
+
+/**
+ * サービスページの「このサービスを相談する」から ?service= 付きで来たときは
+ * 対応サービスを選択済みにする。既知の選択肢に一致するときだけ採用する。
+ */
+function ContactFormWithParams(props: { showHeader?: boolean }) {
+  const requested = useSearchParams().get("service") ?? "";
+  return (
+    <ContactForm
+      {...props}
+      preselected={SERVICES.includes(requested) ? requested : ""}
+    />
+  );
+}
+
+function ContactForm({
   /** /contact では PageHero が同じ見出しを出すため抑制する。 */
   showHeader = true,
+  /** 「対応サービス」の初期選択値。 */
+  preselected,
 }: {
   showHeader?: boolean;
-} = {}) {
+  preselected: string;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
   const [file, setFile] = useState<{ name: string; data: string } | null>(null);
@@ -157,7 +188,10 @@ export function Contact({
               id="service"
               name="service"
               required
-              defaultValue=""
+              // defaultValue は初回のみ効くため、?service= が変わったら key で
+              // 作り直して選択状態を追従させる。
+              key={preselected}
+              defaultValue={preselected}
               className="w-full rounded-xl border border-line bg-card px-4 py-2.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
             >
               <option value="" disabled>
