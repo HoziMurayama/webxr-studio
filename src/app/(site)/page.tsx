@@ -38,6 +38,7 @@ export default async function HomePage() {
           items={portfolio}
           limit={4}
           columns={4}
+          showStack={false}
           tone="muted"
           eyebrow="CASE STUDY"
           title="お客様事例"

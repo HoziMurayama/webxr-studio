@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * お客様事例の一覧。カードをクリックすると個別ページ（/case-study/[id]）へ遷移する。
  *
  * カード表面: お客様画像 / お客様の声（抜粋）/ 企業名・お名前 / 業界
- * 技術スタックは詳細ページ（/case-study/[id]）に置く。
+ * 技術スタックは /case-study のみ（トップページは概要に絞る）。
  */
 
 /** 企業名と個人名を組み立てる。企業名が空なら個人名のみ。 */
@@ -56,6 +56,11 @@ export function CaseStudies({
    * /case-study は件数が増えるので既定の 3。
    */
   columns = 3,
+  /**
+   * カードに技術スタックを載せるか。/case-study では出し、トップページでは
+   * 概要に絞るため出さない。
+   */
+  showStack = true,
 }: {
   items: Portfolio[];
   description?: string;
@@ -65,6 +70,7 @@ export function CaseStudies({
   limit?: number;
   pageLink?: boolean;
   columns?: 3 | 4;
+  showStack?: boolean;
 }) {
   if (items.length === 0) return null;
 
@@ -137,6 +143,7 @@ export function CaseStudies({
                       {item.industry}
                     </p>
                   )}
+                  {showStack && <Stack tags={item.tags ?? []} />}
                 </div>
               </div>
             </Link>
