@@ -98,7 +98,7 @@ export function TeamCarousel({ teams }: { teams: CarouselTeam[] }) {
                 key={team.no}
                 aria-hidden={!isCenter}
                 // 左右カードは操作対象から外す。中央だけを読ませたいため。
-                {...(!isCenter && { inert: "" as unknown as boolean })}
+                inert={!isCenter}
                 style={
                   isCenter
                     ? undefined
