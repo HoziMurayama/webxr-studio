@@ -12,7 +12,6 @@ import {
   getPortfolio,
   getTeam,
   getFaqs,
-  getSiteSettings,
 } from "@/lib/content";
 
 // Content is DB-driven and editable from the admin; render on each request so
@@ -20,13 +19,12 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [company, services, portfolio, team, faqs, settings] = await Promise.all([
+  const [company, services, portfolio, team, faqs] = await Promise.all([
     getCompany(),
     getServices(),
     getPortfolio(),
     getTeam(),
     getFaqs(),
-    getSiteSettings(),
   ]);
 
   return (
@@ -39,7 +37,7 @@ export default async function HomePage() {
         <Portfolio items={portfolio} />
         <Team members={team} />
         <Faq faqs={faqs} />
-        <Contact contactEmail={settings?.contactEmail || undefined} />
+        <Contact />
       </div>
     </>
   );

@@ -7,7 +7,12 @@ import { Input, Textarea, FieldGroup } from "@/components/ui/Field";
 
 type Status = "idle" | "sending" | "success" | "error";
 
-export function Contact({ contactEmail }: { contactEmail?: string }) {
+export function Contact({
+  /** /contact では PageHero が同じ見出しを出すため抑制する。 */
+  showHeader = true,
+}: {
+  showHeader?: boolean;
+} = {}) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
 
@@ -40,9 +45,11 @@ export function Contact({ contactEmail }: { contactEmail?: string }) {
     <Section
       id="contact"
       align="center"
-      eyebrow="Contact"
-      title="お問い合わせ"
-      description="ご相談・お見積もりは無料です。お気軽にご連絡ください。"
+      eyebrow={showHeader ? "Contact" : undefined}
+      title={showHeader ? "お問い合わせ" : undefined}
+      description={
+        showHeader ? "ご相談・お見積もりは無料です。お気軽にご連絡ください。" : undefined
+      }
     >
       {/* Two columns: intro copy on the left, form on the right. Stacks to a
           single column below `lg`, where the copy still reads before the form. */}
@@ -51,20 +58,6 @@ export function Contact({ contactEmail }: { contactEmail?: string }) {
           <p className="text-base leading-relaxed text-ink-soft">
             プロジェクトのご相談、技術的なお悩み、既存システムの改善など、
             どんな内容でもお気軽にどうぞ。担当者より折り返しご連絡いたします。
-          </p>
-          {contactEmail && (
-            <div>
-              <p className="text-sm text-muted">メール</p>
-              <a
-                href={`mailto:${contactEmail}`}
-                className="text-base font-semibold text-ink hover:text-accent-ink"
-              >
-                {contactEmail}
-              </a>
-            </div>
-          )}
-          <p className="text-sm leading-relaxed text-muted">
-            画面右下のAIアシスタントからも、サービス内容や実績についてすぐにご確認いただけます。
           </p>
         </div>
 
