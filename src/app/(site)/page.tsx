@@ -5,22 +5,15 @@ import { Services } from "@/components/sections/Services";
 import { Portfolio } from "@/components/sections/Portfolio";
 import { Team } from "@/components/sections/Team";
 import { Faq } from "@/components/sections/Faq";
-import {
-  getCompany,
-  getServices,
-  getPortfolio,
-  getTeam,
-  getFaqs,
-} from "@/lib/content";
+import { getCompany, getPortfolio, getTeam, getFaqs } from "@/lib/content";
 
 // Content is DB-driven and editable from the admin; render on each request so
 // edits appear immediately.
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [company, services, portfolio, team, faqs] = await Promise.all([
+  const [company, portfolio, team, faqs] = await Promise.all([
     getCompany(),
-    getServices(),
     getPortfolio(),
     getTeam(),
     getFaqs(),
@@ -32,7 +25,7 @@ export default async function HomePage() {
       <CtoMessage />
       <div className="reveal">
         <About showClosing={false} teamLayout="carousel" />
-        <Services services={services} />
+        <Services />
         <Portfolio items={portfolio} />
         <Team members={team} />
         <Faq faqs={faqs} />

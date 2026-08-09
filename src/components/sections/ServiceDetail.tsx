@@ -9,7 +9,7 @@ import { Section } from "@/components/ui/Section";
  * `Services` section still drives the short summary on the top page.
  */
 
-type Domain = {
+export type Domain = {
   en: string;
   /** Short verb-phrase headline, e.g.「Webで「届ける」」. */
   title: string;
@@ -27,7 +27,7 @@ type Domain = {
   formService: string;
 };
 
-const DOMAINS: Domain[] = [
+export const DOMAINS: Domain[] = [
   {
     en: "WEB DEVELOPMENT",
     image: "/team/web.svg",
