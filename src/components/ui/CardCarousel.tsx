@@ -31,6 +31,11 @@ export function CardCarousel<T>({
   label,
   /** 自動送りの間隔(ms)。文量の少ないカードは短くできる。 */
   autoplayMs = AUTOPLAY_MS,
+  /**
+   * 中央カードの最大幅を決める Tailwind クラス。カードの中身が軽いものは
+   * 既定より狭めて、画面を占めすぎないようにできる。
+   */
+  maxWidthClass = "max-w-3xl",
 }: {
   items: T[];
   renderCard: (item: T, isCenter: boolean) => React.ReactNode;
@@ -38,6 +43,7 @@ export function CardCarousel<T>({
   getLabel: (item: T) => string;
   label: string;
   autoplayMs?: number;
+  maxWidthClass?: string;
 }) {
   const [index, setIndex] = useState(0);
   // ポインタが乗っている / フォーカスがある間は自動送りを止める。読んでいる
@@ -130,7 +136,12 @@ export function CardCarousel<T>({
           左右の padding は矢印と、覗かせる左右カードぶんの逃げ。狭い画面では
           矢印をカードの下に回すため、逃げは要らない。 */}
       <div className="overflow-hidden px-0 py-4 sm:px-16 lg:px-56">
-        <div className="relative mx-auto flex max-w-3xl items-stretch justify-center">
+        <div
+          className={cn(
+            "relative mx-auto flex items-stretch justify-center",
+            maxWidthClass,
+          )}
+        >
           {items.map((item, i) => {
             // 中央からの距離。-1 が左隣、1 が右隣。端はループさせる。
             let offset = i - index;

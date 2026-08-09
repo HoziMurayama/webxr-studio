@@ -31,6 +31,9 @@ export function CaseStudyCarousel({ items }: { items: Portfolio[] }) {
       items={items}
       label="お客様の事例"
       autoplayMs={AUTOPLAY_MS}
+      // 既定の max-w-3xl(768px) より 100px 狭い。事例カードは画像が主で
+      // 文量が少なく、広いと余白ばかりが目立つため。
+      maxWidthClass="max-w-[668px]"
       getKey={(item) => String(item.id)}
       getLabel={(item) => clientLabel(item) || `事例 ${item.id}`}
       renderCard={(item, isCenter) => {
@@ -44,13 +47,15 @@ export function CaseStudyCarousel({ items }: { items: Portfolio[] }) {
                 aria-hidden
                 width={800}
                 height={600}
-                sizes="(min-width: 1024px) 48rem, 100vw"
-                className="aspect-[4/3] w-full bg-surface-2 object-contain"
+                sizes="(min-width: 1024px) 42rem, 100vw"
+                // 4:3 のままだと 668px 幅で 501px になる。縦も 100px 詰めたいので
+                // 高さを直接与える。object-contain なので絵は切れない。
+                className="h-[400px] w-full bg-surface-2 object-contain"
               />
             ) : (
               <div
                 aria-hidden
-                className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted"
+                className="flex h-[400px] w-full items-center justify-center bg-surface text-sm text-muted"
               >
                 No Image
               </div>
