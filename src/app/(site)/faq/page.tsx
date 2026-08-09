@@ -20,7 +20,7 @@ export default async function FaqPage() {
         description="お問い合わせの前に、よくいただくご質問をまとめました。"
         image="/about/fv-team.webp"
       />
-      <Faq faqs={faqs} />
+      <Faq faqs={faqs} showHeader={false} />
     </>
   );
 }

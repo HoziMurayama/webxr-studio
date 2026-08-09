@@ -1,7 +1,14 @@
 import { Section } from "@/components/ui/Section";
 import type { Faq as FaqItem } from "@/db/schema";
 
-export function Faq({ faqs }: { faqs: FaqItem[] }) {
+export function Faq({
+  faqs,
+  /** /faq では PageHero が同じ見出しを出すため抑制する。 */
+  showHeader = true,
+}: {
+  faqs: FaqItem[];
+  showHeader?: boolean;
+}) {
   if (faqs.length === 0) return null;
 
   return (
@@ -9,9 +16,11 @@ export function Faq({ faqs }: { faqs: FaqItem[] }) {
       id="faq"
       align="center"
       tone="muted"
-      eyebrow="FAQ"
-      title="よくある質問"
-      description="お問い合わせの前に、よくいただくご質問をまとめました。"
+      eyebrow={showHeader ? "FAQ" : undefined}
+      title={showHeader ? "よくある質問" : undefined}
+      description={
+        showHeader ? "お問い合わせの前に、よくいただくご質問をまとめました。" : undefined
+      }
     >
       <div className="mx-auto max-w-3xl divide-y divide-line rounded-2xl border border-line bg-card">
         {faqs.map((f) => (
