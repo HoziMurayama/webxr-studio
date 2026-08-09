@@ -6,7 +6,7 @@ import Link from "next/link";
  * white card that overlaps the hero's lower edge — the layout used by the
  * reference site's post-hero band.
  *
- * The whole card is a single link to the inquiry section, so it carries no
+ * The whole card is a single link to the contact page, so it carries no
  * button of its own.
  */
 export function CtoMessage() {
