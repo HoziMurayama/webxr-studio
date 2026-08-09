@@ -79,7 +79,12 @@ export function CaseStudyCarousel({ items }: { items: Portfolio[] }) {
 
               {/* 左右の退色カードには出さない。読ませる対象ではないうえ、
                   幅が足りずボタンが潰れるため。 */}
-              <div className={cn("mt-2", isCenter ? "block" : "hidden")}>
+              <div
+                className={cn(
+                  "mt-2 justify-center",
+                  isCenter ? "flex" : "hidden",
+                )}
+              >
                 {/* サイト内の他の導線（SectionLink）と同じ枠線ボタン。
                     矢印はホバーで右へ動かし、押せることを示す。 */}
                 <Link
