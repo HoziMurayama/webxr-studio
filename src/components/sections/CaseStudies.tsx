@@ -108,28 +108,34 @@ export function CaseStudies({
             <li key={item.id}>
               <Link
                 href={`/case-study/${item.id}`}
-                className="group flex h-full w-full flex-col border border-line bg-card text-left transition-shadow hover:shadow-[0_12px_40px_rgb(13,16,23,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                // ホバーで少し浮かせ、枠線を accent に寄せる。動きは控えめに
+                // して、カードが並んだときに画面がざわつかないようにする。
+                className="group flex h-full w-full flex-col border border-line bg-card text-left transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-accent/50 hover:shadow-[0_16px_44px_rgb(13,16,23,0.13)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
               >
                 {/* 一覧のサムネイルはお客様のお写真。無ければサムネイル指定、
                     それも無ければ制作物画像を使い、いずれも無ければ既定の
                     アバターを出す。 */}
                 {item.imageUrl || item.thumbnailUrl || item.workImageUrl ? (
-                  <Image
-                    src={
-                      item.imageUrl || item.thumbnailUrl || item.workImageUrl
-                    }
-                    alt=""
-                    aria-hidden
-                    width={800}
-                    height={600}
-                    // 実際の表示幅に合わせる。ずれると過大な画像を読み込む。
-                    sizes={
-                      columns === 4
-                        ? "(min-width: 1024px) 17rem, (min-width: 640px) 50vw, 100vw"
-                        : "(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
-                    }
-                    className="aspect-[4/3] w-full bg-surface-2 object-contain"
-                  />
+                  // 拡大したぶんのはみ出しをここで切る。画像自体に
+                  // overflow は効かないので、外側の箱で受ける。
+                  <div className="overflow-hidden bg-surface-2">
+                    <Image
+                      src={
+                        item.imageUrl || item.thumbnailUrl || item.workImageUrl
+                      }
+                      alt=""
+                      aria-hidden
+                      width={800}
+                      height={600}
+                      // 実際の表示幅に合わせる。ずれると過大な画像を読み込む。
+                      sizes={
+                        columns === 4
+                          ? "(min-width: 1024px) 17rem, (min-width: 640px) 50vw, 100vw"
+                          : "(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
+                      }
+                      className="aspect-[4/3] w-full bg-surface-2 object-contain transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
+                  </div>
                 ) : (
                   <AvatarFallback className="aspect-[4/3] w-full" />
                 )}

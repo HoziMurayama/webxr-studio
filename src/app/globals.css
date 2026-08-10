@@ -202,4 +202,12 @@ body {
   .modal-panel {
     animation: none;
   }
+  /* 事例カードのホバー。浮き上がりと画像の拡大を止める。影と枠線の
+     変化は残すので、どのカードを指しているかは分かる。 */
+  .group:hover {
+    transform: none;
+  }
+  .group:hover img {
+    transform: none;
+  }
 }

@@ -78,15 +78,17 @@ export default async function CaseStudyDetailPage({
           {(item.imageUrl || clientLabel(item)) && (
             <div className="border border-line bg-surface">
               {item.imageUrl && (
-                <div className="flex justify-center bg-surface-2 p-6 sm:p-8">
+                <div className="flex justify-center bg-surface-2 p-5 sm:p-6">
                   <Image
                     src={item.imageUrl}
                     alt={clientLabel(item) || "お客様"}
                     width={900}
                     height={1207}
-                    sizes="(min-width: 640px) 20rem, 60vw"
+                    sizes="(min-width: 768px) 34rem, 90vw"
                     priority
-                    className="h-auto w-full max-w-[16rem] rounded-sm sm:max-w-[20rem]"
+                    // 高さは比率に追従させ、余白を出さない。縦長の写真だけは
+                    // 画面を大きく占めてしまうため、高さの上限で抑える。
+                    className="h-auto w-full max-w-[22rem] rounded-sm sm:max-w-[28rem] md:max-w-[34rem]"
                   />
                 </div>
               )}
