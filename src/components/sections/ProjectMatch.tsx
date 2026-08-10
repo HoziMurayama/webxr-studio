@@ -296,9 +296,12 @@ export function ProjectMatch() {
                       <ul className="mt-4 grid gap-4 sm:grid-cols-2">
                         {result.teams.map((t) => (
                           <li key={t.slug}>
+                            {/* 別タブで開く。判定結果を残したまま見比べられる
+                                ようにするため、モーダルは閉じない。 */}
                             <Link
                               href={t.href}
-                              onClick={close}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               className="flex h-full flex-col border border-line bg-card p-5 transition-colors hover:border-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
                             >
                               <p className="text-base font-bold tracking-tight text-ink">
@@ -310,6 +313,9 @@ export function ProjectMatch() {
                               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                                 {t.mission}
                               </p>
+                              <span className="sr-only">
+                                （新しいタブで開きます）
+                              </span>
                             </Link>
                           </li>
                         ))}
@@ -333,7 +339,8 @@ export function ProjectMatch() {
                           <li key={w.id}>
                             <Link
                               href={w.href}
-                              onClick={close}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               className="flex h-full flex-col border border-line bg-card transition-colors hover:border-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
                             >
                               {w.image && (
@@ -356,6 +363,9 @@ export function ProjectMatch() {
                                     {w.client}
                                   </p>
                                 )}
+                                <span className="sr-only">
+                                  （新しいタブで開きます）
+                                </span>
                               </div>
                             </Link>
                           </li>
