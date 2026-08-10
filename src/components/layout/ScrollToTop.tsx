@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 /**
  * ページ先頭へ戻るボタン。周囲の円がページ全体のスクロール率を表す。
  *
- * AI アシスタント（ChatWidget）の左隣に並べる。あちらが右下 `right-5` で
- * 56px 幅なので、こちらは重ならないよう `right-24` に置く。
+ * 右下に単独で置く。以前は AI アシスタントの左隣に避けていたが、
+ * そちらを外したので定位置に戻している。
  *
  * 少しスクロールしただけで出ると邪魔になるため、1画面ぶん下がってから現れる。
  */
@@ -78,7 +78,7 @@ export function ScrollToTop() {
       aria-hidden={!visible}
       inert={!visible}
       className={cn(
-        "fixed bottom-5 right-24 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-card text-ink shadow-lg transition-all hover:bg-surface hover:text-accent-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 active:scale-95",
+        "fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-card text-ink shadow-lg transition-all hover:bg-surface hover:text-accent-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 active:scale-95",
         visible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-2 opacity-0",

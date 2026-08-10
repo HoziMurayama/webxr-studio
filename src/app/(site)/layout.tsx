@@ -1,7 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FooterBanner } from "@/components/layout/FooterBanner";
-import { ChatWidget } from "@/components/ai/ChatWidget";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { LiveContent } from "@/components/LiveContent";
 import type { Metadata } from "next";
@@ -50,7 +49,6 @@ export default async function SiteLayout({
       <FooterBanner />
       <Footer settings={settings} />
       <ScrollToTop />
-      <ChatWidget />
     </div>
   );
 }
