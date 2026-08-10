@@ -120,19 +120,35 @@ function Viewer({
     [kick],
   );
 
+  /**
+   * 等倍で表示したときの初期位置。
+   *
+   * 画像はステージ中央を基準に置いているので、縦長の画像だと真ん中から
+   * 始まってしまい、上端（サイトのヘッダーなど）が画面の外に出る。画像が
+   * ステージより高いぶんだけ下へずらし、上端を合わせる。収まる画像は
+   * 中央のままでよいので 0。
+   */
+  const initialView = useCallback(() => {
+    const stage = stageRef.current;
+    const img = imgRef.current;
+    if (!stage || !img) return { scale: 1, x: 0, y: 0 };
+    const overflow = img.offsetHeight - stage.clientHeight;
+    return { scale: 1, x: 0, y: overflow > 0 ? overflow / 2 : 0 };
+  }, []);
+
   const reset = useCallback(() => {
-    target.current = { scale: 1, x: 0, y: 0 };
+    target.current = initialView();
     kick();
     setShownScale(1);
-  }, [kick]);
+  }, [kick, initialView]);
 
   // 画像を切り替えたら倍率と位置を初期化する。前の画像の位置を引きずらない
   // よう、ここは補間せず即座に等倍へ戻す。
   useEffect(() => {
-    target.current = { scale: 1, x: 0, y: 0 };
+    target.current = initialView();
     applyNow();
     setShownScale(1);
-  }, [src, applyNow]);
+  }, [src, applyNow, initialView]);
 
   // 端で止めず循環させる。
   const go = useCallback(
@@ -296,6 +312,12 @@ function Viewer({
           src={src}
           alt={label}
           draggable={false}
+          // 読み込みが終わるまで高さが 0 なので、初期位置は決められない。
+          // 実寸が入った時点で上端合わせをやり直す。
+          onLoad={() => {
+            target.current = initialView();
+            applyNow();
+          }}
           style={{
             transform: "translate3d(-50%, -50%, 0) scale(1)",
             willChange: "transform",
