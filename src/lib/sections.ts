@@ -2,16 +2,7 @@
 // validation schema, and metadata (labels, whether it's a singleton). The admin
 // API and admin UI both drive off this single source of truth.
 import { z } from "zod";
-import {
-  company,
-  services,
-  portfolio,
-  reviews,
-  team,
-  faqs,
-  siteSettings,
-  contacts,
-} from "@/db/schema";
+import { company, portfolio, faqs, siteSettings, contacts } from "@/db/schema";
 import type { PgTable } from "drizzle-orm/pg-core";
 
 const kv = z.object({ label: z.string(), value: z.string() });
@@ -37,14 +28,6 @@ export const companySchema = z.object({
   stats: z.array(kv).default([]),
 });
 
-export const serviceSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().default(""),
-  icon: z.string().default("sparkles"),
-  price: z.string().default(""),
-  order: num.default(0),
-});
-
 export const portfolioSchema = z.object({
   title: z.string().min(1),
   description: z.string().default(""),
@@ -58,23 +41,6 @@ export const portfolioSchema = z.object({
   companyName: z.string().default(""),
   clientName: z.string().default(""),
   industry: z.string().default(""),
-  order: num.default(0),
-});
-
-export const reviewSchema = z.object({
-  clientName: z.string().min(1),
-  role: z.string().default(""),
-  body: z.string().default(""),
-  rating: num.min(1).max(5).default(5),
-  order: num.default(0),
-});
-
-export const teamSchema = z.object({
-  name: z.string().min(1),
-  role: z.string().default(""),
-  bio: z.string().default(""),
-  avatarUrl: z.string().default(""),
-  socials: z.array(linkItem).default([]),
   order: num.default(0),
 });
 
@@ -93,7 +59,8 @@ export const settingsSchema = z.object({
   seoDescription: z.string().default(""),
 });
 
-export type FieldType = "text" | "textarea" | "number" | "kvlist" | "linklist" | "taglist";
+export type FieldType =
+  "text" | "textarea" | "number" | "kvlist" | "linklist" | "taglist";
 
 export type FieldDef = {
   name: string;
@@ -126,22 +93,12 @@ export const SECTIONS: Record<string, SectionDef> = {
       { name: "about", label: "紹介文", type: "textarea" },
       { name: "mission", label: "ミッション", type: "textarea" },
       { name: "history", label: "沿革", type: "textarea" },
-      { name: "stats", label: "会社データ", type: "kvlist", hint: "ラベルと値のペア" },
-    ],
-  },
-  services: {
-    slug: "services",
-    label: "サービス内容",
-    table: services,
-    schema: serviceSchema,
-    singleton: false,
-    indexed: true,
-    fields: [
-      { name: "title", label: "タイトル", type: "text" },
-      { name: "description", label: "説明", type: "textarea" },
-      { name: "icon", label: "アイコン", type: "text", hint: "server / layout / smartphone / sparkles / code / cloud" },
-      { name: "price", label: "料金目安", type: "text" },
-      { name: "order", label: "表示順", type: "number" },
+      {
+        name: "stats",
+        label: "会社データ",
+        type: "kvlist",
+        hint: "ラベルと値のペア",
+      },
     ],
   },
   portfolio: {
@@ -156,45 +113,34 @@ export const SECTIONS: Record<string, SectionDef> = {
       { name: "description", label: "詳細説明", type: "textarea" },
       { name: "imageUrl", label: "お客様画像URL", type: "text" },
       { name: "workImageUrl", label: "制作物画像URL", type: "text" },
-      { name: "thumbnailUrl", label: "一覧サムネイルURL", type: "text", hint: "未設定なら制作物画像を使用" },
-      { name: "gallery", label: "制作物ギャラリー", type: "kvlist", hint: "ラベルと画像URLのペア" },
+      {
+        name: "thumbnailUrl",
+        label: "一覧サムネイルURL",
+        type: "text",
+        hint: "未設定なら制作物画像を使用",
+      },
+      {
+        name: "gallery",
+        label: "制作物ギャラリー",
+        type: "kvlist",
+        hint: "ラベルと画像URLのペア",
+      },
       { name: "review", label: "お客様の声", type: "textarea" },
-      { name: "companyName", label: "企業名", type: "text", hint: "個人のお客様の場合は空欄" },
+      {
+        name: "companyName",
+        label: "企業名",
+        type: "text",
+        hint: "個人のお客様の場合は空欄",
+      },
       { name: "clientName", label: "お名前", type: "text" },
-      { name: "industry", label: "業界", type: "text", hint: "医療・不動産・教育 など" },
+      {
+        name: "industry",
+        label: "業界",
+        type: "text",
+        hint: "医療・不動産・教育 など",
+      },
       { name: "tags", label: "技術スタック", type: "taglist" },
       { name: "link", label: "リンクURL", type: "text" },
-      { name: "order", label: "表示順", type: "number" },
-    ],
-  },
-  reviews: {
-    slug: "reviews",
-    label: "クライアントの声",
-    table: reviews,
-    schema: reviewSchema,
-    singleton: false,
-    indexed: true,
-    fields: [
-      { name: "clientName", label: "お客様名", type: "text" },
-      { name: "role", label: "肩書き", type: "text" },
-      { name: "body", label: "コメント", type: "textarea" },
-      { name: "rating", label: "評価 (1-5)", type: "number" },
-      { name: "order", label: "表示順", type: "number" },
-    ],
-  },
-  team: {
-    slug: "team",
-    label: "チーム紹介",
-    table: team,
-    schema: teamSchema,
-    singleton: false,
-    indexed: true,
-    fields: [
-      { name: "name", label: "名前", type: "text" },
-      { name: "role", label: "役割", type: "text" },
-      { name: "bio", label: "プロフィール", type: "textarea" },
-      { name: "avatarUrl", label: "アバターURL", type: "text" },
-      { name: "socials", label: "リンク", type: "linklist" },
       { name: "order", label: "表示順", type: "number" },
     ],
   },

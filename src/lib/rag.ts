@@ -5,10 +5,7 @@ import { sql, eq, and } from "drizzle-orm";
 import { db } from "@/db";
 import {
   company,
-  services,
   portfolio,
-  reviews,
-  team,
   faqs,
   siteSettings,
   embeddings,
@@ -22,27 +19,23 @@ type Chunk = { sourceTable: string; sourceId: number; text: string };
  * Collect every content row and turn it into retrievable Japanese text chunks.
  * When `only` is given, restrict to that one table (used after an edit).
  */
-async function collectChunks(only?: { table: string; id?: number }): Promise<Chunk[]> {
+async function collectChunks(only?: {
+  table: string;
+  id?: number;
+}): Promise<Chunk[]> {
   const chunks: Chunk[] = [];
   const want = (t: string) => !only || only.table === t;
 
   if (want("company")) {
     const rows = await db.select().from(company);
     for (const c of rows) {
-      const stats = (c.stats ?? []).map((s) => `${s.label}: ${s.value}`).join("、");
+      const stats = (c.stats ?? [])
+        .map((s) => `${s.label}: ${s.value}`)
+        .join("、");
       chunks.push({
         sourceTable: "company",
         sourceId: c.id,
         text: `会社概要（${c.name}）。キャッチコピー: ${c.tagline}。${c.about} ミッション: ${c.mission} 沿革: ${c.history} 数値: ${stats}`,
-      });
-    }
-  }
-  if (want("services")) {
-    for (const s of await db.select().from(services)) {
-      chunks.push({
-        sourceTable: "services",
-        sourceId: s.id,
-        text: `サービス「${s.title}」: ${s.description}${s.price ? ` 料金目安: ${s.price}` : ""}`,
       });
     }
   }
@@ -52,24 +45,6 @@ async function collectChunks(only?: { table: string; id?: number }): Promise<Chu
         sourceTable: "portfolio",
         sourceId: p.id,
         text: `制作実績「${p.title}」（${(p.tags ?? []).join("、")}）: ${p.description}`,
-      });
-    }
-  }
-  if (want("reviews")) {
-    for (const r of await db.select().from(reviews)) {
-      chunks.push({
-        sourceTable: "reviews",
-        sourceId: r.id,
-        text: `クライアントの声（${r.clientName}${r.role ? "・" + r.role : ""}、評価${r.rating}/5）: ${r.body}`,
-      });
-    }
-  }
-  if (want("team")) {
-    for (const m of await db.select().from(team)) {
-      chunks.push({
-        sourceTable: "team",
-        sourceId: m.id,
-        text: `チームメンバー ${m.name}（${m.role}）: ${m.bio}`,
       });
     }
   }

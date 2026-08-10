@@ -6,13 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
+// サイトに反映される項目だけを並べる。サービス内容・クライアントの声・
+// チーム紹介はコード内の定数で表示しており、DB を編集しても公開側は
+// 変わらないため、管理画面からは外している。
 const NAV = [
   { href: "/admin", label: "ダッシュボード", exact: true },
   { href: "/admin/company", label: "会社概要" },
-  { href: "/admin/services", label: "サービス内容" },
   { href: "/admin/portfolio", label: "制作実績" },
-  { href: "/admin/reviews", label: "クライアントの声" },
-  { href: "/admin/team", label: "チーム紹介" },
   { href: "/admin/faqs", label: "よくある質問" },
   { href: "/admin/site_settings", label: "サイト設定" },
   { href: "/admin/contacts", label: "お問い合わせ" },
@@ -84,8 +84,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           aria-label="メニュー"
           className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink"
         >
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
-            {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+          <svg
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            {open ? (
+              <path d="M6 6l12 12M18 6L6 18" />
+            ) : (
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            )}
           </svg>
         </button>
       </div>

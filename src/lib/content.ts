@@ -4,15 +4,7 @@
 import "server-only";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import {
-  company,
-  services,
-  portfolio,
-  reviews,
-  team,
-  faqs,
-  siteSettings,
-} from "@/db/schema";
+import { company, portfolio, faqs, siteSettings } from "@/db/schema";
 
 // The public pages are `force-dynamic`, but the site layout also reads content.
 // Wrap queries so an unreachable DB (e.g. during `next build`, or before
@@ -33,16 +25,13 @@ export async function getCompany() {
   }, null);
 }
 
-export async function getServices() {
-  return safe(
-    () => db.select().from(services).orderBy(asc(services.order), asc(services.id)),
-    [],
-  );
-}
-
 export async function getPortfolio() {
   return safe(
-    () => db.select().from(portfolio).orderBy(asc(portfolio.order), asc(portfolio.id)),
+    () =>
+      db
+        .select()
+        .from(portfolio)
+        .orderBy(asc(portfolio.order), asc(portfolio.id)),
     [],
   );
 }
@@ -56,19 +45,11 @@ export async function getPortfolioItem(id: number) {
   return rows[0] ?? null;
 }
 
-export async function getReviews() {
+export async function getFaqs() {
   return safe(
-    () => db.select().from(reviews).orderBy(asc(reviews.order), asc(reviews.id)),
+    () => db.select().from(faqs).orderBy(asc(faqs.order), asc(faqs.id)),
     [],
   );
-}
-
-export async function getTeam() {
-  return safe(() => db.select().from(team).orderBy(asc(team.order), asc(team.id)), []);
-}
-
-export async function getFaqs() {
-  return safe(() => db.select().from(faqs).orderBy(asc(faqs.order), asc(faqs.id)), []);
 }
 
 export async function getSiteSettings() {

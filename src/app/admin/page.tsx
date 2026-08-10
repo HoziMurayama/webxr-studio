@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { db } from "@/db";
-import { services, portfolio, reviews, team, faqs, contacts } from "@/db/schema";
+import { portfolio, faqs, contacts } from "@/db/schema";
 import { sql, eq } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 
@@ -13,28 +13,26 @@ async function count(table: PgTable) {
 }
 
 export default async function AdminDashboard() {
-  const [nServices, nPortfolio, nReviews, nTeam, nFaqs, nContacts, nUnhandled] =
-    await Promise.all([
-      count(services),
-      count(portfolio),
-      count(reviews),
-      count(team),
-      count(faqs),
-      count(contacts),
-      db
-        .select({ n: sql<number>`count(*)::int` })
-        .from(contacts)
-        .where(eq(contacts.handled, false))
-        .then((r) => r[0]?.n ?? 0),
-    ]);
+  const [nPortfolio, nFaqs, nContacts, nUnhandled] = await Promise.all([
+    count(portfolio),
+    count(faqs),
+    count(contacts),
+    db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(contacts)
+      .where(eq(contacts.handled, false))
+      .then((r) => r[0]?.n ?? 0),
+  ]);
 
   const tiles = [
-    { label: "サービス", value: nServices, href: "/admin/services" },
     { label: "制作実績", value: nPortfolio, href: "/admin/portfolio" },
-    { label: "クライアントの声", value: nReviews, href: "/admin/reviews" },
-    { label: "チーム", value: nTeam, href: "/admin/team" },
     { label: "FAQ", value: nFaqs, href: "/admin/faqs" },
-    { label: "お問い合わせ", value: nContacts, href: "/admin/contacts", badge: nUnhandled },
+    {
+      label: "お問い合わせ",
+      value: nContacts,
+      href: "/admin/contacts",
+      badge: nUnhandled,
+    },
   ];
 
   return (
@@ -67,7 +65,9 @@ export default async function AdminDashboard() {
       <div className="mt-8 rounded-2xl border border-line bg-card p-6">
         <h2 className="text-base font-semibold text-ink">はじめに</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-muted">
-          <li>左メニューから各セクションのコンテンツを追加・編集・削除できます。</li>
+          <li>
+            左メニューから各セクションのコンテンツを追加・編集・削除できます。
+          </li>
           <li>編集内容は公開サイトに即時反映されます。</li>
           <li>
             コンテンツを更新すると、AIアシスタントの知識（RAGインデックス）も自動で更新されます。
