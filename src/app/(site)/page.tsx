@@ -1,5 +1,4 @@
 import { Hero } from "@/components/sections/Hero";
-import { ProjectMatch } from "@/components/sections/ProjectMatch";
 import { About } from "@/components/sections/About";
 import { Services } from "@/components/sections/Services";
 import { CaseStudies } from "@/components/sections/CaseStudies";
@@ -20,11 +19,10 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* 相談の導線はヒーロー内の2つのボタンに集約している（ProjectMatch）。
+          CTO メッセージは非表示のまま。戻す場合は CtoMessage を置く
+          （コンポーネント自体は残してある）。 */}
       <Hero company={company} />
-      {/* CTO メッセージはいったん非表示。同じ位置に、ご相談内容から担当チームと
-          近い実績を返すセクションを置いている。復帰させる場合は ProjectMatch を
-          CtoMessage に戻す（コンポーネント自体は残してある）。 */}
-      <ProjectMatch />
       <div className="reveal">
         <About showClosing={false} teamLayout="carousel" />
         {/* 会社概要のみ。沿革と企業理念は /company に置く。 */}

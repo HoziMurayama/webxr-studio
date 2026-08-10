@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import { XrMark } from "@/components/brand/XrMark";
+import { ProjectMatch } from "@/components/sections/ProjectMatch";
 import type { Company } from "@/db/schema";
 
 /**
@@ -20,7 +21,8 @@ function taglineWithMark(text: string) {
 }
 
 export function Hero({ company }: { company: Company | null }) {
-  const tagline = company?.tagline || "Web・アプリ・AIで、事業の次の一手をつくる。";
+  const tagline =
+    company?.tagline || "Web・アプリ・AIで、事業の次の一手をつくる。";
 
   return (
     // The header is `fixed` and transparent at rest, so the blue field runs up
@@ -53,8 +55,11 @@ export function Hero({ company }: { company: Company | null }) {
               at `xl`) so this paragraph never widens the auto-sized column and
               squeezes the map. */}
           <p className="mt-5 max-w-md text-lg leading-relaxed text-white sm:mt-6 sm:text-xl xl:max-w-xl xl:text-2xl">
-          株式会社WEB-XR.studioは、お客様のビジネス成長を加速させるITパートナーです。豊富なWeb制作実績を強みに、システム構築からアプリ開発、AI実装までワンストップで最適なソリューションをご提供いたします。
+            株式会社WEB-XR.studioは、お客様のビジネス成長を加速させるITパートナーです。豊富なWeb制作実績を強みに、システム構築からアプリ開発、AI実装までワンストップで最適なソリューションをご提供いたします。
           </p>
+          {/* 相談の入口。1つ目はその場で担当チームを判定するモーダルを開き、
+              2つ目は問い合わせページへ送る。 */}
+          <ProjectMatch />
         </div>
         {/*拠点マップ. Decorative — the locations are conveyed by the
             surrounding copy, so the alt text stays descriptive but brief. */}
