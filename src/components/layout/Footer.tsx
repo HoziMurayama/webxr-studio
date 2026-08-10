@@ -26,14 +26,8 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
               Web制作・システム開発・アプリ開発・AIソリューションを一気通貫で。
               作って終わりではなく、育て続けるITパートナーです。
             </p>
-            {settings?.contactEmail && (
-              <a
-                href={`mailto:${settings.contactEmail}`}
-                className="mt-4 inline-block text-sm font-semibold text-white underline-offset-4 hover:underline"
-              >
-                {settings.contactEmail}
-              </a>
-            )}
+            {/* メールアドレスはフッターに出さない。問い合わせはフォームへ
+                誘導する（設定値そのものは残してあり、他の用途では使える）。 */}
             {settings?.phone && (
               <a
                 href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}
@@ -50,7 +44,10 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
               <ul className="space-y-2">
                 {NAV.map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} className="text-white hover:underline underline-offset-4">
+                    <Link
+                      href={item.href}
+                      className="text-white hover:underline underline-offset-4"
+                    >
                       {item.label}
                     </Link>
                   </li>
@@ -73,7 +70,10 @@ export function Footer({ settings }: { settings: SiteSettings | null }) {
                   </li>
                 ))}
                 <li>
-                  <Link href="/admin" className="text-white hover:underline underline-offset-4">
+                  <Link
+                    href="/admin"
+                    className="text-white hover:underline underline-offset-4"
+                  >
                     管理画面
                   </Link>
                 </li>
