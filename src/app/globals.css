@@ -53,7 +53,8 @@
   --color-chrome-line: var(--chrome-line);
   --color-hero-from: var(--hero-from);
   --color-hero-to: var(--hero-to);
-  --font-sans: "游ゴシック体", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic Pro",
+  --font-sans:
+    "游ゴシック体", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic Pro",
     "ヒラギノ角ゴ Pro W3", "ヒラギノ角ゴ Pro", "メイリオ", "Meiryo", Osaka,
     "ＭＳ Ｐゴシック", "Helvetica", "Verdana", sans-serif;
   --radius-brand: var(--radius);
@@ -145,11 +146,60 @@ body {
     opacity 0.7s ease,
     transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+/* モーダルの膜と中身。膜より中身をわずかに長くして、面が後から
+   追いついてくるように見せる。 */
+.modal-overlay {
+  animation: modal-overlay-in 0.2s ease-out;
+}
+.modal-panel {
+  animation: modal-panel-in 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 拡大表示で画像を送ったときの淡い差し替え。transform は JS が毎フレーム
+   書き換えるので、ここでは opacity だけを動かす。 */
+@keyframes wg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* モーダルの出現。背景の膜は不透明度だけ、中身は少し小さい状態から
+   実寸へ広げる。下からせり上がる動きを少し混ぜると、面が迫ってくる
+   ように見えて出所が伝わりやすい。 */
+@keyframes modal-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .reveal {
     transition: none;
+  }
+  /* 動きを減らす設定では拡大も移動もさせない。出現そのものは
+     残さないと、開いたことが分からなくなる。 */
+  .modal-overlay,
+  .modal-panel {
+    animation: none;
   }
 }

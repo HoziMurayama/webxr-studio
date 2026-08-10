@@ -152,12 +152,12 @@ export function ProjectMatch() {
           role="dialog"
           aria-modal="true"
           aria-label="担当チームを調べる"
-          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 backdrop-blur-sm sm:items-center sm:p-6"
+          className="modal-overlay fixed inset-0 z-50 flex items-end justify-center bg-ink/60 backdrop-blur-sm sm:items-center sm:p-6"
           onClick={(e) => {
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div className="max-h-[88vh] w-full max-w-2xl overflow-y-auto overscroll-contain border border-line bg-card">
+          <div className="modal-panel max-h-[88vh] w-full max-w-2xl overflow-y-auto overscroll-contain border border-line bg-card">
             <div className="sticky top-0 flex items-center justify-between gap-4 border-b border-line bg-card px-6 py-4">
               <p className="text-sm font-bold tracking-tight text-ink">
                 {result
