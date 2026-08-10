@@ -230,7 +230,10 @@ export function ProjectMatch() {
                       maxLength={2000}
                       autoFocus
                       placeholder="例）予約機能のある美容室のサイトを作りたい。スマホ対応と、管理画面から予約状況を確認できるようにしたいです。"
-                      className="w-full resize-y border border-line bg-surface-2 px-4 py-3.5 text-base leading-relaxed text-ink placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                      // 角丸・枠線・フォーカス表現はサイト共通の入力欄
+                      // （ui/Field.tsx の control）に合わせる。文字と余白だけは
+                      // 長文を書く欄なので大きめのままにしている。
+                      className="w-full resize-y rounded-xl border border-line bg-card px-4 py-3.5 text-base leading-relaxed text-ink transition-colors placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
                     />
                     <div className="mt-4 flex items-center justify-between gap-4">
                       <p className="text-xs text-muted">
