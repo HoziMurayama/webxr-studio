@@ -1,5 +1,5 @@
 import { Hero } from "@/components/sections/Hero";
-import { CtoMessage } from "@/components/sections/CtoMessage";
+import { ProjectMatch } from "@/components/sections/ProjectMatch";
 import { About } from "@/components/sections/About";
 import { Services } from "@/components/sections/Services";
 import { CaseStudies } from "@/components/sections/CaseStudies";
@@ -21,7 +21,10 @@ export default async function HomePage() {
   return (
     <>
       <Hero company={company} />
-      <CtoMessage />
+      {/* CTO メッセージはいったん非表示。同じ位置に、ご相談内容から担当チームと
+          近い実績を返すセクションを置いている。復帰させる場合は ProjectMatch を
+          CtoMessage に戻す（コンポーネント自体は残してある）。 */}
+      <ProjectMatch />
       <div className="reveal">
         <About showClosing={false} teamLayout="carousel" />
         {/* 会社概要のみ。沿革と企業理念は /company に置く。 */}

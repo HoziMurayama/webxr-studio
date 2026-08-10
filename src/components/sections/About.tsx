@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * admin-editable.
  */
 
-type Team = {
+export type Team = {
   no: string;
   en: string;
   ja: string;
