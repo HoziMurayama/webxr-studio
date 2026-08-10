@@ -60,7 +60,17 @@ export const settingsSchema = z.object({
 });
 
 export type FieldType =
-  "text" | "textarea" | "number" | "kvlist" | "linklist" | "taglist";
+  | "text"
+  | "textarea"
+  | "number"
+  | "kvlist"
+  | "linklist"
+  | "taglist"
+  // 画像 1 枚。URL の直接入力に加え、ファイルを選ぶと Cloudinary へ
+  // アップロードして URL が入る。
+  | "image"
+  // ラベルと画像 URL の組。ギャラリーのように複数枚を並べる欄で使う。
+  | "imagelist";
 
 export type FieldDef = {
   name: string;
@@ -111,19 +121,19 @@ export const SECTIONS: Record<string, SectionDef> = {
     fields: [
       { name: "title", label: "案件名", type: "text" },
       { name: "description", label: "詳細説明", type: "textarea" },
-      { name: "imageUrl", label: "お客様画像URL", type: "text" },
-      { name: "workImageUrl", label: "制作物画像URL", type: "text" },
+      { name: "imageUrl", label: "お客様画像", type: "image" },
+      { name: "workImageUrl", label: "制作物画像", type: "image" },
       {
         name: "thumbnailUrl",
-        label: "一覧サムネイルURL",
-        type: "text",
+        label: "一覧サムネイル",
+        type: "image",
         hint: "未設定なら制作物画像を使用",
       },
       {
         name: "gallery",
         label: "制作物ギャラリー",
-        type: "kvlist",
-        hint: "ラベルと画像URLのペア",
+        type: "imagelist",
+        hint: "ラベルと画像。ファイルを選ぶと自動でアップロードされます",
       },
       { name: "review", label: "お客様の声", type: "textarea" },
       {

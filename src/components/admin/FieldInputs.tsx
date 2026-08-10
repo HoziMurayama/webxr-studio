@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Input, Textarea, Label } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import type { FieldDef } from "@/lib/sections";
@@ -31,23 +32,52 @@ export function FieldInput({
         <Input
           type="number"
           value={value === "" || value == null ? "" : String(value)}
-          onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
+          onChange={(e) =>
+            onChange(e.target.value === "" ? "" : Number(e.target.value))
+          }
         />
       );
     case "taglist":
       return <TagList value={(value as string[]) ?? []} onChange={onChange} />;
+    case "image":
+      return <ImageField value={String(value ?? "")} onChange={onChange} />;
+    case "imagelist":
+      return <ImageList value={(value as KV[]) ?? []} onChange={onChange} />;
     case "kvlist":
-      return <PairList value={(value as KV[]) ?? []} keys={["label", "value"]} labels={["ラベル", "値"]} onChange={onChange} />;
+      return (
+        <PairList
+          value={(value as KV[]) ?? []}
+          keys={["label", "value"]}
+          labels={["ラベル", "値"]}
+          onChange={onChange}
+        />
+      );
     case "linklist":
-      return <PairList value={(value as KV[]) ?? []} keys={["label", "url"]} labels={["ラベル", "URL"]} onChange={onChange} />;
+      return (
+        <PairList
+          value={(value as KV[]) ?? []}
+          keys={["label", "url"]}
+          labels={["ラベル", "URL"]}
+          onChange={onChange}
+        />
+      );
     default:
       return (
-        <Input value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} />
+        <Input
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+        />
       );
   }
 }
 
-function TagList({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+function TagList({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (v: string[]) => void;
+}) {
   return (
     <Input
       value={value.join(", ")}
@@ -65,6 +95,174 @@ function TagList({ value, onChange }: { value: string[]; onChange: (v: string[])
 }
 
 type KV = Record<string, string>;
+
+/** KB 表記。削減率を見せるために使う。 */
+function kb(bytes: number) {
+  return `${Math.max(1, Math.round(bytes / 1024))}KB`;
+}
+
+/**
+ * 画像を Cloudinary へ送り、配信 URL を返す。変換と圧縮は向こう側で行う
+ * ので、ここは送って結果を受け取るだけ。
+ */
+async function upload(file: File): Promise<{ url: string; note: string }> {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error ?? "アップロードに失敗しました。");
+  const saved =
+    data.originalBytes && data.bytes
+      ? `${kb(data.originalBytes)} → ${kb(data.bytes)}`
+      : "";
+  return { url: String(data.url), note: saved };
+}
+
+/** ファイル選択とプレビューを備えた画像 1 枚ぶんの入力欄。 */
+function ImageField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [note, setNote] = useState("");
+
+  async function pick(file: File | undefined) {
+    if (!file) return;
+    setBusy(true);
+    setError("");
+    setNote("");
+    try {
+      const r = await upload(file);
+      onChange(r.url);
+      setNote(r.note);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "アップロードに失敗しました。");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-start gap-3">
+        {/* プレビュー。next/image は外部ドメインの設定が要るので、ここは
+            管理画面限定の素の img で足りる。 */}
+        {value ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={value}
+            alt=""
+            className="h-20 w-20 shrink-0 rounded-lg border border-line bg-surface object-contain"
+          />
+        ) : (
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-dashed border-line bg-surface text-xs text-muted">
+            なし
+          </div>
+        )}
+        <div className="min-w-0 flex-1 space-y-2">
+          <Input
+            value={value}
+            placeholder="https://res.cloudinary.com/..."
+            onChange={(e) => onChange(e.target.value)}
+          />
+          <div className="flex items-center gap-2">
+            <label className="inline-flex cursor-pointer items-center rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface">
+              {busy ? "アップロード中…" : "画像を選ぶ"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={busy}
+                onChange={(e) => pick(e.target.files?.[0])}
+              />
+            </label>
+            {value && (
+              <button
+                type="button"
+                onClick={() => {
+                  onChange("");
+                  setNote("");
+                }}
+                className="rounded-lg px-2 py-1.5 text-xs text-muted hover:bg-red-50 hover:text-red-600"
+              >
+                削除
+              </button>
+            )}
+            {note && <span className="text-xs text-muted">WebP {note}</span>}
+          </div>
+          {error && <p className="text-xs text-red-600">{error}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** ラベルと画像の組を並べる欄。ギャラリー用。 */
+function ImageList({
+  value,
+  onChange,
+}: {
+  value: KV[];
+  onChange: (v: KV[]) => void;
+}) {
+  const rows = value.length ? value : [];
+
+  function update(i: number, key: string, v: string) {
+    onChange(rows.map((r, idx) => (idx === i ? { ...r, [key]: v } : r)));
+  }
+
+  return (
+    <div className="space-y-3">
+      {rows.map((r, i) => (
+        <div
+          key={i}
+          className="space-y-2 rounded-lg border border-line bg-surface p-3"
+        >
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="ラベル（例：トップページ）"
+              value={r.label ?? ""}
+              onChange={(e) => update(i, "label", e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => onChange(rows.filter((_, idx) => idx !== i))}
+              aria-label="削除"
+              className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-red-50 hover:text-red-600"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
+          <ImageField
+            value={r.value ?? ""}
+            onChange={(v) => update(i, "value", v)}
+          />
+        </div>
+      ))}
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={() => onChange([...rows, { label: "", value: "" }])}
+      >
+        + 画像を追加
+      </Button>
+    </div>
+  );
+}
 
 function PairList({
   value,
@@ -110,7 +308,14 @@ function PairList({
             aria-label="削除"
             className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-red-50 hover:text-red-600"
           >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
           </button>
