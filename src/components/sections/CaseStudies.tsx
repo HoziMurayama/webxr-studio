@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Section } from "@/components/ui/Section";
 import { SectionLink } from "@/components/ui/SectionLink";
 import { CaseStudyCarousel } from "@/components/sections/CaseStudyCarousel";
+import { AvatarFallback } from "@/components/ui/AvatarFallback";
 import type { Portfolio } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
@@ -110,7 +111,8 @@ export function CaseStudies({
                 className="group flex h-full w-full flex-col border border-line bg-card text-left transition-shadow hover:shadow-[0_12px_40px_rgb(13,16,23,0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
               >
                 {/* 一覧のサムネイルはお客様のお写真。無ければサムネイル指定、
-                    それも無ければ制作物画像を使う。 */}
+                    それも無ければ制作物画像を使い、いずれも無ければ既定の
+                    アバターを出す。 */}
                 {item.imageUrl || item.thumbnailUrl || item.workImageUrl ? (
                   <Image
                     src={
@@ -129,12 +131,7 @@ export function CaseStudies({
                     className="aspect-[4/3] w-full bg-surface-2 object-contain"
                   />
                 ) : (
-                  <div
-                    aria-hidden
-                    className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted"
-                  >
-                    No Image
-                  </div>
+                  <AvatarFallback className="aspect-[4/3] w-full" />
                 )}
 
                 <div className="flex flex-1 flex-col gap-4 p-5">
