@@ -67,21 +67,28 @@ export default async function CaseStudyDetailPage({
             </h2>
           </div>
 
-          {/* お客様のお写真を全幅のバナーとして最上部に。制作物より先に人が
-              見えるようにする。写真は縦長なので `object-contain` で全体を収め、
-              お名前などは画像の下に置く。 */}
+          {/* お客様のお写真を最上部に。制作物より先に人が見えるようにする。
+              お名前などは画像の下に置く。
+
+              写真の比率は事例ごとに 0.64〜1.50 と幅がある。全幅に伸ばして
+              高さを固定すると、横長の写真では左右に、小さな写真では四方に
+              余白が出て、事例ごとに見え方が揃わない。中央に置いて幅を抑え、
+              高さは写真の比率に追従させることで、どの写真でも余白なしに
+              収まるようにしている。 */}
           {(item.imageUrl || clientLabel(item)) && (
             <div className="border border-line bg-surface">
               {item.imageUrl && (
-                <Image
-                  src={item.imageUrl}
-                  alt={clientLabel(item) || "お客様"}
-                  width={900}
-                  height={1207}
-                  sizes="(min-width: 768px) 48rem, 100vw"
-                  priority
-                  className="h-[22rem] w-full bg-surface-2 object-contain sm:h-[28rem]"
-                />
+                <div className="flex justify-center bg-surface-2 p-6 sm:p-8">
+                  <Image
+                    src={item.imageUrl}
+                    alt={clientLabel(item) || "お客様"}
+                    width={900}
+                    height={1207}
+                    sizes="(min-width: 640px) 20rem, 60vw"
+                    priority
+                    className="h-auto w-full max-w-[16rem] rounded-sm sm:max-w-[20rem]"
+                  />
+                </div>
               )}
               {(clientLabel(item) || item.review) && (
                 <div className="border-t border-line p-6 sm:p-8">
