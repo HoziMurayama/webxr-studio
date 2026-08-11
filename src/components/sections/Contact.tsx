@@ -64,6 +64,18 @@ function ContactForm({
   // 添付についての指摘。フォーム全体のエラーとは分けて、添付欄の
   // 直下に出す。
   const [fileError, setFileError] = useState("");
+  // 閉じる操作の最中。縮小を見せてから消したいので、状態を分けている。
+  const [closing, setClosing] = useState(false);
+
+  /** 完了モーダルを畳む。縮む様子を見せてから状態を戻す。 */
+  function closeSuccess() {
+    setClosing(true);
+    // アニメーションの長さ（0.18s）に合わせる。先に消すと縮みが見えない。
+    setTimeout(() => {
+      setClosing(false);
+      setStatus("idle");
+    }, 180);
+  }
   const editorRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -139,6 +151,9 @@ function ContactForm({
     <Section
       id="contact"
       align="center"
+      // 背景を一段沈ませ、白いフォームを手前に立たせる。地の白に白い
+      // 枠を置くと、どこからが入力欄なのか分かりにくかった。
+      tone="muted"
       eyebrow={showHeader ? "Contact" : undefined}
       title={showHeader ? "お問い合わせ" : undefined}
       description={
@@ -156,7 +171,7 @@ function ContactForm({
         <form
           ref={formRef}
           onSubmit={onSubmit}
-          className="mt-10 rounded-2xl border border-line bg-card p-6 shadow-[0_1px_3px_rgb(13,16,23,0.04)] sm:p-10"
+          className="mt-10 rounded-2xl border border-line bg-card p-6 shadow-[0_8px_30px_rgb(13,16,23,0.08)] sm:p-10"
         >
           <fieldset className="space-y-6 border-0 p-0">
             <div className="grid gap-6 sm:grid-cols-2">
@@ -349,28 +364,100 @@ function ContactForm({
               )}
             </div>
 
-            {status === "success" && (
-              <p className="rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-sm font-medium text-accent-ink">
-                送信しました。折り返しご連絡いたします。ありがとうございます。
-              </p>
-            )}
+            {/* 送信できたことはモーダルで伝えるので、ここには出さない。
+                失敗だけを入力欄のそばに残す。 */}
             {error && (
               <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-sm font-medium text-red-700">
                 {error}
               </p>
             )}
 
-            <Button
-              type="submit"
-              size="lg"
-              disabled={status === "sending"}
-              className={cn("w-full sm:w-auto sm:min-w-48")}
-            >
-              {status === "sending" ? "送信中..." : "送信する"}
-            </Button>
+            {/* 入力の終わりに置き、右へ寄せる。読み進めた先に次の動作が
+                あるほうが迷わない。 */}
+            <div className="flex justify-end border-t border-line pt-6">
+              <Button
+                type="submit"
+                size="lg"
+                disabled={status === "sending"}
+                className={cn(
+                  "w-full gap-2 rounded-xl px-8 shadow-lg shadow-accent/20 transition-transform sm:w-auto sm:min-w-52",
+                  status !== "sending" && "hover:-translate-y-0.5",
+                )}
+              >
+                {status === "sending" ? (
+                  "送信中..."
+                ) : (
+                  <>
+                    送信する
+                    <svg
+                      viewBox="0 0 20 20"
+                      aria-hidden
+                      className="h-4 w-4 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M4 10h11M10 5l5 5-5 5" />
+                    </svg>
+                  </>
+                )}
+              </Button>
+            </div>
           </fieldset>
         </form>
       </div>
+
+      {/* 送信できたことを伝えるモーダル。入力欄のそばに小さく出すより、
+          手が離れたことがはっきり分かる。 */}
+      {status === "success" && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="送信完了"
+          className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-5 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeSuccess();
+          }}
+        >
+          <div
+            className={cn(
+              "w-full max-w-sm rounded-2xl bg-card p-8 text-center shadow-2xl",
+              // 閉じるときは縮めてから消す。開くときは modal-panel の拡大。
+              closing ? "modal-panel-out" : "modal-panel",
+            )}
+          >
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden
+                className="check-draw h-8 w-8 text-accent"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={3}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p className="mt-5 text-lg font-bold text-ink">送信しました</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+              お問い合わせありがとうございます。
+              <br />
+              担当者より折り返しご連絡いたします。
+            </p>
+            <button
+              type="button"
+              onClick={closeSuccess}
+              className="mt-6 w-full rounded-xl bg-accent px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/40"
+            >
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
     </Section>
   );
 }

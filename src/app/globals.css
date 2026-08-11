@@ -154,6 +154,14 @@ body {
 .modal-panel {
   animation: modal-panel-in 0.26s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.modal-panel-out {
+  animation: modal-panel-out 0.18s ease-in forwards;
+}
+/* 32 は path の実長より少し長め。多少余っても描き切りには影響しない。 */
+.check-draw path {
+  stroke-dasharray: 32;
+  animation: check-draw 0.4s ease-out 0.15s backwards;
+}
 
 /* 拡大表示で画像を送ったときの淡い差し替え。transform は JS が毎フレーム
    書き換えるので、ここでは opacity だけを動かす。 */
@@ -189,6 +197,30 @@ body {
   }
 }
 
+/* 閉じるときは縮めて消す。開くときより短くして、操作に対する
+   反応が鈍く感じられないようにする。 */
+@keyframes modal-panel-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/* チェックマークを描く。線の長さぶんの破線を用意し、ずらした位置から
+   0 へ動かすと、ペンでなぞったように見える。 */
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 32;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -199,8 +231,14 @@ body {
   /* 動きを減らす設定では拡大も移動もさせない。出現そのものは
      残さないと、開いたことが分からなくなる。 */
   .modal-overlay,
-  .modal-panel {
+  .modal-panel,
+  .modal-panel-out {
     animation: none;
+  }
+  /* 描画をやめ、最初から線が引かれた状態にする。 */
+  .check-draw path {
+    animation: none;
+    stroke-dasharray: none;
   }
   /* 事例カードのホバー。浮き上がりと画像の拡大を止める。影と枠線の
      変化は残すので、どのカードを指しているかは分かる。 */
