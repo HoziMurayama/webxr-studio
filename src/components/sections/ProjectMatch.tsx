@@ -126,10 +126,14 @@ export function ProjectMatch() {
 
   return (
     <>
-      {/* ヒーロー本文の下に置く2つのボタン。横並びだと青地の上で白い塊が
-          横に伸びて見出しと競るため、縦に積んで幅を揃える。上から順に
-          読ませたいので、主となる相談を上に置く。 */}
-      <div className="mt-8 flex max-w-xs flex-col items-stretch gap-3">
+      {/* 説明文とボタンの間の区切り。白を薄く敷くだけにして、青地の上で
+          線そのものが主張しないようにする。 */}
+      <hr className="mt-8 border-0 border-t border-white/30" />
+
+      {/* 2つのボタンを半分ずつに割る。等幅の2列にすると、どちらも同じ重さ
+          の選択肢に見える。狭い画面では横に並べると文字が窮屈なので、
+          そこだけ積み上げる。 */}
+      <div className="mt-8 grid gap-3 sm:grid-cols-2">
         <button
           type="button"
           onClick={() => setOpen(true)}

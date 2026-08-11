@@ -34,8 +34,10 @@ export function Hero({ company }: { company: Company | null }) {
     <section className="hero-bg reveal relative isolate flex min-h-[34rem] items-center overflow-hidden px-5 pb-32 pt-36 sm:min-h-[40rem] sm:pb-40 sm:pt-40">
       {/* Heading left, map right. The map takes the larger share now that it is
           rendered big; below `lg` the two stack and the map sits underneath. */}
+      {/* Heading left, map right. The map takes the larger share now that it is
+          rendered big; below `lg` the two stack and the map sits underneath. */}
       <div className="mx-auto grid w-full max-w-6xl items-center gap-8 lg:grid-cols-[auto_minmax(0,1fr)]">
-        <div>
+        <div className="min-w-0">
           {/* `aria-label` carries the plain string so screen readers announce the
               tagline as text, not as prose interrupted by an image. */}
           <h1
@@ -49,16 +51,17 @@ export function Hero({ company }: { company: Company | null }) {
           >
             {taglineWithMark(tagline)}
           </h1>
-          {/* The heading is `whitespace-nowrap`, so this paragraph is what sets
-              the column's usable width; it wraps normally. */}
-          {/* The cap stays under the heading's own width (469px at `sm`, 587px
-              at `xl`) so this paragraph never widens the auto-sized column and
-              squeezes the map. */}
-          <p className="mt-5 max-w-md text-lg leading-relaxed text-white sm:mt-6 sm:text-xl xl:max-w-xl xl:text-2xl">
+          {/* 上限は見出しの実寸に合わせてある（`lg` で 448px、`xl` で 576px）。
+              二段組になる `lg` 以上では、これで説明文の右端が見出しと揃う。
+              上限を外すと列そのものが伸びて右の地図が消えるため、外せない。
+              一段になる `lg` 未満では見出しが幅いっぱいに広がるので、
+              上限を掛けず同じ幅に流す。 */}
+          <p className="mt-5 text-lg leading-relaxed text-white sm:mt-6 sm:text-xl lg:max-w-md xl:max-w-xl xl:text-2xl">
             株式会社WEB-XR.studioは、お客様のビジネス成長を加速させるITパートナーです。豊富なWeb制作実績を強みに、システム構築からアプリ開発、AI実装までワンストップで最適なソリューションをご提供いたします。
           </p>
           {/* 相談の入口。1つ目はその場で担当チームを判定するモーダルを開き、
-              2つ目は問い合わせページへ送る。 */}
+              2つ目は問い合わせページへ送る。説明文との間は ProjectMatch 側で
+              罫線を引いて区切っている。 */}
           <ProjectMatch />
         </div>
         {/*拠点マップ. Decorative — the locations are conveyed by the
