@@ -98,6 +98,43 @@ export async function uploadImage(
   };
 }
 
+/**
+ * お問い合わせの添付ファイル。画像とは扱いを分ける。
+ *
+ * 画像に限らず PDF なども受けるので変換はせず、原本のまま置く。
+ * `type: "authenticated"` にはせず、URL を知っていれば取れる状態にする
+ * （管理画面からダウンロードするだけなので、署名の仕組みまでは要らない）。
+ */
+export async function uploadAttachment(
+  file: Buffer,
+  filename: string,
+): Promise<{ url: string; bytes: number }> {
+  const client = getClient();
+
+  const res = await new Promise<Record<string, unknown>>((resolve, reject) => {
+    client.uploader
+      .upload_stream(
+        {
+          folder: "webxr-studio/contacts",
+          // 元の名前を残す。管理画面で何のファイルか分かるようにするため。
+          public_id: filename.replace(/\.[^.]+$/, ""),
+          // 画像以外も来るので raw ではなく auto に任せる。
+          resource_type: "auto",
+          use_filename: true,
+          unique_filename: true,
+        },
+        (err, result) => {
+          if (err || !result)
+            return reject(err ?? new Error("アップロードに失敗しました。"));
+          resolve(result as unknown as Record<string, unknown>);
+        },
+      )
+      .end(file);
+  });
+
+  return { url: String(res.secure_url), bytes: Number(res.bytes ?? 0) };
+}
+
 /** 設定済みかどうか。管理画面で「使えない」ことを先に伝えるために使う。 */
 export function isConfigured(): boolean {
   return Boolean(

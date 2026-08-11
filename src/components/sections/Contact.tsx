@@ -152,20 +152,7 @@ function ContactForm({
           onSubmit={onSubmit}
           className="mt-10 border border-line bg-surface p-6 sm:p-10"
         >
-          {/* 受付を停止している旨を、入力欄より先に置く。書き終えてから
-              送れないと分かる事態を避けるため。 */}
-          <p
-            role="status"
-            className="border border-line bg-card px-4 py-3 text-sm leading-relaxed text-ink-soft"
-          >
-            ただいまお問い合わせフォームの受付を停止しております。
-            ご不便をおかけし申し訳ございません。
-          </p>
-
-          {/* fieldset の disabled は中の入力欄とボタンをまとめて無効にする。
-              入力欄が複数の子コンポーネントに散っているため、個別に渡すより
-              取りこぼしがない。 */}
-          <fieldset disabled className="mt-6 space-y-6 border-0 p-0 opacity-60">
+          <fieldset className="space-y-6 border-0 p-0">
             <div className="grid gap-6 sm:grid-cols-2">
               <FieldGroup label="お名前（必須）" htmlFor="name">
                 <Input
@@ -244,12 +231,9 @@ function ContactForm({
               <div
                 id="message-editor"
                 ref={editorRef}
-                // contentEditable は fieldset の disabled が効かないため、
-                // ここだけ個別に編集を止める。
-                contentEditable={false}
+                contentEditable
                 role="textbox"
                 aria-multiline="true"
-                aria-disabled="true"
                 aria-label="内容"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {

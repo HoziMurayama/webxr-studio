@@ -83,9 +83,17 @@ export const contacts = pgTable("contacts", {
   service: text("service").notNull().default(""),
   // 本文。太字・赤字は HTML として保存する。
   message: text("message").notNull(),
-  // 添付ファイル。data URL 形式で保存する（上限は API 側で 2MB）。
+  // 添付ファイル。実体は Cloudinary に置き、ここには URL だけを持つ。
+  // data URL のまま入れると 1 件で数 MB になり、一覧の取得まで重くなる。
   attachmentName: text("attachment_name").notNull().default(""),
+  attachmentUrl: text("attachment_url").notNull().default(""),
+  // 旧方式で保存された data URL。新規では使わないが、既存データの
+  // 表示のために残している。
   attachmentData: text("attachment_data").notNull().default(""),
+  // 送信元。どこからの問い合わせかを管理画面で見るために持つ。
+  ip: text("ip").notNull().default(""),
+  country: text("country").notNull().default(""),
+  city: text("city").notNull().default(""),
   handled: boolean("handled").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
