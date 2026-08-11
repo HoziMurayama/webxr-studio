@@ -93,32 +93,31 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
   }, []);
 
   /**
-   * 新着を取りに行く。
+   * 新着を SSE で受け取る。
    *
-   * SSE ではなくポーリングにしている。既存の配信はサーバー1プロセスの
-   * メモリで購読者を持つ作りで、Vercel のように複数インスタンスへ分かれる
-   * 環境では、書き込みを受けたインスタンスに繋がっている人にしか届かない。
-   * DB を見に行けばどのインスタンスからでも同じ結果になる。
+   * ブラウザから数秒おきに HTTP を投げるのではなく、接続を張ったまま
+   * サーバーからの通知を待つ。変化が無い間は往復が発生しない。
    *
-   * 通知が off でも一覧は更新する。手動で読み込み直す手間をなくすため。
-   * 画面を見ていない間は止め、戻ったときに一度だけ取りに行く。
+   * 変化の検出はサーバー側で DB を見て行う。購読者をメモリに置く
+   * pub/sub は、Vercel のように複数インスタンスへ分かれる環境では
+   * 書き込みを受けた側にしか届かないため。
+   *
+   * 接続が切れたら EventSource が自動で繋ぎ直す。Vercel の実行時間の
+   * 上限でサーバー側から畳まれるので、これは通常運転の一部。
    */
   useEffect(() => {
-    let alive = true;
+    // 通知が off のときは、背面にいる間は繋がない。前面に戻ったら張り直す。
+    let es: EventSource | null = null;
 
-    async function poll() {
-      // 通知が有効なら、タブが背面でも取りに行く。前面のときだけ動かすと
-      // 「別のタブを見ている間に届いた分」を知らせられず、通知の意味が
-      // 半分なくなるため。off のときは節約して前面だけにする。
-      if (document.hidden && !notify) return;
+    /** 変化の知らせを受けたら、一覧を取り直して差分を通知する。 */
+    async function refresh() {
       try {
         const res = await fetch("/api/admin/contacts", { cache: "no-store" });
-        if (!res.ok || !alive) return;
+        if (!res.ok) return;
         const data = (await res.json()) as { rows?: Contact[] };
         const fresh = data.rows ?? [];
         const incoming = fresh.filter((r) => r.id > seenId.current);
 
-        // 件数や対応状況の変化も拾いたいので、新着が無くても差し替える。
         setRows(fresh);
         if (incoming.length === 0) return;
         seenId.current = Math.max(...fresh.map((r) => r.id));
@@ -140,19 +139,41 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
           }
         }
       } catch {
-        // 取得に失敗しても黙って次の周期を待つ。
+        // 取得に失敗しても接続は保つ。次の知らせで取り直せる。
       }
     }
 
-    const timer = setInterval(poll, 5_000);
-    // タブに戻った直後は、次の周期を待たずに取りに行く。
+    function connect() {
+      if (es) return;
+      es = new EventSource("/api/admin/contacts/stream");
+      es.addEventListener("change", refresh);
+      es.onerror = () => {
+        // EventSource は自動で再接続する。ここでは閉じない。
+      };
+    }
+
+    function disconnect() {
+      es?.close();
+      es = null;
+    }
+
+    // 通知が有効なら常時つなぐ。無効なら前面のときだけ。
+    const shouldConnect = () => notify || !document.hidden;
+    if (shouldConnect()) connect();
+
     const onVisible = () => {
-      if (!document.hidden) poll();
+      if (shouldConnect()) {
+        connect();
+        // 切れていた間の分を取り戻す。
+        refresh();
+      } else {
+        disconnect();
+      }
     };
     document.addEventListener("visibilitychange", onVisible);
+
     return () => {
-      alive = false;
-      clearInterval(timer);
+      disconnect();
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [notify]);
