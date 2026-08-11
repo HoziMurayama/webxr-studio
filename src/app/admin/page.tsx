@@ -25,8 +25,8 @@ export default async function AdminDashboard() {
   ]);
 
   const tiles = [
-    { label: "制作実績", value: nPortfolio, href: "/admin/portfolio" },
-    { label: "FAQ", value: nFaqs, href: "/admin/faqs" },
+    { label: "お客様事例", value: nPortfolio, href: "/admin/portfolio" },
+    { label: "よくある質問", value: nFaqs, href: "/admin/faqs" },
     {
       label: "お問い合わせ",
       value: nContacts,
@@ -69,9 +69,6 @@ export default async function AdminDashboard() {
             左メニューから各セクションのコンテンツを追加・編集・削除できます。
           </li>
           <li>編集内容は公開サイトに即時反映されます。</li>
-          <li>
-            コンテンツを更新すると、AIアシスタントの知識（RAGインデックス）も自動で更新されます。
-          </li>
         </ul>
       </div>
     </AdminShell>

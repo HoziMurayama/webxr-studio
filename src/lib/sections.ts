@@ -93,27 +93,6 @@ export type SectionDef = {
 };
 
 export const SECTIONS: Record<string, SectionDef> = {
-  company: {
-    slug: "company",
-    label: "会社案内",
-    table: company,
-    schema: companySchema,
-    singleton: true,
-    indexed: true,
-    fields: [
-      { name: "name", label: "会社名", type: "text" },
-      { name: "tagline", label: "キャッチコピー", type: "text" },
-      { name: "about", label: "紹介文", type: "textarea" },
-      { name: "mission", label: "ミッション", type: "textarea" },
-      { name: "history", label: "沿革", type: "textarea" },
-      {
-        name: "stats",
-        label: "会社データ",
-        type: "kvlist",
-        hint: "ラベルと値のペア",
-      },
-    ],
-  },
   portfolio: {
     slug: "portfolio",
     label: "お客様事例",
@@ -154,22 +133,6 @@ export const SECTIONS: Record<string, SectionDef> = {
       { name: "question", label: "質問", type: "text" },
       { name: "answer", label: "回答", type: "textarea" },
       { name: "order", label: "表示順", type: "number" },
-    ],
-  },
-  site_settings: {
-    slug: "site_settings",
-    label: "サイト共通設定",
-    table: siteSettings,
-    schema: settingsSchema,
-    singleton: true,
-    indexed: true,
-    fields: [
-      { name: "contactEmail", label: "問い合わせメール", type: "text" },
-      { name: "phone", label: "電話番号", type: "text" },
-      { name: "address", label: "所在地", type: "text" },
-      { name: "socials", label: "SNS/リンク", type: "linklist" },
-      { name: "seoTitle", label: "SEOタイトル", type: "text" },
-      { name: "seoDescription", label: "SEO説明文", type: "textarea" },
     ],
   },
 };

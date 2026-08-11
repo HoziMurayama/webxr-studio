@@ -21,12 +21,9 @@ const NAV: {
   exact?: boolean;
 }[] = [
   { href: "/admin", label: "ダッシュボード", exact: true },
-  { href: "/admin/company", label: "会社案内", page: "/company" },
   { href: "/admin/portfolio", label: "お客様事例", page: "/case-study" },
   { href: "/admin/faqs", label: "よくある質問", page: "/faq" },
   { href: "/admin/contacts", label: "お問い合わせ", page: "/contact" },
-  { href: "/admin/site_settings", label: "サイト共通設定" },
-  { href: "/admin/ai", label: "AIインデックス" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
