@@ -59,29 +59,32 @@ function ContactForm({
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
-  const [file, setFile] = useState<{
-    name: string;
-    data: string;
-    size: number;
-  } | null>(null);
+  const [file, setFile] = useState<{ name: string; data: string } | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  // 添付についての指摘。フォーム全体のエラーとは分けて、添付欄の
+  // 直下に出す。
+  const [fileError, setFileError] = useState("");
   const editorRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   async function onPickFile(f: File | undefined) {
     if (!f) return setFile(null);
     if (f.size > MAX_FILE_BYTES) {
-      setError("添付ファイルは 50MB 以内にしてください。");
+      // 実際の容量を添えて、どれだけ超えているかを分かるようにする。
+      const mb = (f.size / 1024 / 1024).toFixed(1);
+      setFileError(
+        `このファイルは ${mb}MB です。50MB 以内のファイルを添付してください。`,
+      );
       return setFile(null);
     }
-    setError("");
+    setFileError("");
     const data = await new Promise<string>((resolve, reject) => {
       const r = new FileReader();
       r.onload = () => resolve(String(r.result));
       r.onerror = reject;
       r.readAsDataURL(f);
     });
-    setFile({ name: f.name, data, size: f.size });
+    setFile({ name: f.name, data });
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -292,7 +295,6 @@ function ContactForm({
                   <>
                     <p className="text-sm font-medium text-ink">{file.name}</p>
                     <p className="mt-1 text-xs text-muted">
-                      {(file.size / 1024 / 1024).toFixed(1)}MB ・
                       クリックで選び直す
                     </p>
                   </>
@@ -323,10 +325,23 @@ function ContactForm({
                   onChange={(e) => onPickFile(e.target.files?.[0])}
                 />
               </label>
+              {/* 添付についての指摘はこの欄の直下に出す。送信ボタン付近だと
+                  どの入力が悪いのか分かりにくいため。 */}
+              {fileError && (
+                <p
+                  role="alert"
+                  className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700"
+                >
+                  {fileError}
+                </p>
+              )}
               {file && (
                 <button
                   type="button"
-                  onClick={() => setFile(null)}
+                  onClick={() => {
+                    setFile(null);
+                    setFileError("");
+                  }}
                   className="mt-2 text-xs text-muted underline-offset-4 hover:text-red-600 hover:underline"
                 >
                   添付を取り消す
