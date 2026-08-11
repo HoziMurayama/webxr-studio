@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 type Team = {
   slug: string;
@@ -52,13 +53,35 @@ export function ProjectMatch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 閉じる操作の最中。縮む様子を見せてから畳みたいので、開閉とは
+  // 別に持つ。問い合わせフォームの完了モーダルと同じ作りにしている。
+  const [closing, setClosing] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const close = useCallback(() => {
-    setOpen(false);
-    // 閉じたら結果は捨てる。次に開いたときに前回の判定が残っていると、
-    // いま入力した内容の結果と紛らわしいため。
-    setResult(null);
-    setError("");
+    // Escape の連打や、閉じている最中の再クリックで二重に走らせない。
+    if (closeTimer.current) return;
+    setClosing(true);
+    // アニメーションの長さ（0.18s）に合わせる。先に畳むと縮みが見えない。
+    closeTimer.current = setTimeout(() => {
+      closeTimer.current = null;
+      setClosing(false);
+      setOpen(false);
+      // 閉じたら結果は捨てる。次に開いたときに前回の判定が残っていると、
+      // いま入力した内容の結果と紛らわしいため。
+      setResult(null);
+      setError("");
+    }, 180);
   }, []);
+
+  // 畳み切る前に画面から消えた場合に備えて後始末する。残ったタイマーが
+  // 次に開いたモーダルを勝手に閉じてしまうのを防ぐ。
+  useEffect(
+    () => () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    },
+    [],
+  );
 
   // 開いている間は背後を固定し、Escape で閉じられるようにする。
   useEffect(() => {
@@ -103,16 +126,16 @@ export function ProjectMatch() {
 
   return (
     <>
-      {/* ヒーロー本文の下に並ぶ2つのボタン。相談を主、問い合わせを従として
-          塗りと白枠で主従を分けている。狭い画面では縦積みにして、どちらも
-          押しやすい幅を確保する。 */}
-      <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+      {/* ヒーロー本文の下に置く2つのボタン。横並びだと青地の上で白い塊が
+          横に伸びて見出しと競るため、縦に積んで幅を揃える。上から順に
+          読ませたいので、主となる相談を上に置く。 */}
+      <div className="mt-8 flex max-w-xs flex-col items-stretch gap-3">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-base font-bold tracking-tight text-chrome shadow-lg transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-base font-bold tracking-tight text-chrome shadow-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
         >
-          担当チームを調べる
+          アイデアを入力する
           <svg
             viewBox="0 0 20 20"
             aria-hidden
@@ -129,7 +152,7 @@ export function ProjectMatch() {
 
         <Link
           href="/contact"
-          className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/80 px-7 py-3.5 text-base font-bold tracking-tight text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
+          className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/70 bg-white/10 px-7 py-3.5 text-base font-bold tracking-tight text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
         >
           お問い合わせ
           <svg
@@ -151,20 +174,30 @@ export function ProjectMatch() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="担当チームを調べる"
-          className="modal-overlay fixed inset-0 z-50 flex items-end justify-center bg-ink/60 backdrop-blur-sm sm:items-center sm:p-6"
+          aria-label="アイデアを入力する"
+          className={cn(
+            "fixed inset-0 z-50 flex items-end justify-center bg-ink/60 backdrop-blur-sm sm:items-center sm:p-6",
+            closing ? "modal-overlay-out" : "modal-overlay",
+          )}
           onClick={(e) => {
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div className="modal-panel max-h-[88vh] w-full max-w-2xl overflow-y-auto overscroll-contain border border-line bg-card">
-            <div className="sticky top-0 flex items-center justify-between gap-4 border-b border-line bg-card px-6 py-4">
+          <div
+            className={cn(
+              // 下端にぴったり付く狭い画面では下側の角丸を落とす。浮いて
+              // いないのに角だけ丸いと、画面の縁との隙間が目立つ。
+              "max-h-[88vh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-t-2xl border border-line bg-card shadow-2xl sm:rounded-2xl",
+              closing ? "modal-panel-out" : "modal-panel",
+            )}
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 rounded-t-2xl border-b border-line bg-card px-6 py-4">
               <p className="text-sm font-bold tracking-tight text-ink">
                 {result
                   ? result.relevant
                     ? "ご相談内容の判定結果"
                     : "ご相談について"
-                  : "担当チームを調べる"}
+                  : "アイデアを入力する"}
               </p>
               <button
                 type="button"

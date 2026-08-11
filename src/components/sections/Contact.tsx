@@ -416,7 +416,10 @@ function ContactForm({
           role="dialog"
           aria-modal="true"
           aria-label="送信完了"
-          className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-5 backdrop-blur-sm"
+          className={cn(
+            "fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-5 backdrop-blur-sm",
+            closing ? "modal-overlay-out" : "modal-overlay",
+          )}
           onClick={(e) => {
             if (e.target === e.currentTarget) closeSuccess();
           }}

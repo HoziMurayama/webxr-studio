@@ -157,6 +157,11 @@ body {
 .modal-panel-out {
   animation: modal-panel-out 0.18s ease-in forwards;
 }
+/* 膜も中身と一緒に引く。面だけ消えて膜が残ると、背景が暗いまま
+   一瞬止まって見える。 */
+.modal-overlay-out {
+  animation: modal-overlay-out 0.18s ease-in forwards;
+}
 /* 32 は path の実長より少し長め。多少余っても描き切りには影響しない。 */
 .check-draw path {
   stroke-dasharray: 32;
@@ -183,6 +188,15 @@ body {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes modal-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 
@@ -231,6 +245,7 @@ body {
   /* 動きを減らす設定では拡大も移動もさせない。出現そのものは
      残さないと、開いたことが分からなくなる。 */
   .modal-overlay,
+  .modal-overlay-out,
   .modal-panel,
   .modal-panel-out {
     animation: none;
