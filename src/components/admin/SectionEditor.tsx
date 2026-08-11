@@ -231,7 +231,23 @@ function EditorForm({
     setBusy(true);
     setError("");
     const payload: Record<string, unknown> = {};
-    for (const f of fields) payload[f.name] = values[f.name] ?? defaultFor(f);
+    for (const f of fields) {
+      // client 型は 1 つの欄で 3 列（写真・企業名・お名前）を扱う。
+      // 表示上のフィールド名 clientPhoto は列ではないので送らない。
+      if (f.type === "client") {
+        payload.imageUrl = values.imageUrl ?? "";
+        payload.companyName = values.companyName ?? "";
+        payload.clientName = values.clientName ?? "";
+        continue;
+      }
+      payload[f.name] = values[f.name] ?? defaultFor(f);
+    }
+    // 一覧カードのサムネイルはギャラリー 1 枚目を使う。管理画面から
+    // 個別の欄を外したので、保存のたびにここで揃えておく。
+    const gallery = (values.gallery ?? []) as { value?: string }[];
+    const first = gallery.find((g) => g.value)?.value ?? "";
+    payload.workImageUrl = first;
+    payload.thumbnailUrl = first;
 
     const isUpdate = values.id != null;
     const url =
@@ -275,6 +291,13 @@ function EditorForm({
             field={f}
             value={values[f.name] ?? defaultFor(f)}
             onChange={(v) => setValues((prev) => ({ ...prev, [f.name]: v }))}
+            // client 型だけは 3 列をまとめて扱うため、行そのものを渡す。
+            row={f.type === "client" ? values : undefined}
+            onRowChange={
+              f.type === "client"
+                ? (patch) => setValues((prev) => ({ ...prev, ...patch }))
+                : undefined
+            }
           />
         ))}
       </div>

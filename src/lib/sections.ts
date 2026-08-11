@@ -70,7 +70,10 @@ export type FieldType =
   // アップロードして URL が入る。
   | "image"
   // ラベルと画像 URL の組。ギャラリーのように複数枚を並べる欄で使う。
-  | "imagelist";
+  | "imagelist"
+  // お客様の写真・企業名・お名前をひとまとまりで編集する欄。
+  // 3つを別々に並べるより、誰の事例かが掴みやすい。
+  | "client";
 
 export type FieldDef = {
   name: string;
@@ -121,28 +124,14 @@ export const SECTIONS: Record<string, SectionDef> = {
     fields: [
       { name: "title", label: "案件名", type: "text" },
       { name: "description", label: "詳細説明", type: "textarea" },
-      { name: "imageUrl", label: "お客様画像", type: "image" },
-      { name: "workImageUrl", label: "制作物画像", type: "image" },
-      {
-        name: "thumbnailUrl",
-        label: "一覧サムネイル",
-        type: "image",
-        hint: "未設定なら制作物画像を使用",
-      },
+      { name: "clientPhoto", label: "お客様情報", type: "client" },
       {
         name: "gallery",
-        label: "制作物ギャラリー",
+        label: "制作物",
         type: "imagelist",
-        hint: "ラベルと画像。ファイルを選ぶと自動でアップロードされます",
+        hint: "1枚目が一覧カードのサムネイルになります",
       },
       { name: "review", label: "お客様の声", type: "textarea" },
-      {
-        name: "companyName",
-        label: "企業名",
-        type: "text",
-        hint: "個人のお客様の場合は空欄",
-      },
-      { name: "clientName", label: "お名前", type: "text" },
       {
         name: "industry",
         label: "業界",

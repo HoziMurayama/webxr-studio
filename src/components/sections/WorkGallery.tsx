@@ -502,8 +502,9 @@ export function WorkGallery({
         </p>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-medium text-ink">{current.label}</p>
+      {/* 画像の名前は出さない。何の画面かは絵を見れば分かるうえ、
+          事例ごとに付け方が揃わないため。 */}
+      <div className="mt-3 flex flex-wrap items-center justify-end gap-3">
         <button
           type="button"
           onClick={() => setZoomOpen(true)}

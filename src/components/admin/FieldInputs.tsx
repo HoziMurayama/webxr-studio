@@ -119,21 +119,24 @@ async function upload(file: File): Promise<{ url: string; note: string }> {
   return { url: String(data.url), note: saved };
 }
 
-/** ファイル選択とプレビューを備えた画像 1 枚ぶんの入力欄。 */
+/**
+ * 画像 1 枚ぶんの入力欄。画像そのものが押せる領域になっていて、
+ * クリック・ドラッグ・貼り付けのいずれでもアップロードできる。
+ * 説明文は置かない（並べると枚数が増えたときに読みづらいため）。
+ */
 function ImageField({
   value,
   onChange,
+  className,
 }: {
   value: string;
   onChange: (v: string) => void;
+  className?: string;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
   const [over, setOver] = useState(false);
-  // URL 欄は既定で畳む。既に URL が入っているものだけ開いておく必要はなく、
-  // ふだんはドラッグかファイル選択で足りるため。
-  const [showUrl, setShowUrl] = useState(false);
 
   async function pick(file: File | undefined) {
     if (!file) return;
@@ -152,10 +155,10 @@ function ImageField({
   }
 
   return (
-    <div className="space-y-2">
-      {/* 枠ごと落とせるようにする。ファイル選択のダイアログを開かずに
-          済むほうが、まとめて差し替えるときに速い。 */}
-      <div
+    <div className={cn("group relative space-y-1", className)}>
+      {/* 画像そのものが押せる領域。説明文を並べず、クリックで選択、
+          ドラッグと貼り付けでも受ける。 */}
+      <label
         onDragOver={(e) => {
           e.preventDefault();
           if (!busy) setOver(true);
@@ -166,7 +169,6 @@ function ImageField({
           setOver(false);
           pick(e.dataTransfer.files?.[0]);
         }}
-        // スクリーンショットをそのまま貼れるようにする。
         onPaste={(e) => {
           const f = Array.from(e.clipboardData.files)[0];
           if (f) {
@@ -175,94 +177,70 @@ function ImageField({
           }
         }}
         className={cn(
-          "flex items-start gap-3 rounded-xl border border-dashed p-3 transition-colors",
-          over ? "border-accent bg-accent/5" : "border-line bg-surface",
-          busy && "opacity-60",
+          "flex aspect-[4/3] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-dashed bg-surface transition-colors",
+          over
+            ? "border-accent bg-accent/5"
+            : "border-line hover:border-accent/60",
+          busy && "cursor-wait opacity-60",
         )}
       >
-        {/* プレビュー。next/image は外部ドメインの設定が要るので、ここは
-            管理画面限定の素の img で足りる。 */}
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={value}
-            alt=""
-            className="h-24 w-24 shrink-0 rounded-lg border border-line bg-card object-contain"
-          />
+          <img src={value} alt="" className="h-full w-full object-contain" />
         ) : (
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg border border-dashed border-line bg-card text-xs text-muted">
-            画像なし
-          </div>
+          <span className="text-xs text-muted">
+            {busy ? "アップロード中…" : "＋ 画像"}
+          </span>
         )}
 
-        <div className="min-w-0 flex-1">
-          <p className="text-sm text-ink-soft">
-            {busy ? "アップロード中…" : "ここに画像をドラッグ、または貼り付け"}
-          </p>
-          <p className="mt-0.5 text-xs text-muted">
-            JPG / PNG / WebP など。自動で WebP に変換して保存します。
-          </p>
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          disabled={busy}
+          onChange={(e) => pick(e.target.files?.[0])}
+        />
+      </label>
 
-          <div className="mt-2.5 flex flex-wrap items-center gap-2">
-            <label
-              className={cn(
-                "inline-flex items-center rounded-lg border border-line bg-card px-3 py-1.5 text-xs font-medium text-ink",
-                busy ? "cursor-not-allowed" : "cursor-pointer hover:bg-surface",
-              )}
-            >
-              ファイルを選ぶ
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={busy}
-                onChange={(e) => pick(e.target.files?.[0])}
-              />
-            </label>
-            {value && (
-              <button
-                type="button"
-                onClick={() => {
-                  onChange("");
-                  setNote("");
-                }}
-                className="rounded-lg px-2 py-1.5 text-xs text-muted hover:bg-red-50 hover:text-red-600"
-              >
-                削除
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => setShowUrl((v) => !v)}
-              className="rounded-lg px-2 py-1.5 text-xs text-muted hover:bg-card hover:text-ink"
-            >
-              {showUrl ? "URL を隠す" : "URL で指定"}
-            </button>
-            {note && (
-              <span className="text-xs font-medium text-accent-ink">
-                WebP {note}
-              </span>
-            )}
-          </div>
+      {/* 削除は画像の右上に重ねる。label の中に入れるとクリックが
+          ファイル選択に吸われるため、外に出して絶対配置する。 */}
+      {value && !busy && (
+        <button
+          type="button"
+          onClick={() => {
+            onChange("");
+            setNote("");
+          }}
+          aria-label="画像を削除"
+          className="absolute right-1.5 top-1.5 z-10 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink/60 text-white opacity-0 transition-opacity hover:bg-ink/85 group-hover:opacity-100"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      )}
 
-          {/* 既存の URL を直したいときだけ開く。ふだんは畳んでおく。 */}
-          {showUrl && (
-            <div className="mt-2">
-              <Input
-                value={value}
-                placeholder="https://res.cloudinary.com/..."
-                onChange={(e) => onChange(e.target.value)}
-              />
-            </div>
-          )}
-          {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-        </div>
-      </div>
+      {note && <p className="text-[11px] text-accent-ink">WebP {note}</p>}
+      {error && <p className="text-[11px] text-red-600">{error}</p>}
     </div>
   );
 }
 
-/** ラベルと画像の組を並べる欄。ギャラリー用。 */
+/**
+ * 画像を並べる欄。ギャラリー用。
+ *
+ * 画像だけを格子に並べる。1 枚ごとにラベル欄を挟むと縦に伸びて全体を
+ * 見渡せないうえ、公開ページでも名前は出さないため。`label` は形を
+ * 保つために空文字で持つ（DB は {label, value} の組で入っている）。
+ */
 function ImageList({
   value,
   onChange,
@@ -272,55 +250,103 @@ function ImageList({
 }) {
   const rows = value.length ? value : [];
 
-  function update(i: number, key: string, v: string) {
-    onChange(rows.map((r, idx) => (idx === i ? { ...r, [key]: v } : r)));
-  }
-
   return (
     <div className="space-y-3">
-      {rows.map((r, i) => (
-        <div
-          key={i}
-          className="space-y-2 rounded-lg border border-line bg-surface p-3"
-        >
-          <div className="flex items-center gap-2">
-            <Input
-              placeholder="ラベル（例：トップページ）"
-              value={r.label ?? ""}
-              onChange={(e) => update(i, "label", e.target.value)}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {rows.map((r, i) => (
+          <div key={i} className="group relative">
+            <ImageField
+              value={r.value ?? ""}
+              onChange={(v) =>
+                onChange(
+                  rows.map((row, idx) =>
+                    idx === i ? { ...row, value: v } : row,
+                  ),
+                )
+              }
             />
+            {/* 枠ごと取り除く。画像だけ消したいときは画像側の × を使う。 */}
             <button
               type="button"
               onClick={() => onChange(rows.filter((_, idx) => idx !== i))}
-              aria-label="削除"
-              className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-red-50 hover:text-red-600"
+              aria-label="この枠を削除"
+              className="absolute -right-1.5 -top-1.5 z-20 inline-flex h-6 w-6 items-center justify-center rounded-full border border-line bg-card text-muted opacity-0 shadow-sm transition-opacity hover:text-red-600 group-hover:opacity-100"
             >
               <svg
                 viewBox="0 0 24 24"
-                width="18"
-                height="18"
+                width="13"
+                height="13"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.5"
+                strokeLinecap="round"
               >
                 <path d="M6 6l12 12M18 6L6 18" />
               </svg>
             </button>
           </div>
-          <ImageField
-            value={r.value ?? ""}
-            onChange={(v) => update(i, "value", v)}
-          />
-        </div>
-      ))}
-      <Button
-        type="button"
-        variant="secondary"
-        size="sm"
-        onClick={() => onChange([...rows, { label: "", value: "" }])}
+        ))}
+
+        {/* 追加枠。押すとその場でファイル選択が開き、選んだ画像が入る。 */}
+        <AddImageTile
+          onAdd={(url) => onChange([...rows, { label: "", value: url }])}
+        />
+      </div>
+    </div>
+  );
+}
+
+/** ギャラリー末尾の追加枠。選んだ時点で 1 枚ぶんの行を足す。 */
+function AddImageTile({ onAdd }: { onAdd: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [over, setOver] = useState(false);
+
+  async function pick(file: File | undefined) {
+    if (!file) return;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await upload(file);
+      onAdd(r.url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "アップロードに失敗しました。");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-1">
+      <label
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!busy) setOver(true);
+        }}
+        onDragLeave={() => setOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setOver(false);
+          pick(e.dataTransfer.files?.[0]);
+        }}
+        className={cn(
+          "flex aspect-[4/3] w-full cursor-pointer items-center justify-center rounded-xl border border-dashed text-xs transition-colors",
+          over
+            ? "border-accent bg-accent/5 text-accent-ink"
+            : "border-line bg-surface text-muted hover:border-accent/60 hover:text-accent-ink",
+          busy && "cursor-wait opacity-60",
+        )}
       >
-        + 画像を追加
-      </Button>
+        {busy ? "アップロード中…" : "＋ 画像を追加"}
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          disabled={busy}
+          onChange={(e) => pick(e.target.files?.[0])}
+        />
+      </label>
+      {error && <p className="text-[11px] text-red-600">{error}</p>}
     </div>
   );
 }
@@ -394,16 +420,66 @@ export function EditableField({
   field,
   value,
   onChange,
+  row,
+  onRowChange,
 }: {
   field: FieldDef;
   value: Value;
   onChange: (v: Value) => void;
+  /** client 型のように複数の列をまとめて扱う欄で使う。 */
+  row?: Row;
+  onRowChange?: (patch: Row) => void;
 }) {
   return (
     <div>
       <Label>{field.label}</Label>
-      <FieldInput field={field} value={value} onChange={onChange} />
+      {field.type === "client" && row && onRowChange ? (
+        <ClientField row={row} onChange={onRowChange} />
+      ) : (
+        <FieldInput field={field} value={value} onChange={onChange} />
+      )}
       {field.hint && <p className="mt-1 text-xs text-muted">{field.hint}</p>}
+    </div>
+  );
+}
+
+/**
+ * お客様の写真・企業名・お名前をひとまとまりで編集する欄。
+ * 左に写真、右に名前を置き、誰の事例かをその場で確かめられるようにする。
+ */
+function ClientField({
+  row,
+  onChange,
+}: {
+  row: Row;
+  onChange: (patch: Row) => void;
+}) {
+  return (
+    <div className="flex gap-4 rounded-xl border border-line bg-surface p-3">
+      <div className="w-28 shrink-0 sm:w-32">
+        <ImageField
+          value={String(row.imageUrl ?? "")}
+          onChange={(v) => onChange({ imageUrl: v })}
+        />
+      </div>
+      <div className="min-w-0 flex-1 space-y-2.5">
+        <div>
+          <p className="mb-1 text-xs text-muted">企業名（個人なら空欄）</p>
+          <Input
+            value={String(row.companyName ?? "")}
+            placeholder="株式会社サンプル"
+            onChange={(e) => onChange({ companyName: e.target.value })}
+          />
+        </div>
+        <div>
+          <p className="mb-1 text-xs text-muted">お名前</p>
+          <Input
+            value={String(row.clientName ?? "")}
+            placeholder="山田 太郎 様"
+            onChange={(e) => onChange({ clientName: e.target.value })}
+          />
+        </div>
+      </div>
     </div>
   );
 }
