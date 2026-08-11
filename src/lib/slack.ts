@@ -1,4 +1,5 @@
 import "server-only";
+import { downloadUrl, flagOf } from "./contact-format";
 
 /**
  * お問い合わせを Slack へ流す。
@@ -24,20 +25,6 @@ export type ContactForSlack = {
   attachmentUrl?: string | null;
   createdAt?: Date | string | null;
 };
-
-/**
- * ISO の 2 文字コードを旗の絵文字にする。管理画面と同じ見え方に揃える。
- * 各文字を「地域表示記号」へ移すと、2 文字の並びが旗として描画される。
- */
-function flagOf(code: string | null | undefined): string {
-  if (!code || !/^[A-Za-z]{2}$/.test(code)) return "";
-  return String.fromCodePoint(
-    ...code
-      .toUpperCase()
-      .split("")
-      .map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
-  );
-}
 
 /** 設定済みかどうか。未設定なら通知処理そのものを飛ばす。 */
 export function isSlackConfigured(): boolean {
@@ -138,9 +125,7 @@ export async function notifyContact(row: ContactForSlack): Promise<void> {
   if (row.attachmentUrl) {
     // 保存用は fl_attachment を挟む。そのままの URL では Slack から
     // 押したときにブラウザで開くだけになる。
-    const download = row.attachmentUrl.includes("res.cloudinary.com")
-      ? row.attachmentUrl.replace("/upload/", "/upload/fl_attachment/")
-      : row.attachmentUrl;
+    const download = downloadUrl(row.attachmentUrl);
     blocks.push({
       type: "section",
       text: {

@@ -27,9 +27,10 @@ export default async function AdminSectionPage({
   if (!def.singleton && cols.order) orderBy.push(asc(cols.order));
   if (cols.id) orderBy.push(asc(cols.id));
 
-  const rows = (await db.select().from(def.table).orderBy(...orderBy)) as Array<
-    Record<string, unknown> & { id?: number }
-  >;
+  const rows = (await db
+    .select()
+    .from(def.table)
+    .orderBy(...orderBy)) as Array<Record<string, unknown> & { id?: number }>;
 
   return (
     <AdminShell>

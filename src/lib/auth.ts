@@ -38,7 +38,9 @@ export async function createSessionToken(): Promise<string> {
 }
 
 /** Returns true if the token is a valid, unexpired admin session. */
-export async function verifySessionToken(token: string | undefined): Promise<boolean> {
+export async function verifySessionToken(
+  token: string | undefined,
+): Promise<boolean> {
   if (!token) return false;
   try {
     const { payload } = await jwtVerify(token, getSecret());

@@ -25,7 +25,10 @@ export function Logo({
     <span className="inline-flex items-center gap-2.5">
       <svg
         viewBox="0 0 200 200"
-        className={cn("shrink-0 transition-[width,height] duration-300 ease-out", markClassName)}
+        className={cn(
+          "shrink-0 transition-[width,height] duration-300 ease-out",
+          markClassName,
+        )}
         role="img"
         aria-label={showName ? undefined : "WEB-XR.studio"}
         aria-hidden={showName ? true : undefined}
@@ -71,12 +74,18 @@ export function Logo({
   // Both the mark and the wordmark inherit `currentColor`, so a caller on a
   // dark background can recolor the whole logo with a single text utility.
   const content = (
-    <span className={cn("inline-flex items-center text-ink", className)}>{mark}</span>
+    <span className={cn("inline-flex items-center text-ink", className)}>
+      {mark}
+    </span>
   );
 
   if (href === null) return content;
   return (
-    <Link href={href} className="inline-flex items-center" aria-label="WEB-XR.studio ホーム">
+    <Link
+      href={href}
+      className="inline-flex items-center"
+      aria-label="WEB-XR.studio ホーム"
+    >
       {content}
     </Link>
   );

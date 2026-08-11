@@ -42,7 +42,9 @@ function LoginForm() {
         <div className="mb-6 flex justify-center">
           <Logo href={null} />
         </div>
-        <h1 className="mb-1 text-center text-lg font-bold text-ink">管理画面ログイン</h1>
+        <h1 className="mb-1 text-center text-lg font-bold text-ink">
+          管理画面ログイン
+        </h1>
         <p className="mb-6 text-center text-sm text-muted">
           コンテンツを編集するにはログインしてください。
         </p>
@@ -59,7 +61,9 @@ function LoginForm() {
             />
           </FieldGroup>
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              {error}
+            </p>
           )}
           <Button type="submit" size="lg" disabled={busy} className="w-full">
             {busy ? "確認中..." : "ログイン"}

@@ -11,16 +11,25 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "リクエストが不正です。" }, { status: 400 });
+    return NextResponse.json(
+      { error: "リクエストが不正です。" },
+      { status: 400 },
+    );
   }
 
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "パスワードを入力してください。" }, { status: 400 });
+    return NextResponse.json(
+      { error: "パスワードを入力してください。" },
+      { status: 400 },
+    );
   }
 
   if (!verifyPassword(parsed.data.password)) {
-    return NextResponse.json({ error: "パスワードが正しくありません。" }, { status: 401 });
+    return NextResponse.json(
+      { error: "パスワードが正しくありません。" },
+      { status: 401 },
+    );
   }
 
   const token = await createSessionToken();

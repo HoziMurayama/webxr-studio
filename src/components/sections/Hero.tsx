@@ -47,7 +47,10 @@ export function Hero({ company }: { company: Company | null }) {
             // otherwise wrap after the mark in the narrower heading column.
             // `text-[7.5vw]` below `sm` keeps the un-wrappable name inside even a
             // 320px viewport; from `sm` up the fixed sizes always fit.
-            className="whitespace-nowrap text-[7.5vw] font-black leading-[1.1] tracking-tight text-white sm:text-5xl xl:text-6xl"
+            // 見出しの文字列は列の幅いっぱいには届かないので、そのままだと
+            // 下の説明文の右端との間に余りが出て、左に寄って見える。列の
+            // 中央に置いて、下のかたまりと中心を合わせる。
+            className="whitespace-nowrap text-center text-[7.5vw] font-black leading-[1.1] tracking-tight text-white sm:text-5xl xl:text-6xl"
           >
             {taglineWithMark(tagline)}
           </h1>

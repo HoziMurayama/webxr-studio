@@ -10,7 +10,8 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary: "bg-accent text-white hover:bg-accent-hover",
-  secondary: "bg-card text-accent-ink border border-accent/40 hover:border-accent hover:bg-accent/5",
+  secondary:
+    "bg-card text-accent-ink border border-accent/40 hover:border-accent hover:bg-accent/5",
   ghost: "text-ink-soft hover:text-ink hover:bg-surface",
 };
 
@@ -35,7 +36,10 @@ export function Button({
   ...props
 }: CommonProps & ComponentProps<"button">) {
   return (
-    <button className={cn(base, variants[variant], sizes[size], className)} {...props}>
+    <button
+      className={cn(base, variants[variant], sizes[size], className)}
+      {...props}
+    >
       {children}
     </button>
   );
@@ -49,7 +53,10 @@ export function ButtonLink({
   ...props
 }: CommonProps & ComponentProps<typeof Link>) {
   return (
-    <Link className={cn(base, variants[variant], sizes[size], className)} {...props}>
+    <Link
+      className={cn(base, variants[variant], sizes[size], className)}
+      {...props}
+    >
       {children}
     </Link>
   );

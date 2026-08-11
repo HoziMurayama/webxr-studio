@@ -7,7 +7,10 @@ import { ContactsTable } from "@/components/admin/ContactsTable";
 export const dynamic = "force-dynamic";
 
 export default async function AdminContactsPage() {
-  const rows = await db.select().from(contacts).orderBy(desc(contacts.createdAt));
+  const rows = await db
+    .select()
+    .from(contacts)
+    .orderBy(desc(contacts.createdAt));
   return (
     <AdminShell>
       <div className="mb-6">

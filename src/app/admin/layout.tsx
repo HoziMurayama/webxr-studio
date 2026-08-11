@@ -7,6 +7,10 @@ export const metadata: Metadata = {
 
 // Passthrough layout. The dashboard pages wrap themselves in <AdminShell>;
 // the login page renders its own full-screen UI. Auth is enforced by proxy.ts.
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return children;
 }
