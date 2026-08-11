@@ -17,6 +17,9 @@ const ALLOWED = new Set([
   "image/avif",
 ]);
 
+/** MIME 型が付かない送信元のための、拡張子による判定。 */
+const ALLOWED_EXT = new Set(["jpg", "jpeg", "png", "webp", "gif", "avif"]);
+
 export async function POST(request: Request) {
   if (!isConfigured()) {
     return NextResponse.json(
@@ -45,9 +48,14 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  if (!ALLOWED.has(file.type)) {
+  // ブラウザからは MIME 型が付くが、送信側によっては
+  // application/octet-stream になる。その場合は拡張子で判断する。
+  const ext = file.name.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] ?? "";
+  const okByType = ALLOWED.has(file.type);
+  const okByExt = ALLOWED_EXT.has(ext);
+  if (!okByType && !okByExt) {
     return NextResponse.json(
-      { error: `対応していない形式です（${file.type || "不明"}）。` },
+      { error: `対応していない形式です（${file.type || ext || "不明"}）。` },
       { status: 400 },
     );
   }

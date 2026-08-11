@@ -92,7 +92,7 @@ export type SectionDef = {
 export const SECTIONS: Record<string, SectionDef> = {
   company: {
     slug: "company",
-    label: "会社概要",
+    label: "会社案内",
     table: company,
     schema: companySchema,
     singleton: true,
@@ -113,7 +113,7 @@ export const SECTIONS: Record<string, SectionDef> = {
   },
   portfolio: {
     slug: "portfolio",
-    label: "制作実績",
+    label: "お客様事例",
     table: portfolio,
     schema: portfolioSchema,
     singleton: false,
@@ -169,7 +169,7 @@ export const SECTIONS: Record<string, SectionDef> = {
   },
   site_settings: {
     slug: "site_settings",
-    label: "サイト設定",
+    label: "サイト共通設定",
     table: siteSettings,
     schema: settingsSchema,
     singleton: true,

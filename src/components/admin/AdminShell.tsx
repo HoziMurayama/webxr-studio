@@ -6,16 +6,26 @@ import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
-// サイトに反映される項目だけを並べる。サービス内容・クライアントの声・
-// チーム紹介はコード内の定数で表示しており、DB を編集しても公開側は
-// 変わらないため、管理画面からは外している。
-const NAV = [
+/**
+ * 公開サイトのページ単位で並べる。「どのページを直したいか」から入れる
+ * ほうが、テーブル名で探すより迷わないため。`page` はそのセクションが
+ * 反映される公開ページで、メニューに小さく添える。
+ *
+ * サービス内容・クライアントの声・チーム紹介はコード内の定数で表示して
+ * おり、DB を編集しても公開側は変わらないため置いていない。
+ */
+const NAV: {
+  href: string;
+  label: string;
+  page?: string;
+  exact?: boolean;
+}[] = [
   { href: "/admin", label: "ダッシュボード", exact: true },
-  { href: "/admin/company", label: "会社概要" },
-  { href: "/admin/portfolio", label: "制作実績" },
-  { href: "/admin/faqs", label: "よくある質問" },
-  { href: "/admin/site_settings", label: "サイト設定" },
-  { href: "/admin/contacts", label: "お問い合わせ" },
+  { href: "/admin/company", label: "会社案内", page: "/company" },
+  { href: "/admin/portfolio", label: "お客様事例", page: "/case-study" },
+  { href: "/admin/faqs", label: "よくある質問", page: "/faq" },
+  { href: "/admin/contacts", label: "お問い合わせ", page: "/contact" },
+  { href: "/admin/site_settings", label: "サイト共通設定" },
   { href: "/admin/ai", label: "AIインデックス" },
 ];
 
@@ -52,6 +62,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               )}
             >
               {item.label}
+              {/* どの公開ページに出るかを添える。編集前に行き先が分かる。 */}
+              {item.page && (
+                <span
+                  className={cn(
+                    "mt-0.5 block text-[11px]",
+                    isActive(item) ? "text-white/60" : "text-muted",
+                  )}
+                >
+                  {item.page}
+                </span>
+              )}
             </Link>
           </li>
         ))}

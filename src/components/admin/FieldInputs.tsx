@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Input, Textarea, Label } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import type { FieldDef } from "@/lib/sections";
+import { cn } from "@/lib/utils";
 
 type Value = unknown;
 type Row = Record<string, Value>;
@@ -129,6 +130,10 @@ function ImageField({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
+  const [over, setOver] = useState(false);
+  // URL 欄は既定で畳む。既に URL が入っているものだけ開いておく必要はなく、
+  // ふだんはドラッグかファイル選択で足りるため。
+  const [showUrl, setShowUrl] = useState(false);
 
   async function pick(file: File | undefined) {
     if (!file) return;
@@ -148,7 +153,33 @@ function ImageField({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-start gap-3">
+      {/* 枠ごと落とせるようにする。ファイル選択のダイアログを開かずに
+          済むほうが、まとめて差し替えるときに速い。 */}
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!busy) setOver(true);
+        }}
+        onDragLeave={() => setOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setOver(false);
+          pick(e.dataTransfer.files?.[0]);
+        }}
+        // スクリーンショットをそのまま貼れるようにする。
+        onPaste={(e) => {
+          const f = Array.from(e.clipboardData.files)[0];
+          if (f) {
+            e.preventDefault();
+            pick(f);
+          }
+        }}
+        className={cn(
+          "flex items-start gap-3 rounded-xl border border-dashed p-3 transition-colors",
+          over ? "border-accent bg-accent/5" : "border-line bg-surface",
+          busy && "opacity-60",
+        )}
+      >
         {/* プレビュー。next/image は外部ドメインの設定が要るので、ここは
             管理画面限定の素の img で足りる。 */}
         {value ? (
@@ -156,22 +187,30 @@ function ImageField({
           <img
             src={value}
             alt=""
-            className="h-20 w-20 shrink-0 rounded-lg border border-line bg-surface object-contain"
+            className="h-24 w-24 shrink-0 rounded-lg border border-line bg-card object-contain"
           />
         ) : (
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-dashed border-line bg-surface text-xs text-muted">
-            なし
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg border border-dashed border-line bg-card text-xs text-muted">
+            画像なし
           </div>
         )}
-        <div className="min-w-0 flex-1 space-y-2">
-          <Input
-            value={value}
-            placeholder="https://res.cloudinary.com/..."
-            onChange={(e) => onChange(e.target.value)}
-          />
-          <div className="flex items-center gap-2">
-            <label className="inline-flex cursor-pointer items-center rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface">
-              {busy ? "アップロード中…" : "画像を選ぶ"}
+
+        <div className="min-w-0 flex-1">
+          <p className="text-sm text-ink-soft">
+            {busy ? "アップロード中…" : "ここに画像をドラッグ、または貼り付け"}
+          </p>
+          <p className="mt-0.5 text-xs text-muted">
+            JPG / PNG / WebP など。自動で WebP に変換して保存します。
+          </p>
+
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <label
+              className={cn(
+                "inline-flex items-center rounded-lg border border-line bg-card px-3 py-1.5 text-xs font-medium text-ink",
+                busy ? "cursor-not-allowed" : "cursor-pointer hover:bg-surface",
+              )}
+            >
+              ファイルを選ぶ
               <input
                 type="file"
                 accept="image/*"
@@ -192,9 +231,31 @@ function ImageField({
                 削除
               </button>
             )}
-            {note && <span className="text-xs text-muted">WebP {note}</span>}
+            <button
+              type="button"
+              onClick={() => setShowUrl((v) => !v)}
+              className="rounded-lg px-2 py-1.5 text-xs text-muted hover:bg-card hover:text-ink"
+            >
+              {showUrl ? "URL を隠す" : "URL で指定"}
+            </button>
+            {note && (
+              <span className="text-xs font-medium text-accent-ink">
+                WebP {note}
+              </span>
+            )}
           </div>
-          {error && <p className="text-xs text-red-600">{error}</p>}
+
+          {/* 既存の URL を直したいときだけ開く。ふだんは畳んでおく。 */}
+          {showUrl && (
+            <div className="mt-2">
+              <Input
+                value={value}
+                placeholder="https://res.cloudinary.com/..."
+                onChange={(e) => onChange(e.target.value)}
+              />
+            </div>
+          )}
+          {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
         </div>
       </div>
     </div>
