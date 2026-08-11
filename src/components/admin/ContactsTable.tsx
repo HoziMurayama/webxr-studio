@@ -8,6 +8,62 @@ import { cn } from "@/lib/utils";
 const NOTIFY_KEY = "webxr-admin-notify";
 
 /**
+ * ブラウザがそのまま開ける拡張子。
+ *
+ * 画像・PDF・動画・音声・テキストは新しいタブで見られる。zip や Office
+ * 形式は開けずに落ちるだけなので、閲覧ボタンを出さずダウンロードに絞る。
+ */
+const VIEWABLE = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "avif",
+  "svg",
+  "bmp",
+  "ico",
+  "pdf",
+  "mp4",
+  "webm",
+  "ogv",
+  "mov",
+  "mp3",
+  "wav",
+  "ogg",
+  "m4a",
+  "txt",
+  "csv",
+  "json",
+  "xml",
+  "md",
+]);
+
+function extOf(nameOrUrl: string): string {
+  // URL のクエリや断片を落としてから拡張子を見る。
+  const clean = nameOrUrl.split(/[?#]/)[0] ?? "";
+  return clean.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] ?? "";
+}
+
+/** その添付をブラウザで開けるか。 */
+function canView(name: string, url: string): boolean {
+  return VIEWABLE.has(extOf(name) || extOf(url));
+}
+
+/**
+ * 保存用の URL。
+ *
+ * `download` 属性は別ドメインの相手には効かず、Cloudinary の URL では
+ * ただ開くだけになる。`fl_attachment` を挟むと Content-Disposition が
+ * 付いて確実に保存される。data URL（旧データ）は同一文書扱いなので
+ * そのままで効く。
+ */
+function downloadUrl(url: string): string {
+  if (!url.includes("res.cloudinary.com")) return url;
+  return url.replace("/upload/", "/upload/fl_attachment/");
+}
+
+/**
  * ISO の 2 文字コードを旗の絵文字にする。
  *
  * 各文字を「地域表示記号」（U+1F1E6 から始まる A–Z）に移すと、2 文字の
@@ -51,7 +107,10 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
     let alive = true;
 
     async function poll() {
-      if (document.hidden) return;
+      // 通知が有効なら、タブが背面でも取りに行く。前面のときだけ動かすと
+      // 「別のタブを見ている間に届いた分」を知らせられず、通知の意味が
+      // 半分なくなるため。off のときは節約して前面だけにする。
+      if (document.hidden && !notify) return;
       try {
         const res = await fetch("/api/admin/contacts", { cache: "no-store" });
         if (!res.ok || !alive) return;
@@ -66,10 +125,18 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
 
         if (notify && typeof Notification !== "undefined") {
           for (const r of incoming.slice(0, 3)) {
-            new Notification("新しいお問い合わせ", {
+            const n = new Notification("新しいお問い合わせ", {
               body: `${r.name}様${r.company ? `（${r.company}）` : ""}\n${r.service || ""}`,
               tag: `contact-${r.id}`,
+              // 手を離している間に届くこともあるので、操作するまで残す。
+              requireInteraction: true,
             });
+            // 押したらこのタブへ戻す。別のタブを見ていても、その場で
+            // 内容を確かめられる。
+            n.onclick = () => {
+              window.focus();
+              n.close();
+            };
           }
         }
       } catch {
@@ -147,7 +214,7 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
         <div>
           <p className="text-sm font-medium text-ink">新着の通知</p>
           <p className="mt-0.5 text-xs text-muted">
-            この画面を開いている間、新しいお問い合わせをデスクトップ通知でお知らせします。
+            このタブを開いたままにしておけば、別のタブを見ている間でも新着をお知らせします。
           </p>
         </div>
         <button
@@ -237,28 +304,45 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
               {/* 添付。Cloudinary に上げたものは URL、旧データは data URL。
                   どちらも download 属性でそのまま保存できる。 */}
               {(r.attachmentUrl || r.attachmentData) && (
-                <a
-                  href={r.attachmentUrl || r.attachmentData}
-                  download={r.attachmentName || undefined}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-xs font-medium text-ink hover:bg-surface"
-                >
+                <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2">
                   <svg
                     viewBox="0 0 24 24"
                     aria-hidden
                     width="14"
                     height="14"
+                    className="shrink-0 text-muted"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M12 3v12M7 12l5 5 5-5M5 21h14" />
+                    <path d="M21.4 11.05 12.25 20.2a6 6 0 0 1-8.49-8.49l9.2-9.19a4 4 0 0 1 5.65 5.66l-9.2 9.19a2 2 0 0 1-2.82-2.83l8.49-8.48" />
                   </svg>
-                  {r.attachmentName || "添付ファイル"}
-                </a>
+                  <span className="min-w-0 flex-1 truncate text-xs text-ink">
+                    {r.attachmentName || "添付ファイル"}
+                  </span>
+
+                  {/* ブラウザで開ける形式だけ「開く」を出す。zip などは
+                      押しても落ちるだけなので、ダウンロードに絞る。 */}
+                  {canView(r.attachmentName, r.attachmentUrl) && (
+                    <a
+                      href={r.attachmentUrl || r.attachmentData}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 rounded-md border border-line bg-card px-2.5 py-1 text-xs font-medium text-ink hover:bg-surface-2"
+                    >
+                      開く
+                    </a>
+                  )}
+                  <a
+                    href={downloadUrl(r.attachmentUrl || r.attachmentData)}
+                    download={r.attachmentName || undefined}
+                    className="shrink-0 rounded-md border border-line bg-card px-2.5 py-1 text-xs font-medium text-ink hover:bg-surface-2"
+                  >
+                    保存
+                  </a>
+                </div>
               )}
 
               <div className="mt-4 flex gap-2">
