@@ -181,6 +181,10 @@ export async function notifyContact(row: ContactForSlack): Promise<void> {
         // 通知一覧やプレビューではこちらが出る。
         text: `新しいお問い合わせ：${who || row.name}様`,
         blocks,
+        // 添付の URL を Slack が勝手に展開して、同じものが二重に出るのを
+        // 防ぐ。リンクは本文側に置いてあるので、プレビューは要らない。
+        unfurl_links: false,
+        unfurl_media: false,
       }),
       signal: AbortSignal.timeout(5000),
     });
