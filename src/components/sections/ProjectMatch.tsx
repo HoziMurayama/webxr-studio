@@ -135,7 +135,7 @@ export function ProjectMatch() {
           onClick={() => setOpen(true)}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-base font-bold tracking-tight text-chrome shadow-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
         >
-          アイデアを入力する
+          即時解決OK
           <svg
             viewBox="0 0 20 20"
             aria-hidden
@@ -174,7 +174,7 @@ export function ProjectMatch() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="アイデアを入力する"
+          aria-label="即時解決OK"
           className={cn(
             "fixed inset-0 z-50 flex items-end justify-center bg-ink/60 backdrop-blur-sm sm:items-center sm:p-6",
             closing ? "modal-overlay-out" : "modal-overlay",
@@ -197,7 +197,7 @@ export function ProjectMatch() {
                   ? result.relevant
                     ? "ご相談内容の判定結果"
                     : "ご相談について"
-                  : "アイデアを入力する"}
+                  : "即時解決OK"}
               </p>
               <button
                 type="button"
