@@ -128,10 +128,16 @@ function ImageField({
   value,
   onChange,
   className,
+  /**
+   * 削除ボタンを出すか。ギャラリーでは枠ごと消す × を外側に置くので、
+   * こちらは出さない（× が2つ並んで、どちらを押すか迷うため）。
+   */
+  deletable = true,
 }: {
   value: string;
   onChange: (v: string) => void;
   className?: string;
+  deletable?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -204,7 +210,7 @@ function ImageField({
 
       {/* 削除は画像の右上に重ねる。label の中に入れるとクリックが
           ファイル選択に吸われるため、外に出して絶対配置する。 */}
-      {value && !busy && (
+      {deletable && value && !busy && (
         <button
           type="button"
           onClick={() => {
@@ -257,6 +263,7 @@ function ImageList({
           <div key={i} className="group relative">
             <ImageField
               value={r.value ?? ""}
+              deletable={false}
               onChange={(v) =>
                 onChange(
                   rows.map((row, idx) =>
@@ -265,12 +272,12 @@ function ImageList({
                 )
               }
             />
-            {/* 枠ごと取り除く。画像だけ消したいときは画像側の × を使う。 */}
+            {/* この1枚を取り除く。差し替えたいだけなら画像を押せばよい。 */}
             <button
               type="button"
               onClick={() => onChange(rows.filter((_, idx) => idx !== i))}
-              aria-label="この枠を削除"
-              className="absolute -right-1.5 -top-1.5 z-20 inline-flex h-6 w-6 items-center justify-center rounded-full border border-line bg-card text-muted opacity-0 shadow-sm transition-opacity hover:text-red-600 group-hover:opacity-100"
+              aria-label="この画像を削除"
+              className="absolute right-1.5 top-1.5 z-20 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink/60 text-white opacity-0 transition-opacity hover:bg-ink/85 group-hover:opacity-100"
             >
               <svg
                 viewBox="0 0 24 24"
