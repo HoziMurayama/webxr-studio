@@ -18,7 +18,11 @@ export async function GET(
 ) {
   const { section } = await ctx.params;
   const def = getSection(section);
-  if (!def) return NextResponse.json({ error: "不明なセクションです。" }, { status: 404 });
+  if (!def)
+    return NextResponse.json(
+      { error: "不明なセクションです。" },
+      { status: 404 },
+    );
 
   // `order` exists only on list sections; fall back to id ordering otherwise.
   const cols = getTableColumns(def.table) as Record<string, never>;
@@ -26,7 +30,10 @@ export async function GET(
   if (!def.singleton && cols.order) orderBy.push(asc(cols.order));
   if (cols.id) orderBy.push(asc(cols.id));
 
-  const rows = await db.select().from(def.table).orderBy(...orderBy);
+  const rows = await db
+    .select()
+    .from(def.table)
+    .orderBy(...orderBy);
   return NextResponse.json({ rows });
 }
 
@@ -36,7 +43,11 @@ export async function POST(
 ) {
   const { section } = await ctx.params;
   const def = getSection(section);
-  if (!def) return NextResponse.json({ error: "不明なセクションです。" }, { status: 404 });
+  if (!def)
+    return NextResponse.json(
+      { error: "不明なセクションです。" },
+      { status: 404 },
+    );
   if (def.singleton) {
     return NextResponse.json(
       { error: "このセクションは単一レコードのため作成できません。" },
@@ -48,7 +59,10 @@ export async function POST(
   const parsed = def.schema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "入力内容を確認してください。" },
+      {
+        error:
+          parsed.error.issues[0]?.message ?? "入力内容を確認してください。",
+      },
       { status: 400 },
     );
   }
@@ -60,7 +74,7 @@ export async function POST(
   const row = inserted[0];
 
   if (def.indexed && row?.id != null) {
-    await reindexRow(def.slug, row.id);
+    await reindexRow(def.tableName, row.id);
   }
 
   revalidatePath("/", "layout");

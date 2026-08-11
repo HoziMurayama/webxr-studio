@@ -25,8 +25,8 @@ export default async function AdminDashboard() {
   ]);
 
   const tiles = [
-    { label: "お客様事例", value: nPortfolio, href: "/admin/portfolio" },
-    { label: "よくある質問", value: nFaqs, href: "/admin/faqs" },
+    { label: "お客様事例", value: nPortfolio, href: "/admin/case-study" },
+    { label: "よくある質問", value: nFaqs, href: "/admin/faq" },
     {
       label: "お問い合わせ",
       value: nContacts,

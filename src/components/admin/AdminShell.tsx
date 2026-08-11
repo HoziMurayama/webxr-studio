@@ -21,8 +21,8 @@ const NAV: {
   exact?: boolean;
 }[] = [
   { href: "/admin", label: "ダッシュボード", exact: true },
-  { href: "/admin/portfolio", label: "お客様事例", page: "/case-study" },
-  { href: "/admin/faqs", label: "よくある質問", page: "/faq" },
+  { href: "/admin/case-study", label: "お客様事例", page: "/case-study" },
+  { href: "/admin/faq", label: "よくある質問", page: "/faq" },
   { href: "/admin/contacts", label: "お問い合わせ", page: "/contact" },
 ];
 

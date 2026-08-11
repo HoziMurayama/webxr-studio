@@ -83,7 +83,13 @@ export type FieldDef = {
 };
 
 export type SectionDef = {
+  /** 管理画面の URL。公開サイトのパスに合わせる（例: case-study）。 */
   slug: string;
+  /**
+   * DB のテーブル名。RAG の索引が `source_table` にこの名前で入っている
+   * ため、URL とは別に持つ。URL を変えても索引が壊れない。
+   */
+  tableName: string;
   label: string; // Japanese section name
   table: PgTable;
   schema: z.ZodTypeAny;
@@ -93,8 +99,9 @@ export type SectionDef = {
 };
 
 export const SECTIONS: Record<string, SectionDef> = {
-  portfolio: {
-    slug: "portfolio",
+  "case-study": {
+    slug: "case-study",
+    tableName: "portfolio",
     label: "お客様事例",
     table: portfolio,
     schema: portfolioSchema,
@@ -122,8 +129,9 @@ export const SECTIONS: Record<string, SectionDef> = {
       { name: "order", label: "表示順", type: "number" },
     ],
   },
-  faqs: {
-    slug: "faqs",
+  faq: {
+    slug: "faq",
+    tableName: "faqs",
     label: "よくある質問",
     table: faqs,
     schema: faqSchema,

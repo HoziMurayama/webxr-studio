@@ -22,7 +22,11 @@ export async function PATCH(
 ) {
   const { section, id } = await ctx.params;
   const def = getSection(section);
-  if (!def) return NextResponse.json({ error: "不明なセクションです。" }, { status: 404 });
+  if (!def)
+    return NextResponse.json(
+      { error: "不明なセクションです。" },
+      { status: 404 },
+    );
 
   const numId = Number(id);
   if (!Number.isInteger(numId)) {
@@ -33,12 +37,18 @@ export async function PATCH(
   const parsed = def.schema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "入力内容を確認してください。" },
+      {
+        error:
+          parsed.error.issues[0]?.message ?? "入力内容を確認してください。",
+      },
       { status: 400 },
     );
   }
 
-  const values = { ...(parsed.data as Record<string, unknown>), updatedAt: new Date() };
+  const values = {
+    ...(parsed.data as Record<string, unknown>),
+    updatedAt: new Date(),
+  };
 
   // Singletons are upserted by id so the row always exists after save.
   let row: { id: number } | undefined;
@@ -69,11 +79,15 @@ export async function PATCH(
       .where(eq(idColumn(def.table), numId))
       .returning()) as Array<{ id: number }>;
     row = updated[0];
-    if (!row) return NextResponse.json({ error: "対象が見つかりません。" }, { status: 404 });
+    if (!row)
+      return NextResponse.json(
+        { error: "対象が見つかりません。" },
+        { status: 404 },
+      );
   }
 
   if (def.indexed && row?.id != null) {
-    await reindexRow(def.slug, row.id);
+    await reindexRow(def.tableName, row.id);
   }
 
   // Drop the cached render of the public site, then tell open pages to refetch.
@@ -89,7 +103,11 @@ export async function DELETE(
 ) {
   const { section, id } = await ctx.params;
   const def = getSection(section);
-  if (!def) return NextResponse.json({ error: "不明なセクションです。" }, { status: 404 });
+  if (!def)
+    return NextResponse.json(
+      { error: "不明なセクションです。" },
+      { status: 404 },
+    );
   if (def.singleton) {
     return NextResponse.json(
       { error: "このセクションは削除できません。" },
@@ -106,7 +124,7 @@ export async function DELETE(
 
   // A delete can shift the index; rebuild just this table's chunks.
   if (def.indexed) {
-    await reindexTable(def.slug);
+    await reindexTable(def.tableName);
   }
 
   revalidatePath("/", "layout");
