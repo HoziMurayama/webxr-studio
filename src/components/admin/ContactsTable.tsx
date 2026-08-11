@@ -37,24 +37,34 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
   }, []);
 
   /**
-   * 新着を拾って通知する。
+   * 新着を取りに行く。
    *
-   * 管理画面を開いている間だけ動く。常駐の仕組み（Service Worker や
-   * Push）は用意していないので、閉じている間の分は次に開いたときに
-   * 一覧で確認する形になる。
+   * SSE ではなくポーリングにしている。既存の配信はサーバー1プロセスの
+   * メモリで購読者を持つ作りで、Vercel のように複数インスタンスへ分かれる
+   * 環境では、書き込みを受けたインスタンスに繋がっている人にしか届かない。
+   * DB を見に行けばどのインスタンスからでも同じ結果になる。
+   *
+   * 通知が off でも一覧は更新する。手動で読み込み直す手間をなくすため。
+   * 画面を見ていない間は止め、戻ったときに一度だけ取りに行く。
    */
   useEffect(() => {
-    if (!notify) return;
-    const timer = setInterval(async () => {
+    let alive = true;
+
+    async function poll() {
+      if (document.hidden) return;
       try {
         const res = await fetch("/api/admin/contacts", { cache: "no-store" });
-        if (!res.ok) return;
+        if (!res.ok || !alive) return;
         const data = (await res.json()) as { rows?: Contact[] };
         const fresh = data.rows ?? [];
         const incoming = fresh.filter((r) => r.id > seenId.current);
-        if (incoming.length) {
-          seenId.current = Math.max(...fresh.map((r) => r.id));
-          setRows(fresh);
+
+        // 件数や対応状況の変化も拾いたいので、新着が無くても差し替える。
+        setRows(fresh);
+        if (incoming.length === 0) return;
+        seenId.current = Math.max(...fresh.map((r) => r.id));
+
+        if (notify && typeof Notification !== "undefined") {
           for (const r of incoming.slice(0, 3)) {
             new Notification("新しいお問い合わせ", {
               body: `${r.name}様${r.company ? `（${r.company}）` : ""}\n${r.service || ""}`,
@@ -65,8 +75,19 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
       } catch {
         // 取得に失敗しても黙って次の周期を待つ。
       }
-    }, 30_000);
-    return () => clearInterval(timer);
+    }
+
+    const timer = setInterval(poll, 5_000);
+    // タブに戻った直後は、次の周期を待たずに取りに行く。
+    const onVisible = () => {
+      if (!document.hidden) poll();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [notify]);
 
   async function toggleNotify() {

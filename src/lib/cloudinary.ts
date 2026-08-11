@@ -138,6 +138,60 @@ export async function uploadAttachment(
   return { url: String(res.secure_url), bytes: Number(res.bytes ?? 0) };
 }
 
+/**
+ * 配信 URL から Cloudinary の public_id を取り出す。
+ *
+ * URL は .../upload/v1234567890/folder/name.webp の形。バージョン（v から
+ * 始まる数字）より後ろが public_id で、拡張子は含まない。当社が上げた
+ * ものだけを対象にしたいので、ホスト名も確かめる。
+ */
+function publicIdFromUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname !== "res.cloudinary.com") return null;
+    const parts = u.pathname.split("/").filter(Boolean);
+    const at = parts.indexOf("upload");
+    if (at === -1) return null;
+    let rest = parts.slice(at + 1);
+    // 変換パラメータやバージョンを読み飛ばす。
+    if (rest[0] && /^v\d+$/.test(rest[0])) rest = rest.slice(1);
+    if (rest.length === 0) return null;
+    const joined = rest.join("/");
+    return joined.replace(/\.[^./]+$/, "");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * URL で指す画像・ファイルを Cloudinary から消す。
+ *
+ * 行を消したのに実体が残ると、使われない画像が溜まり続ける。呼び出し側の
+ * 処理を止めたくないので、失敗しても投げずに false を返す。
+ */
+export async function deleteByUrl(url: string): Promise<boolean> {
+  if (!url || !isConfigured()) return false;
+  const publicId = publicIdFromUrl(url);
+  if (!publicId) return false;
+
+  try {
+    const client = getClient();
+    // 画像と、お問い合わせの添付（PDF など raw）の両方を試す。
+    // どちらの種類かは URL からは判別しきれないため。
+    for (const resourceType of ["image", "raw", "video"] as const) {
+      const res = await client.uploader.destroy(publicId, {
+        resource_type: resourceType,
+        invalidate: true,
+      });
+      if (res.result === "ok") return true;
+    }
+    return false;
+  } catch (err) {
+    console.error("cloudinary delete failed", publicId, err);
+    return false;
+  }
+}
+
 /** 設定済みかどうか。管理画面で「使えない」ことを先に伝えるために使う。 */
 export function isConfigured(): boolean {
   return Boolean(

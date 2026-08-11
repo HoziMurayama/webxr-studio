@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { getSection } from "@/lib/sections";
 import { reindexRow, reindexTable } from "@/lib/rag";
 import { publishContentChange } from "@/lib/realtime";
+import { deleteByUrl } from "@/lib/cloudinary";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,39 @@ export const runtime = "nodejs";
 
 function idColumn(table: PgTable) {
   return (getTableColumns(table) as Record<string, never>).id;
+}
+
+/**
+ * 行が抱えている Cloudinary の URL を全て拾う。
+ *
+ * 列名を決め打ちにせず値の形で判断する。事例の画像・ギャラリー、
+ * お問い合わせの添付と保存先が散っており、列を増やすたびにここを直す
+ * のは漏れやすいため。
+ */
+function collectCloudinaryUrls(row: Record<string, unknown> | undefined) {
+  if (!row) return [];
+  const urls = new Set<string>();
+  const isCloudinary = (v: unknown): v is string =>
+    typeof v === "string" && v.includes("res.cloudinary.com");
+
+  for (const value of Object.values(row)) {
+    if (isCloudinary(value)) {
+      urls.add(value);
+      continue;
+    }
+    // ギャラリーのような [{label, value}] の配列。
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (isCloudinary(item)) urls.add(item);
+        else if (item && typeof item === "object") {
+          for (const inner of Object.values(item as Record<string, unknown>)) {
+            if (isCloudinary(inner)) urls.add(inner);
+          }
+        }
+      }
+    }
+  }
+  return [...urls];
 }
 
 export async function PATCH(
@@ -120,7 +154,21 @@ export async function DELETE(
     return NextResponse.json({ error: "IDが不正です。" }, { status: 400 });
   }
 
+  // 消す前に、その行が抱えている Cloudinary の URL を控える。行を消して
+  // からでは辿れず、使われないファイルが溜まり続けるため。
+  const [before] = await db
+    .select()
+    .from(def.table)
+    .where(eq(idColumn(def.table), numId))
+    .limit(1);
+
   await db.delete(def.table).where(eq(idColumn(def.table), numId));
+
+  // 実体の削除は行の削除に付随する後始末。失敗しても 200 を返す
+  // （DB からは既に消えており、呼び出し側にできることがない）。
+  for (const url of collectCloudinaryUrls(before)) {
+    await deleteByUrl(url);
+  }
 
   // A delete can shift the index; rebuild just this table's chunks.
   if (def.indexed) {

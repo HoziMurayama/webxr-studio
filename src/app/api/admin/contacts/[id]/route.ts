@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { contacts } from "@/db/schema";
+import { deleteByUrl } from "@/lib/cloudinary";
 
 export const runtime = "nodejs";
 
@@ -27,7 +28,11 @@ export async function PATCH(
     .set({ handled: parsed.data.handled })
     .where(eq(contacts.id, numId))
     .returning();
-  if (!row) return NextResponse.json({ error: "対象が見つかりません。" }, { status: 404 });
+  if (!row)
+    return NextResponse.json(
+      { error: "対象が見つかりません。" },
+      { status: 404 },
+    );
   return NextResponse.json({ row });
 }
 
@@ -41,6 +46,19 @@ export async function DELETE(
   if (!Number.isInteger(numId)) {
     return NextResponse.json({ error: "IDが不正です。" }, { status: 400 });
   }
+  // 添付の実体も消す。行だけ消すと Cloudinary に使われないファイルが
+  // 残り続けるため。URL は行を消す前に控えておく。
+  const [before] = await db
+    .select({ attachmentUrl: contacts.attachmentUrl })
+    .from(contacts)
+    .where(eq(contacts.id, numId))
+    .limit(1);
+
   await db.delete(contacts).where(eq(contacts.id, numId));
+
+  if (before?.attachmentUrl) {
+    await deleteByUrl(before.attachmentUrl);
+  }
+
   return NextResponse.json({ ok: true });
 }
