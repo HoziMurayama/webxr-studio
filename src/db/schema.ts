@@ -93,6 +93,8 @@ export const contacts = pgTable("contacts", {
   // 送信元。どこからの問い合わせかを管理画面で見るために持つ。
   ip: text("ip").notNull().default(""),
   country: text("country").notNull().default(""),
+  // ISO の 2 文字コード。旗の絵文字に変換して使う。
+  countryCode: text("country_code").notNull().default(""),
   city: text("city").notNull().default(""),
   handled: boolean("handled").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),

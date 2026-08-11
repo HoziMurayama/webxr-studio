@@ -13,7 +13,10 @@ import { v2 as cloudinary } from "cloudinary";
 /** 事例画像の置き場。Cloudinary 上でフォルダ分けしておくと後から探しやすい。 */
 const FOLDER = "webxr-studio/case";
 
-/** アップロード上限。管理画面からの誤操作で巨大な原本が飛ぶのを防ぐ。 */
+/**
+ * 管理画面の画像アップロード上限。誤操作で巨大な原本が飛ぶのを防ぐ。
+ * お問い合わせの添付（50MB まで）とは別の値。
+ */
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 let configured = false;

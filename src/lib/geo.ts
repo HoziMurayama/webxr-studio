@@ -34,7 +34,7 @@ function isPrivate(ip: string): boolean {
   );
 }
 
-export type Geo = { country: string; city: string };
+export type Geo = { country: string; countryCode: string; city: string };
 
 /**
  * IP から国と都市を引く。
@@ -44,23 +44,29 @@ export type Geo = { country: string; city: string };
  * 打ち切り、地域が空のまま保存する（問い合わせを落とさないため）。
  */
 export async function lookupIp(ip: string): Promise<Geo> {
-  if (isPrivate(ip)) return { country: "", city: "" };
+  if (isPrivate(ip)) return { country: "", countryCode: "", city: "" };
 
   try {
     const ctl = AbortSignal.timeout(3000);
     const res = await fetch(
-      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,country,city`,
+      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,country,countryCode,city`,
       { signal: ctl, cache: "no-store" },
     );
-    if (!res.ok) return { country: "", city: "" };
+    if (!res.ok) return { country: "", countryCode: "", city: "" };
     const data = (await res.json()) as {
       status?: string;
       country?: string;
+      countryCode?: string;
       city?: string;
     };
-    if (data.status !== "success") return { country: "", city: "" };
-    return { country: data.country ?? "", city: data.city ?? "" };
+    if (data.status !== "success")
+      return { country: "", countryCode: "", city: "" };
+    return {
+      country: data.country ?? "",
+      countryCode: data.countryCode ?? "",
+      city: data.city ?? "",
+    };
   } catch {
-    return { country: "", city: "" };
+    return { country: "", countryCode: "", city: "" };
   }
 }

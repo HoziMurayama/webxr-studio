@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /** 添付ファイルの上限（data URL 換算）。Base64 で約 1.37 倍に膨らむ。 */
-const MAX_ATTACHMENT = 2 * 1024 * 1024 * 1.4;
+const MAX_ATTACHMENT = 50 * 1024 * 1024 * 1.4;
 
 /**
  * 本文は改行だけを持つ素のテキストとして保存する。エディタ由来の HTML を
@@ -48,7 +48,7 @@ const schema = z.object({
   attachmentName: z.string().trim().max(255).optional().default(""),
   attachmentData: z
     .string()
-    .max(MAX_ATTACHMENT, "添付ファイルは 2MB 以内にしてください。")
+    .max(MAX_ATTACHMENT, "添付ファイルは 50MB 以内にしてください。")
     .optional()
     .default(""),
 });
@@ -111,6 +111,7 @@ export async function POST(request: Request) {
     attachmentData: attachmentUrl ? "" : attachmentData,
     ip,
     country: geo.country,
+    countryCode: geo.countryCode,
     city: geo.city,
     message: sanitize(parsed.data.message),
   });

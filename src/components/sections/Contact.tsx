@@ -19,7 +19,7 @@ const SERVICES = [
   "その他・相談したい",
 ];
 
-const MAX_FILE_BYTES = 2 * 1024 * 1024;
+const MAX_FILE_BYTES = 50 * 1024 * 1024;
 
 /**
  * useSearchParams はプリレンダリング時に Suspense 境界を必要とするため、
@@ -59,16 +59,19 @@ function ContactForm({
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
-  const [file, setFile] = useState<{ name: string; data: string } | null>(null);
+  const [file, setFile] = useState<{
+    name: string;
+    data: string;
+    size: number;
+  } | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
+  async function onPickFile(f: File | undefined) {
     if (!f) return setFile(null);
     if (f.size > MAX_FILE_BYTES) {
-      setError("添付ファイルは 2MB 以内にしてください。");
-      e.target.value = "";
+      setError("添付ファイルは 50MB 以内にしてください。");
       return setFile(null);
     }
     setError("");
@@ -78,7 +81,7 @@ function ContactForm({
       r.onerror = reject;
       r.readAsDataURL(f);
     });
-    setFile({ name: f.name, data });
+    setFile({ name: f.name, data, size: f.size });
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -150,7 +153,7 @@ function ContactForm({
         <form
           ref={formRef}
           onSubmit={onSubmit}
-          className="mt-10 border border-line bg-surface p-6 sm:p-10"
+          className="mt-10 rounded-2xl border border-line bg-card p-6 shadow-[0_1px_3px_rgb(13,16,23,0.04)] sm:p-10"
         >
           <fieldset className="space-y-6 border-0 p-0">
             <div className="grid gap-6 sm:grid-cols-2">
@@ -255,31 +258,89 @@ function ContactForm({
                   const text = e.clipboardData.getData("text/plain");
                   document.execCommand("insertText", false, text);
                 }}
-                className="min-h-56 w-full overflow-y-auto border border-line bg-card px-4 py-3 text-sm leading-relaxed text-ink focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25 [&:empty]:before:text-muted/70 [&:empty]:before:content-['ご相談内容をご記入ください。']"
+                // 角丸と枠線・フォーカス表現は他の入力欄（ui/Field.tsx の
+                // control）に合わせる。高さと行間だけ本文向けに広げている。
+                className="min-h-56 w-full overflow-y-auto rounded-xl border border-line bg-card px-4 py-3 text-sm leading-relaxed text-ink transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25 [&:empty]:before:text-muted/70 [&:empty]:before:content-['ご相談内容をご記入ください。']"
               />
             </div>
 
-            <FieldGroup label="添付ファイル" htmlFor="attachment">
-              <input
-                id="attachment"
-                type="file"
-                onChange={onPickFile}
-                className="w-full text-sm text-ink-soft file:mr-4 file:border file:border-line file:bg-card file:px-4 file:py-2 file:text-sm file:font-medium file:text-ink hover:file:bg-surface"
-              />
-              <p className="mt-2 text-xs text-muted">
-                {file
-                  ? `選択中: ${file.name}`
-                  : "2MB までのファイルを添付できます。"}
-              </p>
-            </FieldGroup>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-ink">
+                添付ファイル
+              </label>
+              {/* 枠ごと落とせるようにする。仕様書やスクリーンショットを
+                  そのまま渡せるほうが、相談の往復が減る。 */}
+              <label
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOver(false);
+                  onPickFile(e.dataTransfer.files?.[0]);
+                }}
+                className={cn(
+                  "flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-4 py-8 text-center transition-colors",
+                  dragOver
+                    ? "border-accent bg-accent/5"
+                    : "border-line bg-card hover:border-accent/60",
+                )}
+              >
+                {file ? (
+                  <>
+                    <p className="text-sm font-medium text-ink">{file.name}</p>
+                    <p className="mt-1 text-xs text-muted">
+                      {(file.size / 1024 / 1024).toFixed(1)}MB ・
+                      クリックで選び直す
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden
+                      className="h-6 w-6 text-muted"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 16V4M7 9l5-5 5 5M5 20h14" />
+                    </svg>
+                    <p className="mt-2 text-sm text-ink-soft">
+                      ファイルをドラッグ、またはクリックして選択
+                    </p>
+                    <p className="mt-1 text-xs text-muted">50MB まで</p>
+                  </>
+                )}
+                <input
+                  id="attachment"
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => onPickFile(e.target.files?.[0])}
+                />
+              </label>
+              {file && (
+                <button
+                  type="button"
+                  onClick={() => setFile(null)}
+                  className="mt-2 text-xs text-muted underline-offset-4 hover:text-red-600 hover:underline"
+                >
+                  添付を取り消す
+                </button>
+              )}
+            </div>
 
             {status === "success" && (
-              <p className="border-l-2 border-accent bg-accent/10 px-4 py-3 text-sm font-medium text-accent-ink">
+              <p className="rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-sm font-medium text-accent-ink">
                 送信しました。折り返しご連絡いたします。ありがとうございます。
               </p>
             )}
             {error && (
-              <p className="border-l-2 border-red-600 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+              <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-sm font-medium text-red-700">
                 {error}
               </p>
             )}

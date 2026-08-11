@@ -7,6 +7,22 @@ import { cn } from "@/lib/utils";
 /** 通知の可否をこの端末に覚えさせる。端末ごとの設定なので localStorage。 */
 const NOTIFY_KEY = "webxr-admin-notify";
 
+/**
+ * ISO の 2 文字コードを旗の絵文字にする。
+ *
+ * 各文字を「地域表示記号」（U+1F1E6 から始まる A–Z）に移すと、2 文字の
+ * 並びがその国の旗として描画される。画像を持たずに済む。
+ */
+function flagOf(code: string): string {
+  if (!/^[A-Za-z]{2}$/.test(code)) return "";
+  return String.fromCodePoint(
+    ...code
+      .toUpperCase()
+      .split("")
+      .map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
+  );
+}
+
 export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
   const [rows, setRows] = useState(initialRows);
   const [notify, setNotify] = useState(false);
@@ -181,7 +197,14 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
                   </span>
                 )}
                 {(r.country || r.city) && (
-                  <span>{[r.country, r.city].filter(Boolean).join(" / ")}</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    {flagOf(r.countryCode) && (
+                      <span aria-hidden className="text-sm leading-none">
+                        {flagOf(r.countryCode)}
+                      </span>
+                    )}
+                    {[r.country, r.city].filter(Boolean).join(" / ")}
+                  </span>
                 )}
                 {r.ip && <span className="tabular-nums">IP {r.ip}</span>}
               </div>
