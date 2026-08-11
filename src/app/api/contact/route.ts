@@ -5,6 +5,7 @@ import { contacts } from "@/db/schema";
 import { uploadAttachment, isConfigured } from "@/lib/cloudinary";
 import { lookupIp, clientIpFrom } from "@/lib/geo";
 import { publishContentChange } from "@/lib/realtime";
+import { notifyContact } from "@/lib/slack";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -103,21 +104,28 @@ export async function POST(request: Request) {
   const ip = clientIpFrom(request.headers);
   const geo = await lookupIp(ip);
 
-  await db.insert(contacts).values({
-    ...rest,
-    attachmentName,
-    attachmentUrl,
-    // Cloudinary に上げられた場合は data URL を持たない。
-    attachmentData: attachmentUrl ? "" : attachmentData,
-    ip,
-    country: geo.country,
-    countryCode: geo.countryCode,
-    city: geo.city,
-    message: sanitize(parsed.data.message),
-  });
+  const [row] = await db
+    .insert(contacts)
+    .values({
+      ...rest,
+      attachmentName,
+      attachmentUrl,
+      // Cloudinary に上げられた場合は data URL を持たない。
+      attachmentData: attachmentUrl ? "" : attachmentData,
+      ip,
+      country: geo.country,
+      countryCode: geo.countryCode,
+      city: geo.city,
+      message: sanitize(parsed.data.message),
+    })
+    .returning();
 
   // 管理画面を開いている端末へ知らせる。通知の可否は受け手側で決める。
   publishContentChange({ section: "contacts", action: "create" });
+
+  // Slack へ流す。管理画面を開いていないときに気づくための補助なので、
+  // 失敗しても送信は成功として返す（記録は DB に残っている）。
+  if (row) await notifyContact(row);
 
   return NextResponse.json({ ok: true });
 }
