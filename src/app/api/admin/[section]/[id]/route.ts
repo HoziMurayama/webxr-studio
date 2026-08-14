@@ -5,7 +5,6 @@ import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import { getSection } from "@/lib/sections";
 import { reindexRow, reindexTable } from "@/lib/rag";
-import { publishContentChange } from "@/lib/realtime";
 import { deleteByUrl } from "@/lib/cloudinary";
 
 export const runtime = "nodejs";
@@ -124,9 +123,8 @@ export async function PATCH(
     await reindexRow(def.tableName, row.id);
   }
 
-  // Drop the cached render of the public site, then tell open pages to refetch.
+  // 公開サイトのキャッシュを捨てる。次のアクセスで新しい内容が出る。
   revalidatePath("/", "layout");
-  publishContentChange({ section: def.slug, action: "update", id: row?.id });
 
   return NextResponse.json({ row });
 }
@@ -176,7 +174,6 @@ export async function DELETE(
   }
 
   revalidatePath("/", "layout");
-  publishContentChange({ section: def.slug, action: "delete", id: numId });
 
   return NextResponse.json({ ok: true });
 }

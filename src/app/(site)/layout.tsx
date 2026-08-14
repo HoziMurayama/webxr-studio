@@ -2,7 +2,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FooterBanner } from "@/components/layout/FooterBanner";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
-import { LiveContent } from "@/components/LiveContent";
 import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/content";
 
@@ -41,8 +40,10 @@ export default async function SiteLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Refreshes this route when an admin save is broadcast. Renders nothing. */}
-      <LiveContent />
+      {/* 管理画面の保存を待ち受ける常時接続は置かない。訪問者ごとに関数が
+          開きっぱなしになり、待っている間もずっと課金対象になるため。
+          このレイアウトは `force-dynamic` なので、次の遷移や再読み込みで
+          最新の内容が出る。 */}
       <Header />
       <main className="flex-1">{children}</main>
       {/* 全ページ共通の問い合わせ導線。フッターの直前に置く。 */}

@@ -92,7 +92,9 @@ npm run dev
 
 ### コンテンツの編集
 
-管理画面（`/admin`）の左メニューから各セクションを選び、項目を追加・編集・削除できます。変更は公開サイトに即時反映され、AI判定の知識（RAGインデックス）も保存時に自動で更新されます。
+管理画面（`/admin`）の左メニューから各セクションを選び、項目を追加・編集・削除できます。保存すると公開サイトのキャッシュが破棄され、次のアクセスから新しい内容になります。AI判定の知識（RAGインデックス）も保存時に自動で更新されます。
+
+> **メモ:** 以前は接続を張ったまま更新を待つ方式（SSE）でしたが、待っている間もサーバーの実行時間として課金され続けるため取りやめました。お問い合わせの新着は、管理画面を開いている間だけ30秒ごとに確認します。
 
 ### お問い合わせ
 
@@ -116,7 +118,7 @@ src/
       contact/           お問い合わせ送信
   components/            UI / sections / layout / admin / brand
   db/                    Drizzle schema・接続・migrate・seed
-  lib/                   auth / content / embeddings / rag / groq / sections
+  lib/                   auth / content / embeddings / rag / groq / sections / slack
   proxy.ts               管理エリアの認証ガード（Next.js 16 の Proxy）
 public/                  地図・沿革・チームなどの画像
 ```

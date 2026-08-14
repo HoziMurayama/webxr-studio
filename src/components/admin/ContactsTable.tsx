@@ -9,6 +9,15 @@ import { cn } from "@/lib/utils";
 const NOTIFY_KEY = "webxr-admin-notify";
 
 /**
+ * 新着を見に行く間隔。
+ *
+ * 問い合わせは1日に何件も来るものではないので、短くしても待ち時間が
+ * 縮むだけで、取りこぼしは減らない。画面を見ている間だけ動くので、
+ * 30秒あれば気づくのに十分で、費用も抑えられる。
+ */
+const POLL_MS = 30_000;
+
+/**
  * ブラウザがそのまま開ける拡張子。
  *
  * 画像・PDF・動画・音声・テキストは新しいタブで見られる。zip や Office
@@ -69,97 +78,111 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
   }, []);
 
   /**
-   * 新着を SSE で受け取る。
+   * 新着を見に行く。
    *
-   * ブラウザから数秒おきに HTTP を投げるのではなく、接続を張ったまま
-   * サーバーからの通知を待つ。変化が無い間は往復が発生しない。
+   * 以前は SSE で接続を張ったままにしていたが、待っている間もサーバーの
+   * 実行時間として課金され続けるため取りやめた。開いているだけで費用が
+   * 積み上がり、無料枠を使い切ってしまう。
    *
-   * 変化の検出はサーバー側で DB を見て行う。購読者をメモリに置く
-   * pub/sub は、Vercel のように複数インスタンスへ分かれる環境では
-   * 書き込みを受けた側にしか届かないため。
-   *
-   * 接続が切れたら EventSource が自動で繋ぎ直す。Vercel の実行時間の
-   * 上限でサーバー側から畳まれるので、これは通常運転の一部。
+   * 代わりに、この画面を見ている間だけ間隔をあけて問い合わせる。
+   * 背面のタブや別ウィンドウでは止め、前面に戻ったときにすぐ1回見る。
+   * 確認は最大 id と件数だけを返す軽い口を使い、変化があったときにだけ
+   * 一覧を取りに行く。
    */
   useEffect(() => {
-    // 通知が off のときは、背面にいる間は繋がない。前面に戻ったら張り直す。
-    let es: EventSource | null = null;
+    let timer: ReturnType<typeof setInterval> | undefined;
+    // 直前に見た状態。これと違えば何かが起きたと判断する。
+    let last = { maxId: seenId.current, total: initialRows.length };
+    // 取得が重なるのを防ぐ。回線が遅いときに何本も走らせない。
+    let busy = false;
 
-    /** 変化の知らせを受けたら、一覧を取り直して差分を通知する。 */
-    async function refresh() {
-      try {
-        const res = await fetch("/api/admin/contacts", { cache: "no-store" });
-        if (!res.ok) return;
-        const data = (await res.json()) as { rows?: Contact[] };
-        const fresh = data.rows ?? [];
-        const incoming = fresh.filter((r) => r.id > seenId.current);
+    /** 一覧を取り直し、増えた分を通知する。 */
+    async function pull() {
+      const res = await fetch("/api/admin/contacts", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = (await res.json()) as { rows?: Contact[] };
+      const fresh = data.rows ?? [];
+      const incoming = fresh.filter((r) => r.id > seenId.current);
 
-        setRows(fresh);
-        // 消えた行を選択に残さない。残っていると、次のまとめて削除で
-        // 件数だけが合わなくなる。
-        const alive = new Set(fresh.map((r) => r.id));
-        setSelected((prev) => {
-          const next = new Set([...prev].filter((id) => alive.has(id)));
-          return next.size === prev.size ? prev : next;
-        });
-        if (incoming.length === 0) return;
-        seenId.current = Math.max(...fresh.map((r) => r.id));
+      setRows(fresh);
+      // 消えた行を選択に残さない。残っていると、次のまとめて削除で
+      // 件数だけが合わなくなる。
+      const alive = new Set(fresh.map((r) => r.id));
+      setSelected((prev) => {
+        const next = new Set([...prev].filter((id) => alive.has(id)));
+        return next.size === prev.size ? prev : next;
+      });
+      if (incoming.length === 0) return;
+      seenId.current = Math.max(...fresh.map((r) => r.id));
 
-        if (notify && typeof Notification !== "undefined") {
-          for (const r of incoming.slice(0, 3)) {
-            const n = new Notification("新しいお問い合わせ", {
-              body: `${r.name}様${r.company ? `（${r.company}）` : ""}\n${r.service || ""}`,
-              tag: `contact-${r.id}`,
-              // 手を離している間に届くこともあるので、操作するまで残す。
-              requireInteraction: true,
-            });
-            // 押したらこのタブへ戻す。別のタブを見ていても、その場で
-            // 内容を確かめられる。
-            n.onclick = () => {
-              window.focus();
-              n.close();
-            };
-          }
+      if (notify && typeof Notification !== "undefined") {
+        for (const r of incoming.slice(0, 3)) {
+          const n = new Notification("新しいお問い合わせ", {
+            body: `${r.name}様${r.company ? `（${r.company}）` : ""}\n${r.service || ""}`,
+            tag: `contact-${r.id}`,
+            // 手を離している間に届くこともあるので、操作するまで残す。
+            requireInteraction: true,
+          });
+          // 押したらこのタブへ戻す。別のタブを見ていても、その場で
+          // 内容を確かめられる。
+          n.onclick = () => {
+            window.focus();
+            n.close();
+          };
         }
-      } catch {
-        // 取得に失敗しても接続は保つ。次の知らせで取り直せる。
       }
     }
 
-    function connect() {
-      if (es) return;
-      es = new EventSource("/api/admin/contacts/stream");
-      es.addEventListener("change", refresh);
-      es.onerror = () => {
-        // EventSource は自動で再接続する。ここでは閉じない。
-      };
+    /** 変化の有無だけを確かめ、あったときだけ一覧を取り直す。 */
+    async function check() {
+      if (busy || document.hidden) return;
+      busy = true;
+      try {
+        const res = await fetch("/api/admin/contacts/check", {
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const now = (await res.json()) as { maxId: number; total: number };
+        // 件数が減る（削除）のも変化として拾う。別の端末で消したとき、
+        // 手元の一覧に残り続けるのを防ぐ。
+        if (now.maxId === last.maxId && now.total === last.total) return;
+        last = now;
+        await pull();
+      } catch {
+        // 一時的な失敗は無視する。次の周期で取り直せる。
+      } finally {
+        busy = false;
+      }
     }
 
-    function disconnect() {
-      es?.close();
-      es = null;
+    function start() {
+      if (timer) return;
+      timer = setInterval(check, POLL_MS);
     }
 
-    // 通知が有効なら常時つなぐ。無効なら前面のときだけ。
-    const shouldConnect = () => notify || !document.hidden;
-    if (shouldConnect()) connect();
+    function stop() {
+      if (timer) clearInterval(timer);
+      timer = undefined;
+    }
 
+    // 前面にいる間だけ動かす。背面では止めて、戻ったらすぐ1回見る。
     const onVisible = () => {
-      if (shouldConnect()) {
-        connect();
-        // 切れていた間の分を取り戻す。
-        refresh();
+      if (document.hidden) {
+        stop();
       } else {
-        disconnect();
+        check();
+        start();
       }
     };
+
+    if (!document.hidden) start();
     document.addEventListener("visibilitychange", onVisible);
 
     return () => {
-      disconnect();
+      stop();
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [notify]);
+  }, [notify, initialRows.length]);
 
   async function toggleNotify() {
     if (typeof Notification === "undefined") {
@@ -280,7 +303,8 @@ export function ContactsTable({ initialRows }: { initialRows: Contact[] }) {
         <div>
           <p className="text-sm font-medium text-ink">新着の通知</p>
           <p className="mt-0.5 text-xs text-muted">
-            このタブを開いたままにしておけば、別のタブを見ている間でも新着をお知らせします。
+            このページを開いている間、新着を確認してお知らせします。Slack
+            を設定しておくと、閉じている間に届いた分もそちらで確認できます。
           </p>
         </div>
         <button
